@@ -2,16 +2,17 @@ import {memo} from 'react'
 import styles from './services.module.sass'
 import Image from 'next/image'
 import FadeUp from '/src/lib/fadeup'
+import Link from 'next/link'
 const services = [
-    ['Service-1', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
-    ['Service-2', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
-    ['Service-3', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
-    ['Service-4', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
-    ['Service-5', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
-    ['Service-6', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
-    ['Service-7', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
-    ['Service-8', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
-    ['Service-9', 'Description', "/dnt1.jpg", 'http://localhost:3000/services'],
+    ['Service-1', 'Description', "/dnt1.jpg", '/services'],
+    ['Service-2', 'Description', "/dnt1.jpg", '/services'],
+    ['Service-3', 'Description', "/dnt1.jpg", '/services'],
+    ['Service-4', 'Description', "/dnt1.jpg", '/services'],
+    ['Service-5', 'Description', "/dnt1.jpg", '/services'],
+    ['Service-6', 'Description', "/dnt1.jpg", '/services'],
+    ['Service-7', 'Description', "/dnt1.jpg", '/services'],
+    ['Service-8', 'Description', "/dnt1.jpg", '/services'],
+    ['Service-9', 'Description', "/dnt1.jpg", '/services'],
 ]
 function Services({services}){
     return <>
@@ -30,11 +31,13 @@ Services.defaultProps = {
 }
 
 function Service({title, desc, vis, slink}){
-    return <a className={styles.service} href={slink}>
-        <div className={styles.title}>{title}</div>
-        <div className={styles.desc}>{desc}</div>
-        <ServiceImage img={vis} alt="" />
-    </a>
+    return <Link href={slink}>
+        <a className={styles.service} >
+            <div className={styles.title}>{title}</div>
+            <div className={styles.desc}>{desc}</div>
+            <ServiceImage img={vis} alt="" />
+        </a>
+    </Link>
 }
 
 function ServiceImage({img, alt, children}){

@@ -31,7 +31,7 @@ function ScrollNav({selected, setSelected, setReset}){
             navRef.current.style.top = "-55px"
             window.onscroll = () => {
                 cur = window.pageYOffset
-                if (prev > cur) {navRef.current.style.top = "0"} 
+                if (prev > cur && navRef.current) {navRef.current.style.top = "0"} 
                 else {navRef.current.style.top = "-55px";}
                 prev = cur;
             }
@@ -41,9 +41,8 @@ function ScrollNav({selected, setSelected, setReset}){
 
     return <section className={css.navbar} ref={navRef}>
         {elems.map((elem,i) => {
-            return <Link href={links[i]} key={i} onClick={() => {reset_tst}}>
+            return <Link href={links[i]} key={i}>
                 <a 
-                    href={links[i]}
                     key={i} 
                     className={classnames(css.nav_elem, {[css.selected]: selected==i})}
                     onClick={() => {reset_tst()}}

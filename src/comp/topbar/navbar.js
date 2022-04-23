@@ -13,9 +13,8 @@ function NavBar({selected, setSelected}){
 
     return <section className={css.navbar}>
         {elems.map((elem,i) => {
-            return <Link href={links[i]} key={i} onClick={() => {reset_tst}}>
+            return <Link href={links[i]} key={i}>
                     <a 
-                        href={links[i]}
                         key={i} 
                         className={classnames(css.nav_elem, {[css.selected]: selected==i})}
                         onClick={() => {reset_tst()}}
