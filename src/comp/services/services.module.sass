@@ -1,0 +1,88 @@
+@use "sass:math"
+$grid-gap: 60px
+
+.heading
+    margin-top: 100px
+    font-size: 100px
+    width: 100%
+    text-align: center
+
+.services
+    display: grid
+    width: 100%
+    grid-template-columns: auto auto auto
+    justify-items: center
+    align-items: center
+    justify-content: center
+    align-content: center
+    // border: 1px solid black
+    padding: 60px 0px 100px 0px
+
+    column-gap: $grid-gap
+    row-gap: $grid-gap
+
+
+
+.service
+    position: relative
+    //border: 1px solid transparent
+    aspect-ratio: 1 / 1
+    height: 300px
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    font-size: 24px
+    transition: 1000ms
+    cursor: pointer
+    text-align: center
+    border-radius: 10px
+    overflow: hidden
+    // box-shadow: 0px 5px 10px #888888
+        
+    &:hover
+        height: 380px
+        transition: 1000ms
+        // box-shadow: 0px 10px 20px #888888
+        .title
+            transition: 300ms
+            font-size: 26px
+        .service-image
+            filter: brightness(50%)
+            transition: 500ms
+
+
+.title
+    color: white
+    text-align: center
+    transition: 300ms
+    // cursor: pointer
+        
+    // &:hover
+    //     font-size: 26px
+
+.desc
+    font-size: 16px
+    color: white
+    text-align: center
+    transition: 300ms
+
+.vis
+    color: black
+    position: relative
+    // transition: 300ms
+    // cursor: pointer
+        
+    // &:hover
+    //     font-size: 26px
+
+.service-image
+    position: absolute
+    top:0
+    left:0
+    width: 100%
+    height: 100%
+    z-index: -10
+    overflow: hidden
+    background: white
+    transition: 500ms

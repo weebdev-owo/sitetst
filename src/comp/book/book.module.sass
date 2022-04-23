@@ -1,0 +1,70 @@
+.heading
+    font-size: 100px
+    width: 100%
+    text-align: center
+    padding: 100px
+
+
+
+.form
+    top: 0
+    left: 0
+    // border: 1px solid black
+    height: calc(100vh - 360px)
+    width: 100vw
+    display: grid
+    justify-content: center
+    align-content: start
+    // justify-items: center
+    // align-items: center
+
+.section
+    display: flex
+    flex-direction: column
+    padding-bottom: 2vh
+
+
+.label
+    color: grey
+
+.select
+    @extend .input
+    text-align: center
+
+.option
+    // text-align: center
+    font-size: 30px
+
+.input
+    font-size: 30px
+    border: white
+    border-radius: 20px
+    overflow: hidden
+    padding: 20px
+    color: grey
+    box-shadow: 2px 5px 5px rgba(0,0,0,0.2) inset
+    background-color: rgba(0,0,0,0.1)
+
+.submit
+    @extend .input
+    box-shadow: 0px 5px 5px rgba(0,0,0,0.2)
+    font-size: 24px
+    justify-self: center
+    width: 80%
+    height: 50px
+    text-align: center
+    padding: 10px
+    // transition: 100ms
+    // padding-top: 20px
+    justify-self: center
+    align-self: center
+
+    &:hover
+        cursor: pointer
+        color: black
+        border: 1px solid black
+        // transition: 100ms
+
+.submit-section
+    @extend .section
+    padding-top: 2vh

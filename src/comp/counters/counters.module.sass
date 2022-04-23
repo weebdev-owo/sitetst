@@ -1,0 +1,61 @@
+@use "sass:math"
+$topbar-height: 178px
+$remaining-height: calc(100vh - $topbar-height)
+$car-height: calc(max($remaining-height*0.5787, 640px))
+$counter-height: calc(100vh - ($car-height + $topbar-height))
+
+
+.counters
+    display: grid
+    width: 100%
+    height: $counter-height
+    min-height: 109px
+    grid-template-columns: repeat( 3, 300px )
+    // justify-items: center
+    // align-items: center
+    justify-content: center
+    align-content: center
+    // border: 1px solid black
+
+    column-gap: calc(15vw - 100px)
+
+
+
+.counter
+    // border: 1px solid black
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    font-size: 24px
+    transition: 300ms
+    cursor: pointer
+        
+    &:hover
+        .title
+            transition: 300ms
+            // font-size: 26px
+            color: black
+
+
+.title
+    color: grey
+    text-align: center
+    transition: 300ms
+    // cursor: pointer
+        
+    // &:hover
+    //     font-size: 26px
+
+.separator
+    width: 100%
+    height: 2px
+    background-color: grey
+
+.num
+    color: black
+    // transition: 300ms
+    // cursor: pointer
+        
+    // &:hover
+    //     font-size: 26px

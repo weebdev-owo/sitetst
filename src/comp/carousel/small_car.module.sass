@@ -1,0 +1,106 @@
+@use 'sass:math'
+$min-car-height: 640px
+$slide-height: 100%
+$dotnav-height: 30px
+$navbtn-height: 100px
+
+$topbar-height: 178px
+$remaining-height: calc(100vh - $topbar-height)
+$car-height: calc($remaining-height*0.5787)
+
+.carousel
+    width: 100%
+    height: $car-height
+    min-height: $min-car-height
+    position: relative
+    z-index: 200
+
+.slides
+    width: 100%
+    height: $slide-height
+    position: relative
+    overflow: hidden
+    border-top: 2px solid black
+    //border-bottom: 3px solid black
+
+.slide
+    width: 100%
+    height: 100%
+    position: absolute
+    overflow: hidden
+
+.slide_image
+    position: absolute
+    top:0
+    left:0
+    width: 100%
+    height: 100%
+    z-index: -10
+    overflow: hidden
+    background: white
+
+//contols
+.next
+    display: flex
+    margin: 0
+    padding-left: 200px
+    padding-right: 20px
+    position: absolute
+    top: 0
+    right: 0
+    height: $slide-height
+    font-size: 100px
+    justify-content: center
+    align-items: center
+    opacity: 0
+    transition: 400ms opacity
+
+    &:hover
+        color: white
+        cursor: pointer
+        opacity: 1
+
+.prev
+    display: flex
+    padding-left: 20px
+    padding-right: 200px
+    position: absolute
+    top: 0
+    left: 0
+    height: $slide-height
+    font-size: 100px
+    justify-content: center
+    align-items: center
+    opacity: 0
+    transition: 400ms opacity
+
+
+    &:hover
+        color: white
+        cursor: pointer
+        opacity: 1
+
+//dots
+.dots
+    z-index: 10
+    display: flex
+    width: 100%
+    height: $dotnav-height
+    justify-content: center
+    align-items: center
+    position: absolute
+    bottom: 0
+    left: 0
+    
+
+.dot
+    z-index: 1000
+    font-size:10px
+    padding: 10px
+    //border: solid 1px black
+    &:hover
+        color: grey
+        cursor: pointer
+
+.focused
+    color: white
