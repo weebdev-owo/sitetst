@@ -14,7 +14,7 @@ import Book from '/src/comp/book/book'
 import ScrollNav from '/src/comp/scrollnav/scrollnav'
 
 const imgs = ["/car2.jpg", "/car1.jpg"]
-const empty_reset = () => () => {console.log('reset not set')}
+const empty_reset = () => () => {}
 export default function Home(){
   const [reset, setReset] = useState(empty_reset)
   useEffect(() => {reset()},[reset])

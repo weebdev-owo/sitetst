@@ -18,21 +18,23 @@ function ScrollNav({selected, setSelected, setReset}){
         // router.push('')
         setTimeout(() => {
             if(navRef.current){
-                navRef.current.style.top = "-55px"
+                navRef.current.style.top = "-65px"
                 noHash()
             }
-        }, 100)
+        }, 200)
     }
 
 
     useEffect(() =>{
         if (window){
             prev = window.pageYOffset
-            navRef.current.style.top = "-55px"
+            navRef.current.style.top = "-65px"
             window.onscroll = () => {
                 cur = window.pageYOffset
-                if (prev > cur && navRef.current) {navRef.current.style.top = "0"} 
-                else {navRef.current.style.top = "-55px";}
+                if (navRef.current){
+                    if (prev > cur) {navRef.current.style.top = "0"} 
+                    else {navRef.current.style.top = "-65px";}
+                }
                 prev = cur;
             }
             setReset(() => reset_tst)

@@ -20,6 +20,7 @@
     transition: 4000ms max-height ease-in 4000ms opacity ease-in
     align-items: center
     justify-content: center
+    margin-bottom: 20px
 
 .question-text
     width: fit-content
@@ -31,9 +32,9 @@
     // line-height: 1px
     padding: 10px 40px 10px 40px
     color: grey
-    transition: 1000ms 
+    transition: 500ms 
     &:hover
-        transition: 1000ms border color
+        transition: 500ms border color
         border: 1px solid transparent
         cursor: pointer
         color: black
@@ -41,13 +42,13 @@
             color: grey
 
 .question-text-open
-    transition: 1000ms border color
+    transition: 500ms border color
     border: 1px solid transparent !important
     border-bottom: 1px solid black !important
     color: black
     &:hover
         border-bottom: 1px solid grey !important
-        transition: 1000ms border color
+        transition: 500ms border color
 
 
 
@@ -65,12 +66,14 @@
     overflow: hidden
     opacity: 0
     font-size: 20px
-    padding: 20px
     color: grey
+    padding: 0px 20px 0px 20px
 .answer-text-open
     opacity: 1
     max-height: 500px
     transition: 2000ms max-height ease-out 6000ms opacity ease-out
+    padding: 20px
+    padding-bottom: 40px
 
 
 .desc

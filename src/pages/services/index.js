@@ -11,7 +11,7 @@ import Book from '/src/comp/book/book'
 import ScrollNav from '/src/comp/scrollnav/scrollnav'
 import SetBg from '/src/lib/setbg'
 
-const empty_reset = () => () => {console.log('reset not set')}
+const empty_reset = () => () => {}
 export default function Service(){
     const elemRef = useRef(null)
     SetBg(elemRef)
