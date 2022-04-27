@@ -10,10 +10,11 @@ const loreum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
 const loreum2 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
 const questions = [loreum2, loreum2, loreum2, loreum2, loreum2]
 const answers = [loreum, loreum, loreum, loreum, loreum]
-function FAQ({questions, answers}){
+
+function FAQ({intro, questions, answers}){
     return <>
         <div className={styles["heading"]}>{".Info."}</div>
-        <FadeUp><Desc /></FadeUp>
+        <FadeUp><Desc text={intro}/></FadeUp>
         <div className={styles["questions"]}>
             {questions.map((question, i) =>{
                 return <FadeUp key={i}><Question question={question} answer={answers[i]}/></FadeUp>
@@ -43,14 +44,15 @@ function Question({question, answer}){
     </>
 }
 
-function Desc(){
+function Desc({text}){
     return <>
-        {/* <div className={styles["sub-heading"]}>.Why Us.</div> */}
         <div className={styles.desc}>
-            <div className={styles["desc-text"]}>{loreum}</div>
+            <div className={styles["desc-text"]}>{text}</div>
         </div>
     </>
-
+}
+Desc.default = {
+    text: loreum
 }
 
 export default FAQ

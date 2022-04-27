@@ -2,6 +2,7 @@ import {memo} from 'react'
 import styles from './book.module.sass'
 
 const services = ["loreum ipsum", "loreum ipsum", "loreum ipsum", "loreum ipsum"]
+
 function Book({services}){
 
     const addBooking = event => {
@@ -16,6 +17,7 @@ function Book({services}){
 
                 <div className={styles["section"]}>
                     <select id="services" className={styles["select"]} name="services">
+                        <option value="service" selected disabled hidden className={styles['option']}>{'service'}</option>
                         {services.map((service, i) => {return <option value={service} className={styles['option']} key={i}>{service}</option>})}
                     </select>
                 </div>

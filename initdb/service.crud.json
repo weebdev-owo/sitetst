@@ -1,0 +1,40 @@
+{  
+    "service-tile": {
+        "name": "service name",
+        "desc": "description text",
+        "img": "/dnt1.jpg",
+        "alt": "alt text for image",
+        "link": "/services"
+    },
+
+    "service-page": {
+        "intro": {
+            "title": "Service",
+            "desc": "service summary text",
+            "img": "/nani.png" 
+        },
+        
+        "summary": {
+            "imgs": ["/nani.png", "/nani.png", "/nani.png"],
+            "statements": ["statement"],
+            "texts": ["what", "why"]
+        },
+        
+        "process": {
+            "intro": "process intro text",
+            "steps": [["Step Name", "Step Text"]],
+            "imgs": ["/tree.png"]
+        },
+        
+        "faq": {
+            "intro": "faq intro text",
+            "questions": ["questions"],
+            "answers": ["answers"]
+        },
+        
+        "book": {
+            "services": true
+        }
+    }
+}
+
