@@ -23,7 +23,7 @@ function Desc(){
 
 function Dentists(){
     return <>
-    <div className={styles["sub-heading"]}>.Meet Our Team.</div>
+    <div className={styles["sub-heading"]}>Meet Our Team</div>
     <div className={styles.dentists}>
         <FadeUp><DentistL /></FadeUp> <FadeUp><DentistImageR img={"/doc.png"} alt="" /></FadeUp>
         <FadeUp><DentistImageL img={"/doc.png"} alt="" /></FadeUp> <FadeUp><DentistR /></FadeUp>

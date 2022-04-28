@@ -9,10 +9,12 @@
   },
   "dependencies": {
     "@next/bundle-analyzer": "^12.0.4",
+    "axios": "^0.27.2",
     "classnames": "^2.3.1",
     "cross-env": "^7.0.3",
     "db": "^3.3.1",
     "express": "^4.17.3",
+    "formik": "^2.2.9",
     "mongo": "^0.1.0",
     "mongoose": "^6.3.1",
     "next": "^12.1.5",
@@ -22,7 +24,8 @@
     "react-spring": "^9.3.1",
     "react-spring-carousel-js": "^1.9.30",
     "sass": "^1.43.4",
-    "sharp": "^0.29.3"
+    "sharp": "^0.29.3",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "eslint": "7",

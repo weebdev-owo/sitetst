@@ -8,7 +8,7 @@ export default async function handler (req, res) {
             // title: 'omnom',
             tst: 33,
             "service-tile": {
-                order: 19,
+                order: 10,
                 name: 'test namu3',
                 desc: "ree",
                 img: "/tree.png",
@@ -16,7 +16,7 @@ export default async function handler (req, res) {
                 link: "/services",
             },
         })
-        const services = await Service.find({})
+        const services = await Service.find()
         res.status(200).json({ success: true, data: services })
     } 
     catch (error) {

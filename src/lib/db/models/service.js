@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 console.log('defining service schema')
 const ServiceSchema = new mongoose.Schema({
-	title: {
+	url: {
 		type: String, 
 		minLength: 1,
 		maxLength: 100,
@@ -68,41 +68,35 @@ const ServiceSchema = new mongoose.Schema({
 	  
 });
 
-//unique title validation
-// ServiceSchema.path('title').validate(async (title) => {
-// 	const titleCount = await mongoose.models.Service.countDocuments({title: title})
-// 	return !titleCount
-// }, 'the title of a service must be unique, a service with that title already exists')
-//custom valdator message gives to us an object of the structure {type: , path: , value: }
-//MIDDLEWARE
-//pre save change updated at date
 
+//MIDDLEWARE
+//before save
 ServiceSchema.pre('save', async function(next){
 	//update updatedAt before saving
 	this.updatedAt = Date.now()
 
-	//if a service with the assigned order already exists then increment where necesary such that there are no duplicate orders; all services with an order that are equal to or greater than the assigned order
+	//if a service with the assigned order already exists then where necesary order other services such that there are no duplicate orders but the order is maintained
 	try {
-		const assigned_order = this['service-tile'].order
-		// const orderExists = await mongoose.models.Service.countDocuments({'service-tile.order': assigned_order})
-		// if(orderExists){
-		// 	console.log('other orders found rearranging')
-		// 	const services = await mongoose.models.Service
-		// 		.where('service-tile.order')
-		// 		.gte(this['service-tile'].order)
-		// 		.sort({'service-tile.order': 1})
-		// 	let prev
-		// 	services.forEach(async (service) => {
-
-		// 	})
-		// }
-		// else{
-		// 	console.log('no other services with order', this['service-tile'].order)
-		// }
-		const orderExists = await mongoose.models.Service.findOne().where('service-tile.order').equals(assigned_order)
+		let current_order = this['service-tile'].order
+		let orderExists = await mongoose.models.Service.findOne().where('service-tile.order').equals(current_order).select('service-tile.order')
 		if(orderExists){
-			orderExists['service-tile'].order = assigned_order + 1
-			await orderExists.save() //chain the opertaion by calling this pre hook everytime an order is detected with the same value as the assigned_order
+			//get services with order greater or equal to current order
+			const services = await mongoose.models.Service.find()
+				.select('service-tile.order')
+				.where('service-tile.order')
+				.gte(current_order)
+				.sort({'service-tile.order':1})
+
+			//update the array of services to have a coherent ascending order
+			services.every(async (service, i) =>{
+				if(service['service-tile'].order <= current_order){
+					current_order += 1
+					// services[i]['service-tile'].order = current_order
+					await mongoose.models.Service.updateOne({_id:service._id}, {'service-tile.order': current_order})
+					return true
+				}
+				else {return false}
+			})
 		}
 		next()
 	}
@@ -110,10 +104,10 @@ ServiceSchema.pre('save', async function(next){
 		console.log(e)
 		return
 	}
-	console.log('finally')
 
 })
 
+//after save
 ServiceSchema.post('save', function(document, next){
 	if(document){console.log('saved service document with title: ', document.title)}
 	else{console.log('something went wrong')}
