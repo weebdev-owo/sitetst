@@ -19,18 +19,40 @@ function Create(){
         "faq-answer": "",
     }
 
-    const updateSteps = () =>{
+    const addStep = () =>{
         const newSteps = f.values["process-steps"]
         newSteps.push(step)
         f.setFieldValue('process-steps', newSteps)
     }
 
-    const updateFaqs = () =>{
+    const deleteStep = (i) =>{
+        const newSteps = f.values["process-steps"]
+        newSteps.splice(i, 1)
+        f.setFieldValue('process-steps', newSteps)
+    }
+
+    const insertStep = (i) =>{
+        const newSteps = f.values["process-steps"]
+        newSteps.splice(i+1, 0, step)
+        f.setFieldValue('process-steps', newSteps)
+    }
+
+    const addQuestion = () =>{
         const newItems = f.values["faq-items"]
         newItems.push(question)
         f.setFieldValue('faq-items', newItems)
     }
 
+    const deleteQuestion = (i) =>{
+        const newItems = f.values["faq-items"]
+        newItems.splice(i, 1)
+        f.setFieldValue('faq-items', newItems)
+    }
+    const insertQuestion = (i) =>{
+        const newItems = f.values["faq-items"]
+        newItems.splice(i+1, 0, question)
+        f.setFieldValue('faq-items', newItems)
+    }
 
     const initialValues = {
         "url": "",
@@ -86,7 +108,7 @@ function Create(){
         //do form validation
         //send to api for update/storage
         // setSteps(steps+1)
-        console.log(values)
+        console.log('submmiting', values)
     }
 
     const f = useFormik({
@@ -95,16 +117,15 @@ function Create(){
         onSubmit: sendToAPI
     })
 
-
     console.log(f.values)
     return <>
         <div id={'Book'} className={styles["booking"]}>
             <div className={styles["heading"]}>Create Service</div>
 
-            <form className={styles["form"]} onSubmit={f.handleSubmit}>
-                <TextIn state={f} mid="url" label="url" />
-                <TextIn state={f} mid="disable" label="disable (saved on database but will not appear on website)" />
-                <TextIn state={f} mid="booking" label="show in booking form" />
+            <form className={styles["form"]} onSubmit={f.handleSubmit} autoComplete="off">
+                <TextIn state={f} mid="url" label="name (https://domain/serivices/'name')" />
+                <CheckBox state={f} mid="disable" label="disabled (stored in database but will not appear on website)" />
+                <CheckBox state={f} mid="booking" label="show in booking form" />
 
                 <div className={styles["sub-heading"]}>Service Tile Data</div>
                 <TextIn state={f} mid="tile-order" label="order" />
@@ -141,31 +162,40 @@ function Create(){
                 <div className={styles["sub-sub-heading"]}>Section 3: Our Process</div>
                 <TextIn state={f} mid="process-intro" label="intro text" />
                 {f.values["process-steps"].map((step, i) =>{
-                    // return <TextInD state={f} mid="process-steps" i={i} label={`step ${i}`} key={i}/>
                     return <>
                         <Space />
-                        <div className={""}>{`Step ${i+1}.`} </div>
+                        <div className={styles['elem-topbar']}>
+                            {`Step ${i+1}.`} 
+                            <div>
+                                <button type="button" className={styles["elem-button-add"]} onClick={() =>{insertStep(i)}}>add</button>
+                                <button type="button" className={styles["elem-button-del"]} onClick={() =>{deleteStep(i)}}>delete</button>
+                            </div>
+                        </div>
                         <TextIn state={f} path={["process-steps", i, 'step-name']} i={i} label={`step ${i+1} title`} key={i}/>
                         <TextIn state={f} path={["process-steps", i, 'step-desc']} i={i} label={`step ${i+1} description`} key={i}/>
                         <TextIn state={f} path={["process-steps", i, 'step-img']} i={i} label={`step ${i+1} image`} key={i}/>
                         <TextIn state={f} path={["process-steps", i, 'step-img-alt']} i={i} label={`step ${i+1} text if image fails to load`} key={i}/>
                     </>
                 })}
-                <button type="button" className={styles["submit"]} onClick={updateSteps}>add step</button>  
+                <button type="button" className={styles["list-add"]} onClick={addStep}>+ add step</button>  
 
                 <div className={styles["sub-sub-heading"]}>Section 4: Info/Faq</div>
-                <TextIn state={f} mid="process-intro" label="intro text" />
+                <TextIn state={f} mid="faq-intro" label="intro text" />
                 {f.values["faq-items"].map((item, i) =>{
-                    // return <TextInD state={f} mid="process-steps" i={i} label={`step ${i}`} key={i}/>
                     return <>
                         <Space />
-                        <div className={""}>{`Question ${i+1}.`} </div>
+                        <div className={styles['elem-topbar']}>
+                            {`Question ${i+1}.`} 
+                            <div>
+                                <button type="button" className={styles["elem-button-add"]} onClick={() =>{insertQuestion(i)}}>add</button>
+                                <button type="button" className={styles["elem-button-del"]} onClick={() =>{deleteQuestion(i)}}>delete</button>
+                            </div>
+                        </div>
                         <TextIn state={f} path={["faq-items", i, 'faq-question']} i={i} label={`question`} key={i}/>
                         <TextAr state={f} path={["faq-items", i, 'faq-answer']} i={i} label={`answer`} key={i}/>
                     </>
                 })}
-                <button type="button" className={styles["submit"]} onClick={updateFaqs}>add question</button>
-
+                <button type="button" className={styles["list-add"]} onClick={addQuestion}>+ add question</button>
 
                 <div className={styles["submit-section"]}>
                     <button type="submit" className={styles["submit"]}>.Submit.</button>   
@@ -199,9 +229,15 @@ function TextIn({state, mid, path, label}){
         if(errs){errs = errs[entry]}
         if(touched){touched = touched[entry]}
     })
-
+    let isErr
     //determine if error messages should be displayed based on data
-    const isErr = errs && touched
+    if(errs==='required'){
+        if(state.submitCount){isErr = errs}
+        else{isErr = false}
+    }
+    else{ 
+        isErr = errs && touched 
+    }
     const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
 
     return <div className={styles["section"]}>
@@ -276,19 +312,20 @@ function CheckBox({state, mid, path, label}){
     // const isErr = errs && touched
     // const input_css = classNames(styles["textarea-big"], {[styles["textarea-err"]]: isErr})
 
-    return <div className={styles["section"]}>
-        <label className={styles["label"]} htmlFor={mid}>
-            <p>{`${label}`}</p>
-            {isErr ? <pre className={styles['label-err']}>{` - ${errs}`}</pre>:null}
-        </label>
-        <textarea 
+    return <div className={styles["section-checkbox"]}>
+        <input 
             id={mid}
-            className={styles["textarea-smol"]} 
-            type="text" 
+            className={styles["checkbox"]} 
+            type="checkbox" 
             value={vals}
             onChange={state.handleChange}
             onBlur={state.handleBlur}
+            checked={vals}
          />    
+        <label className={styles["label"]} htmlFor={mid}>
+            <p>{`${label}`}</p>
+        </label>
+
     </div>
 }
 function Space({}){

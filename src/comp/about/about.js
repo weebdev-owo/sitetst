@@ -13,7 +13,6 @@ function About(){
 
 function Desc(){
     return <>
-        {/* <div className={styles["sub-heading"]}>.Why Us.</div> */}
         <div className={styles.desc}>
             <div className={styles["desc-text"]}>{loreum}</div>
         </div>
