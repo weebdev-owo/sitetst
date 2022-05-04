@@ -20,13 +20,6 @@ cloudinary.config({
 })
 
 //validation requirements
-const filenameSchema = Yup.string()
-    .max(20,'max len 20 chars')
-    .matches(/^(?![0-9]*$)[a-zA-Z0-9]+$/, "only letters or numbers allowed")
-    .matches(/^[A-Za-z].*/, "file name should not start with special characters")
-    .matches(/^[^\\/:\*\?"<>\|]+$/,' forbidden characters \ / : * ? " < > |')
-    .matches(/^(?!\.)(?!com[0-9]$)(?!con$)(?!lpt[0-9]$)(?!nul$)(?!aux$)(?!prn$)[^\|\*\?\\:<>/$"]*[^\.\|\*\?\\:<>/$"]+$/, 'forbidden file name')
-    .required("required")
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp']
 
 export default async function handler(req, res) {
@@ -44,34 +37,26 @@ export default async function handler(req, res) {
                 uploadDir: tempDir.name, 
                 keepExtensions: true, 
                 maxFields: 0, 
-                multiples: false, 
-                maxFieldsSize: 1*kb, 
-                maxFileSize: 10*mb
+                multiples: true, 
+                maxFieldsSize: 1, 
+                maxFileSize: 10*mb,
             })
             .catch((error) => {error_message = "Parser Error, Image might be to large for web"; next(error)})
             const {fields, files} = formData; 
             const file = files.image; 
-            const filename = fields.filename
+            
+            const filename = files.newFilename
 
             const public_id = `${process.env.CLOUDINARY_UPLOAD_FOLDER}/${filename}`
 
             //VALIDATE formData and paths
-            if(!file || !filename || Object.keys(fields).length !== 1 || Object.keys(files).length !== 1){ //image and filename supplied and only supplied
+            if(!file || Object.keys(fields).length !== 1 || Object.keys(files).length !== 1){ //image and filename supplied and only supplied
                 error_message = "invalid form data"; throw "Validation Error"
             }
-
-            await filenameSchema.validate(filename) //check if filename is valid
-            .catch((error) => {error_message = "filename invalid"; next(error)})
 
             if(!SUPPORTED_FORMATS.includes(file.mimetype)){ //check if filetype is valid
                 error_message = "filetype invalid"; throw "Validation Error"
             }
-
-            // const fileInfo = await cloudinary.search.expression(`resource_type:image AND public_id=${public_id}`).execute()
-            // .catch((error) => {error_message = `error cloudinary search for ${filename} failed`; next(error)})
-            // if(fileInfo.total_count>0){ //file already exists in cloudinary
-            //     error_message = `file name [${filename}] already in use on another image`; throw "Validation Error"
-            // }
 
             // UPLOAD to cloudinary
             const uploaded_image = await cloudinary.uploader.upload(file.filepath, {

@@ -23,13 +23,6 @@ function AddImage(){
             .test('fileSize', "File Size is too large", value => {if(typeof value == 'object') {return value.size < FILE_SIZE} else{return true}}) 
             .test('fileType', "Unsupported File Format", value => {if(typeof value == 'object') {return SUPPORTED_FORMATS.includes(value.type)} else{return true}})
             .required('required'),
-        "filename": Yup.string()
-            .max(20,'max len 20 chars')
-            .matches(/^(?![0-9]*$)[a-zA-Z0-9]+$/, "only letters or numbers allowed")
-            .matches(/^[A-Za-z].*/, "file name should not start with special characters")
-            .matches(/^[^\\/:\*\?"<>\|]+$/,' forbidden characters \ / : * ? " < > |')
-            .matches(/^(?!\.)(?!com[0-9]$)(?!con$)(?!lpt[0-9]$)(?!nul$)(?!aux$)(?!prn$)[^\|\*\?\\:<>/$"]*[^\.\|\*\?\\:<>/$"]+$/, 'forbidden file name')
-            .required("required")
     })
 
     const sendToAPI = async values => {
