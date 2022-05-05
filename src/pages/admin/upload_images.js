@@ -1,175 +1,124 @@
-import {memo, useRef, useState, useEffect} from 'react'
-import styles from '/src/css/addimage.module.sass'
-import {useFormik} from 'formik'
-import * as Yup from 'yup'
-import  classNames  from 'classnames';
+import { useDropzone } from "react-dropzone"
+import {memo, useCallback, useState, useEffect} from 'react'
+import { Field, Formik } from 'formik';
+// import styles from '/src/css/UploadImages.module.sass'
 import Img from '/src/lib/img'
-import axios from 'axios'
 
 
-function AddImage(){
+function UploadImages({}){
 
-    const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp']
-    const FILE_SIZE = 127000000
-
-    const initialValues = {
-        "filename": "",
-        "image": "",
-
-    }
-
-    const yup_validation = Yup.object({
-        "image": Yup.mixed() 
-            .test('fileSize', "File Size is too large", value => {if(typeof value == 'object') {return value.size < FILE_SIZE} else{return true}}) 
-            .test('fileType', "Unsupported File Format", value => {if(typeof value == 'object') {return SUPPORTED_FORMATS.includes(value.type)} else{return true}})
-            .required('required'),
-    })
-
-    const sendToAPI = async values => {
-        console.log('submit', values.image.size)
-        try{
-            const res = await axios.post('http://localhost:3000/api/upload_image', values, {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
-            })
-            console.log(res.data)
-        }
-        catch (e){
-            console.log(e)
-        }
-    }
-
-    const f = useFormik({
-        initialValues: initialValues, 
-        validationSchema: yup_validation,
-        onSubmit: sendToAPI
-    })
-
-    console.log(f.values)
 
     return <>
-        <div id={'Book'} className={styles["booking"]}>
-            <div className={styles["heading"]}>Edit Images</div>
+    <Formik initaialValues={{}} onSubmit={() => {}} >
+        {({values, errors}) => (
+            <DropZone />
+        )}
 
-            <form className={styles["form"]} onSubmit={f.handleSubmit} autoComplete="off">
-                <ImageIn state={f} mid="image" label="Image"/>
-                <TextIn state={f} mid={"filename"} label="choose a name for the image"/>
-                <div className={styles["submit-section"]}>
-                    <button type="submit" className={styles["submit"]}>.Add Image.</button>   
-                </div>
+    </Formik>
+    </>
 
-            </form>
+}
+
+
+function DropZone({}){
+    const [files, setFiles] = useState([])
+
+    //on every drop get called with the files that were just added (not all the files in the dropzone), valid = passed validation
+    const onDrop = useCallback((valid, invalid) => {
+        const accepted = valid.map(file => ({file, errors: []}))
+        setFiles(cur => [...cur, ...accepted, ...invalid])
+    }, [])
+
+    const {getRootProps, getInputProps} = useDropzone({onDrop})
+    console.log(files)
+    return <>
+        <div {...getRootProps()}>
+            <input {...getInputProps()} />
+            <p>Place files or click to select from folder</p>
+            {files.map((fileWrap, i) => {
+                return <UploadSingleFile file={fileWrap.file} key={i}/>
+            })}
         </div>
     </>
 }
 
-AddImage = memo(AddImage)
-AddImage.defaultProps = {
-    
+
+
+function UploadSingleFile({file}){
+    console.log('uwu', file)
+    //do upload when file recieved
+    const [progress, setProgress] = useState(0)
+    useEffect(() =>{
+        // async function upload(){await uploadFile(file, setProgress)}
+        // const url = upload().catch((err) =>{console.log('failed', err)})
+    },[])
+
+    return <>
+    <div>
+        {/* image preview */}
+        <Preview file={file} />
+        {`${progress} %`}
+    </div>
+    </>
 }
-
-function ImageIn({state, mid, path, label, setimg}){
-
-    //create missing props from supplied ones
-    if(!path){path = [mid]}
-    else{if(!mid){mid=path.join('.')}}
-
-    //get data based on the path supplied
-    let vals = state.values
-    let errs = state.errors
-    let touched = state.touched
-    path.forEach((entry, i)=>{
-        if(vals){vals = vals[entry]}
-        if(errs){errs = errs[entry]}
-        if(touched){touched = touched[entry]}
-    })
-
-
-    //determine if error messages should be displayed based on data
-    let isErr
-    if(errs==='required'){
-        if(state.submitCount){isErr = errs}
-        else{isErr = false}
-    }
-    else{ 
-        isErr = errs && touched 
-    }
-    const input_css = classNames(styles["file"], {[styles["textarea-err"]]: isErr})
-
+function Preview({file}){
     const [preview, setPreview] = useState(null)
     useEffect(() =>{
-        if(vals){
+        if(file){
             const reader = new FileReader()
             reader.onloadend = () => {setPreview(reader.result)}
-            reader.readAsDataURL(vals)
+            reader.readAsDataURL(file)
         }
         else{
             setPreview(null)
         }
-    }, [vals])
+    }, [file])
 
-    return <div className={styles["section"]}>
-        <label className={styles["label"]} htmlFor={mid}>
-            <p>{`${label}`}</p>
-            {isErr ? <pre className={styles['label-err']}>{` - ${errs}`}</pre>:null}
-        </label>
-        <input 
-            id={mid}
-            className={input_css} 
-            type="file" 
-            // value={vals}
-            onChange={(event) => {
-                state.handleChange(event)
-                state.setFieldValue(mid, event.currentTarget.files[0])
-            }}
-            onBlur={state.handleBlur}
-            accept="image/png, image/jpeg"
-        />    
+    return <div>
         {preview ? <Img src={preview} />:null}
     </div>
 }
+const uploadFile = async (file, setProgressBar) =>{
+    console.log('called')
+    return new Promise((resolve, reject) =>{
+        const xhr = new XMLHttpRequest()
 
-function TextIn({state, mid, path, label}){
+        //SETUP
+        //update progress bar as it loads
+        xhr.upload.onprogress = (event) => {
+            //check if we can read the total file size
+            console.log(event)
+            if(event.lengthComputable){
+                const current_progress = Math.round((event.loaded/event.total)*100)
+                setProgressBar(current_progress)
 
-    //create missing props from supplied ones
-    if(!path){path = [mid]}
-    else{if(!mid){mid=path.join('.')}}
+            }
+            else{setProgressBar('uploading')}
+        }
+        //once finished upload
+        xhr.onload = () => {
+            const res = JSON.parse(xhr.responseText)
+            console.log('sucsess', res)
+            resolve(res.secure_url)
+        }
 
-    //get data based on the path supplied
-    let vals = state.values
-    let errs = state.errors
-    let touched = state.touched
-    path.forEach((entry)=>{
-        if(vals){vals = vals[entry]}
-        if(errs){errs = errs[entry]}
-        if(touched){touched = touched[entry]}
+        //error occured
+        xhr.onerror = (event) => reject(event)
+
+        //EXECUTE REQUEST
+        //construct and send form to cloudinary
+        const formData = new FormData()
+        formData.append('file', file)
+        // formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY)
+        formData.append('upload_preset', 'clientside')
+        console.log('here', file)
+        const url = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`
+        xhr.open('POST', url)
+        xhr.send(formData)
+
     })
-    let isErr
-    //determine if error messages should be displayed based on data
-    if(errs==='required'){
-        if(state.submitCount){isErr = errs}
-        else{isErr = false}
-    }
-    else{ 
-        isErr = errs && touched 
-    }
-    const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
-
-    return <div className={styles["section"]}>
-        <label className={styles["label"]} htmlFor={mid}>
-            <p>{`${label}`}</p>
-            {isErr ? <pre className={styles['label-err']}>{` - ${errs}`}</pre>:null}
-        </label>
-        <input 
-            id={mid}
-            className={input_css} 
-            type="text" 
-            value={vals}
-            onChange={state.handleChange}
-            onBlur={state.handleBlur}
-         />    
-    </div>
 }
 
-export default AddImage
+
+UploadImages = memo(UploadImages)
+export default UploadImages
