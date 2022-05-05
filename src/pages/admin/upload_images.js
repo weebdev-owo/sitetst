@@ -1,9 +1,11 @@
 import { useDropzone } from "react-dropzone"
-import {memo, useCallback, useState, useEffect} from 'react'
+import {memo, useCallback, useState, useEffect, useRef} from 'react'
 import { Field, Formik } from 'formik';
 // import styles from '/src/css/UploadImages.module.sass'
-import Img from '/src/lib/img'
-
+import Img from '/src/lib/imgfull'
+import ReactCrop from 'react-image-crop'
+import 'react-image-crop/dist/ReactCrop.css'
+import {base64StringtoFile, image64toCanvasRef} from '/src/lib/imageUtils'
 
 function UploadImages({}){
 
@@ -36,7 +38,7 @@ function DropZone({}){
             <input {...getInputProps()} />
             <p>Place files or click to select from folder</p>
             {files.map((fileWrap, i) => {
-                return <UploadSingleFile file={fileWrap.file} key={i}/>
+                return <FileDisplay file={fileWrap.file} key={i}/>
             })}
         </div>
     </>
@@ -44,7 +46,7 @@ function DropZone({}){
 
 
 
-function UploadSingleFile({file}){
+function FileDisplay({file}){
     console.log('uwu', file)
     //do upload when file recieved
     const [progress, setProgress] = useState(0)
@@ -57,25 +59,37 @@ function UploadSingleFile({file}){
     <div>
         {/* image preview */}
         <Preview file={file} />
-        {`${progress} %`}
+        {/* {`${progress} %`} */}
     </div>
     </>
 }
 function Preview({file}){
     const [preview, setPreview] = useState(null)
+    const [crop, setCrop] = useState(null)
+    const cropResRef = useRef(null)
     useEffect(() =>{
-        if(file){
-            const reader = new FileReader()
-            reader.onloadend = () => {setPreview(reader.result)}
-            reader.readAsDataURL(file)
-        }
-        else{
-            setPreview(null)
-        }
+        const reader = new FileReader()
+        reader.onloadend = () => {setPreview(reader.result)}
+        reader.readAsDataURL(file)
     }, [file])
+    console.log(crop)
 
+    //external file loaded from src
+    const imageLoaded = (image) => {
+        console.log('image', image)
+    }
+
+    const cropComplete = (crop, pixelCrop) =>{
+        console.log('crop FIN', crop, pixelCrop)
+        image64toCanvasRef(cropResRef.current, preview, crop)
+    }
     return <div>
-        {preview ? <Img src={preview} />:null}
+        {/* {preview ? <Img src={preview} />:null} */}
+        {preview ? <ReactCrop src={preview} crop={crop} onChange={c => setCrop(c)} onImageLoaded={imageLoaded} onComplete={cropComplete}>
+            <img src={preview} alt={"failed to render image"}/>
+        </ReactCrop>
+        :null}
+        <canvas ref={cropResRef}></canvas>
     </div>
 }
 const uploadFile = async (file, setProgressBar) =>{
@@ -118,7 +132,6 @@ const uploadFile = async (file, setProgressBar) =>{
 
     })
 }
-
 
 UploadImages = memo(UploadImages)
 export default UploadImages

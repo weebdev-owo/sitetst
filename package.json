@@ -27,6 +27,7 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-dropzone": "^14.2.0",
+    "react-image-crop": "^10.0.0",
     "react-spring": "^9.3.1",
     "react-spring-carousel-js": "^1.9.30",
     "sass": "^1.43.4",
