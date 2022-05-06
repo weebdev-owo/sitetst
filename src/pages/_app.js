@@ -1,4 +1,4 @@
-import '/src/css/global.sass'
+import '/src/styles/global.sass'
 import Head from 'next/head'
 
 function App({ Component, pageProps }) {

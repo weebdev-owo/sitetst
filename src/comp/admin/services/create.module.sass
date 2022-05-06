@@ -3,28 +3,31 @@
     width: 100%
     text-align: center
     padding: 100px
+    color: white
 
 .sub-heading
     font-size: 40px
     width: 100%
     text-align: center
+    padding: 40px
 
 .sub-sub-heading
     font-size: 20px
     width: 100%
     text-align: center
+    padding: 10px
 
 .form
     top: 0
     left: 0
     // border: 1px solid black
-    height: calc(100vh - 360px)
     width: 100vw
     display: grid
     justify-content: center
     align-content: start
     // justify-items: center
     // align-items: center
+    color: white
 
 .section
     display: flex
@@ -71,16 +74,21 @@
     height: 50px
     text-align: center
     padding: 10px
-    // transition: 100ms
+    transition: 300ms
     // padding-top: 20px
     justify-self: center
     align-self: center
+    color: white
+    background: black
+    border: 1px solid white
 
     &:hover
         cursor: pointer
-        color: black
+        color: #B29146
         border: 1px solid black
+        background: white
         // transition: 100ms
+        color: black
 
 .submit-section
     @extend .section
@@ -175,3 +183,15 @@
     border: 1px solid blue
     font-size: 18px
     overflow: hidden
+
+.page-section
+    border: 1px solid black
+    padding: 10px 20px 0px 20px
+    margin-bottom: 40px
+    margin-top: 20px
+    background: white
+    border-radius: 20px
+    color: black
+
+.form-cont
+    background-color: black
