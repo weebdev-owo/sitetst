@@ -1,8 +1,9 @@
-import css from "./navbar.module.sass"
-import { forwardRef, memo } from 'react'
+import styles from "./navbar.module.sass"
+import { memo } from 'react'
 import classnames from 'classnames'
 import Link from 'next/link'
-import noHash from '/src/lib/nohash'
+import noHash from '/src/lib/utils/nohash'
+
 const elems = ['Services', 'About', 'Book']
 const links = ['/#Services', '/#About', '#Book']
 
@@ -11,12 +12,12 @@ const reset_tst = () => {
 }
 function NavBar({selected, setSelected}){
 
-    return <section className={css.navbar}>
+    return <section className={styles.navbar}>
         {elems.map((elem,i) => {
             return <Link href={links[i]} key={i}>
                     <a 
                         key={i} 
-                        className={classnames(css.nav_elem, {[css.selected]: selected==i})}
+                        className={classnames(styles.nav_elem, {[styles.selected]: selected==i})}
                         onClick={() => {reset_tst()}}
                     >{elem}</a>
             </Link>

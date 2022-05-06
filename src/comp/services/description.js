@@ -1,7 +1,7 @@
 import styles from './description.module.sass'
 import { memo, useRef } from 'react'
 import Image from 'next/image'
-import FadeUp from '/src/lib/fadeup'
+import FadeUp from '/src/lib/animations/fadeup'
 
 
 const loreum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'

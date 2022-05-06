@@ -1,7 +1,7 @@
 import {memo} from 'react'
 import styles from './services.module.sass'
 import Image from 'next/image'
-import FadeUp from '/src/lib/fadeup'
+import FadeUp from '/src/lib/animations/fadeup'
 import Link from 'next/link'
 
 const services = [

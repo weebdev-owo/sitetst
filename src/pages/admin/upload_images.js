@@ -1,22 +1,21 @@
+/* eslint-disable @next/next/no-img-element */
 import { useDropzone } from "react-dropzone"
 import {memo, useCallback, useState, useEffect, useRef} from 'react'
 import { Field, Formik } from 'formik';
 // import styles from '/src/css/UploadImages.module.sass'
-import Img from '/src/lib/imgfull'
+import Img from '/src/lib/image/imgfull'
 import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
-import {base64StringtoFile, image64toCanvasRef} from '/src/lib/imageUtils'
+import {base64StringtoFile, image64toCanvasRef} from '/src/lib/utils/imageUtils'
+import CropImage from '/src/lib/image/crop/cropImage'
 
 function UploadImages({}){
-
-
     return <>
-    <Formik initaialValues={{}} onSubmit={() => {}} >
-        {({values, errors}) => (
-            <DropZone />
-        )}
-
-    </Formik>
+        <Formik initaialValues={{}} onSubmit={() => {}} >
+            {({values, errors}) => (
+                <DropZone />
+            )}
+        </Formik>
     </>
 
 }
@@ -58,11 +57,12 @@ function FileDisplay({file}){
     return <>
     <div>
         {/* image preview */}
-        <Preview file={file} />
+        <CropImage file={file} />
         {/* {`${progress} %`} */}
     </div>
     </>
 }
+
 function Preview({file}){
     const [preview, setPreview] = useState(null)
     const [crop, setCrop] = useState(null)

@@ -1,7 +1,5 @@
-import { useSpring, useTransition, animated as a } from 'react-spring'
-import { useReducer } from 'react'
 import styles from './small_car.module.sass'
-import { useCallback, memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 
 const focused = ' '+styles.focused
 

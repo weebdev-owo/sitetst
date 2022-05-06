@@ -1,8 +1,8 @@
-import MainLogo from '/src/comp/svg/mcfd_logo'
-import css from './logobar.module.sass'
+import MainLogo from '/src/svg/mcfd_logo'
+import styles from './logobar.module.sass'
 
 export default function LogoBar() {
-    return <section className={css.logobar}>
-      <a><MainLogo className={css.logo} /></a>
+    return <section className={styles.logobar}>
+      <a><MainLogo className={styles.logo} /></a>
     </section>
 }

@@ -1,9 +1,9 @@
-import css from "./scrollnav.module.sass"
-import { forwardRef, memo, useEffect, useRef } from 'react'
+import styles from "./scrollnav.module.sass"
+import { memo, useEffect, useRef } from 'react'
 import classnames from 'classnames'
-import noHash from '/src/lib/nohash'
+import noHash from '/src/lib/utils/nohash'
 import Link from 'next/link'
-import { useRouter } from "next/router"
+
 
 const elems = ['Services', 'About', 'Book']
 const links = ['/#Services', '/#About', '#Book']
@@ -41,12 +41,12 @@ function ScrollNav({selected, setSelected, setReset}){
         }
     })
 
-    return <section className={css.navbar} ref={navRef}>
+    return <section className={styles.navbar} ref={navRef}>
         {elems.map((elem,i) => {
             return <Link href={links[i]} key={i}>
                 <a 
                     key={i} 
-                    className={classnames(css.nav_elem, {[css.selected]: selected==i})}
+                    className={classnames(styles.nav_elem, {[styles.selected]: selected==i})}
                     onClick={() => {reset_tst()}}
                 >{elem}</a>
             </Link>

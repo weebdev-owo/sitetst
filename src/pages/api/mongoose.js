@@ -1,5 +1,5 @@
-import dbConnect from '/src/lib/db/mongoose_connect'
-import Service from '/src/lib/db/models/service'
+import dbConnect from '/src/lib/api/db/mongoose_connect'
+import Service from '/src/lib/api/db/models/service'
 
 export default async function handler (req, res) {
     await dbConnect()

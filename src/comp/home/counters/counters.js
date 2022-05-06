@@ -1,6 +1,6 @@
 import {memo, useRef, useEffect, useState} from 'react'
 import styles from './counters.module.sass'
-import FadeUp from '/src/lib/fadeup'
+import FadeUp from '/src/lib/animations/fadeup'
 
 
 

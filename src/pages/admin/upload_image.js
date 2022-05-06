@@ -1,9 +1,9 @@
 import {memo, useRef, useState, useEffect} from 'react'
-import styles from '/src/css/addimage.module.sass'
+import styles from '/src/styles/addimage.module.sass'
 import {useFormik} from 'formik'
 import * as Yup from 'yup'
 import  classNames  from 'classnames';
-import Img from '/src/lib/img'
+import Img from '/src/lib/image/img'
 import axios from 'axios'
 
 

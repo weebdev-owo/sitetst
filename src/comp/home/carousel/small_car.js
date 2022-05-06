@@ -1,9 +1,8 @@
 import { useSpring, useTransition, animated as a } from 'react-spring'
-import { useReducer, useEffect } from 'react'
+import { useReducer, useEffect, useCallback, memo } from 'react'
 import styles from './small_car.module.sass'
-import { memo } from 'react'
-import { useCallback } from 'react';
 import DotNav from './dotnav';
+
 let shifter
 const shift_space = 8000
 function SmallCar({children}){

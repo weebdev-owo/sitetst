@@ -1,6 +1,5 @@
-import clientPromise from '/src/lib/db/mongo_connect'
+import clientPromise from '/src/lib/api/db/mongo_connect'
 
-import dbConnect from '/src/lib/db/mongoose_connect';
 
 
 export default async function handler(req, res) {

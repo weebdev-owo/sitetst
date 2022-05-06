@@ -1,18 +1,14 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import Link from 'next/link'
 import {useState, useRef, useEffect} from 'react'
 import TopBar from '/src/comp/topbar/topbar'
-import Car from '/src/comp/carousel/small_car'
-import CarImage from "/src/comp/carousel/carimage"
-import styles from '/src/css/home.module.sass'
-import Counters from '../comp/counters/counters'
-import Services from '../comp/services/services'
-import About from '../comp/about/about'
-import FadeUp from '/src/lib/fadeup'
+import Car from '/src/comp/home/carousel/small_car'
+import CarImage from "/src/comp/home/carousel/carimage"
+import styles from '/src/styles/home.module.sass'
+import Counters from '/src/comp/home/counters/counters'
+import Services from '/src/comp/home/services/services'
+import About from '/src/comp/home/about/about'
 import Book from '/src/comp/book/book'
 import ScrollNav from '/src/comp/scrollnav/scrollnav'
-
 
 export default function Home(){
 

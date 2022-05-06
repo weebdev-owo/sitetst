@@ -1,5 +1,5 @@
-import Create from '/src/admincomp/services/create'
-import styles from '/src/css/home.module.sass'
+import Create from '/src/comp/admin/services/create'
+import styles from '/src/styles/home.module.sass'
 
 
 export default function Home(){

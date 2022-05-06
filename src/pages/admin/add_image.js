@@ -1,139 +1,138 @@
-import React, { useState, useRef } from 'react'
-import ReactCrop, {centerCrop,makeAspectCrop,Crop,PixelCrop,} from 'react-image-crop'
-import { canvasPreview } from './canvasPreview'
-import { useDebounceEffect } from './useDebounceEffect'
-
+/* eslint-disable @next/next/no-img-element */
+import { useDropzone } from "react-dropzone"
+import {memo, useCallback, useState, useEffect, useRef} from 'react'
+import { Field, Formik } from 'formik';
+// import styles from '/src/css/UploadImages.module.sass'
+import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
+import CropImage from '/src/lib/image/crop/cropImage'
+import styles from '/src/styles/dropzone.module.sass'
 
-// This is to demonstate how to make and center a % aspect crop
-// which is a bit trickier so we use some helper functions.
-function centerAspectCrop(mediaWidth , mediaHeight, aspect) {
-    const aspectCrop = makeAspectCrop({unit: '%',width: 90}, aspect, mediaWidth, mediaHeight)
-  return centerCrop(aspectCrop, mediaWidth, mediaHeight)
-}
+function UploadImages({}){
 
-export default function App() {
-  const [imgSrc, setImgSrc] = useState('')
-  const previewCanvasRef = useRef(null)
-  const imgRef = useRef(null)
-  const [crop, setCrop] = useState()
-  const [completedCrop, setCompletedCrop] = useState()
-  const [scale, setScale] = useState(1)
-  const [rotate, setRotate] = useState(0)
-  const [aspect, setAspect] = useState(16 / 9)
-
-  function onSelectFile(e) {
-    if (e.target.files && e.target.files.length > 0) {
-      setCrop(undefined) // Makes crop preview update between images.
-      const reader = new FileReader()
-      reader.addEventListener('load', () =>
-        setImgSrc(reader.result.toString() || ''),
-      )
-      reader.readAsDataURL(e.target.files[0])
-    }
-  }
-
-  function onImageLoad(e) {
-    if (aspect) {
-      const { width, height } = e.currentTarget
-      setCrop(centerAspectCrop(width, height, aspect))
-    }
-  }
-
-  useDebounceEffect(
-    async () => {
-      if (
-        completedCrop?.width &&
-        completedCrop?.height &&
-        imgRef.current &&
-        previewCanvasRef.current
-      ) {
-        // We use canvasPreview as it's much faster than imgPreview.
-        canvasPreview(
-          imgRef.current,
-          previewCanvasRef.current,
-          completedCrop,
-          scale,
-          rotate,
-        )
-      }
-    },
-    100,
-    [completedCrop, scale, rotate],
-  )
-
-  function handleToggleAspectClick() {
-    if (aspect) {
-      setAspect(undefined)
-    } else if (imgRef.current) {
-      const { width, height } = imgRef.current
-      setAspect(16 / 9)
-      setCrop(centerAspectCrop(width, height, 16 / 9))
-    }
-  }
-
-  return (
-    <div className="App">
-      <div className="Crop-Controls">
-        <input type="file" accept="image/*" onChange={onSelectFile} />
-        <div>
-          <label htmlFor="scale-input">Scale: </label>
-          <input
-            id="scale-input"
-            type="number"
-            step="0.1"
-            value={scale}
-            disabled={!imgSrc}
-            onChange={(e) => setScale(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label htmlFor="rotate-input">Rotate: </label>
-          <input
-            id="rotate-input"
-            type="number"
-            value={rotate}
-            disabled={!imgSrc}
-            onChange={(e) =>
-              setRotate(Math.min(180, Math.max(-180, Number(e.target.value))))
-            }
-          />
-        </div>
-        <div>
-          <button onClick={handleToggleAspectClick}>
-            Toggle aspect {aspect ? 'off' : 'on'}
-          </button>
-        </div>
-      </div>
-      {Boolean(imgSrc) && (
-        <ReactCrop
-          crop={crop}
-          onChange={(_, percentCrop) => setCrop(percentCrop)}
-          onComplete={(c) => setCompletedCrop(c)}
-          aspect={aspect}
-        >
-          <img
-            ref={imgRef}
-            alt="Crop me"
-            src={imgSrc}
-            style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
-            onLoad={onImageLoad}
-          />
-        </ReactCrop>
-      )}
-      <div>
-        {Boolean(completedCrop) && (
-          <canvas
-            ref={previewCanvasRef}
-            style={{
-              border: '1px solid black',
-              objectFit: 'contain',
-              width: completedCrop.width,
-              height: completedCrop.height,
-            }}
-          />
+    return <>
+    <Formik initaialValues={{}} onSubmit={() => {}} >
+        {({values, errors}) => (
+            <DropZone > 
+                <p>Place files or click to select from folder</p>
+            </DropZone>
         )}
-      </div>
-    </div>
-  )
+    </Formik>
+    </>
+
 }
+
+
+function DropZone({children}){
+    const [files, setFiles] = useState([])
+
+    //on every drop get called with the files that were just added (not all the files in the dropzone), valid = passed validation
+    const onDrop = useCallback((valid, invalid) => {
+        const accepted = valid.map(file => ({file, errors: []}))
+        setFiles(cur => [...cur, ...accepted, ...invalid])
+    }, [])
+    const {getRootProps, getInputProps} = useDropzone({onDrop})
+
+    return <>
+        <div {...getRootProps()} className={styles['drop-zone-cont']}>
+            <input {...getInputProps()} className={styles['drop-zone-input']}/>
+            {children}
+            {files.map((fileWrap, i) => {
+                    return <FileDisplay file={fileWrap.file} key={i}/>
+            })}
+        </div>
+    </>
+}
+
+
+
+function FileDisplay({file}){
+    console.log('uwu', file)
+    //do upload when file recieved
+    const [progress, setProgress] = useState(0)
+    useEffect(() =>{
+        // async function upload(){await uploadFile(file, setProgress)}
+        // const url = upload().catch((err) =>{console.log('failed', err)})
+    },[])
+
+    return <>
+    <div>
+        {/* image preview */}
+        <CropImage file={file} />
+        {/* {`${progress} %`} */}
+    </div>
+    </>
+}
+
+function Preview({file}){
+    const [preview, setPreview] = useState(null)
+    const [crop, setCrop] = useState(null)
+    const cropResRef = useRef(null)
+    useEffect(() =>{
+        const reader = new FileReader()
+        reader.onloadend = () => {setPreview(reader.result)}
+        reader.readAsDataURL(file)
+    }, [file])
+    console.log(crop)
+
+    //external file loaded from src
+    const imageLoaded = (image) => {
+        console.log('image', image)
+    }
+
+    const cropComplete = (crop, pixelCrop) =>{
+        console.log('crop FIN', crop, pixelCrop)
+        image64toCanvasRef(cropResRef.current, preview, crop)
+    }
+    return <div>
+        {/* {preview ? <Img src={preview} />:null} */}
+        {preview ? <ReactCrop src={preview} crop={crop} onChange={c => setCrop(c)} onImageLoaded={imageLoaded} onComplete={cropComplete}>
+            <img src={preview} alt={"failed to render image"}/>
+        </ReactCrop>
+        :null}
+        <canvas ref={cropResRef}></canvas>
+    </div>
+}
+const uploadFile = async (file, setProgressBar) =>{
+    console.log('called')
+    return new Promise((resolve, reject) =>{
+        const xhr = new XMLHttpRequest()
+
+        //SETUP
+        //update progress bar as it loads
+        xhr.upload.onprogress = (event) => {
+            //check if we can read the total file size
+            console.log(event)
+            if(event.lengthComputable){
+                const current_progress = Math.round((event.loaded/event.total)*100)
+                setProgressBar(current_progress)
+
+            }
+            else{setProgressBar('uploading')}
+        }
+        //once finished upload
+        xhr.onload = () => {
+            const res = JSON.parse(xhr.responseText)
+            console.log('sucsess', res)
+            resolve(res.secure_url)
+        }
+
+        //error occured
+        xhr.onerror = (event) => reject(event)
+
+        //EXECUTE REQUEST
+        //construct and send form to cloudinary
+        const formData = new FormData()
+        formData.append('file', file)
+        // formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY)
+        formData.append('upload_preset', 'clientside')
+        console.log('here', file)
+        const url = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`
+        xhr.open('POST', url)
+        xhr.send(formData)
+
+    })
+}
+
+UploadImages = memo(UploadImages)
+export default UploadImages

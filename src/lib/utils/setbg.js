@@ -1,4 +1,4 @@
-import {useRef, useState, useEffect} from 'react'
+import {useEffect} from 'react'
 const setBgCol = (val) => {
     if (val){
         // console.log("vis")
@@ -17,7 +17,6 @@ const setBgCol = (val) => {
 const SetBg = (elemRef) => {
 
     useEffect(() => {
-
 
         const initial_bg=getComputedStyle(document.body).background
         const initial_scroll_col = getComputedStyle(document.body).getPropertyValue("--scroll-col")
