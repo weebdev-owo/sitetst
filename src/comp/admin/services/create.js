@@ -1,6 +1,6 @@
 import {memo, useRef, useState} from 'react'
 import styles from './create.module.sass'
-import {useField, useFormik, Formik} from 'formik'
+import {useField, useFormikContext, useFormik, Formik} from 'formik'
 import * as Yup from 'yup'
 import  classNames  from 'classnames';
 
@@ -85,81 +85,83 @@ function Create(){
     return <>
         <div id={'Create'} className={styles["form-cont"]}>
             <div className={styles["heading"]}>Create Service</div>
-            <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={yup_validation}>{(f) =>{
+            <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={yup_validation}>{(f) =>{console.log(f.errors);
                 return <form className={styles["form"]} onSubmit={f.handleSubmit} autoComplete="off">
                 <div className={styles['page-section']}>
-                    <TextIn2 state={f} name={"url2"} label={`Testor`} />
-                    <TextIn state={f} mid="url" label="name (https://domain/serivices/'name')" />
-                    <CheckBox state={f} mid="disable" label="disabled (stored in database but will not appear on website)" />
-                    <CheckBox state={f} mid="booking" label="show in booking form (selectable in booking form services)" />
+                    <TextArea name={"url2"} label={`Testor`} />
+                    <Text name="url" label="name (https://domain/serivices/'name')" />
+                    <CheckBox name="disable" label="disabled (stored in database but will not appear on website)" />
+                    <CheckBox name="booking" label="show in booking form (selectable in booking form services)" />
                 </div>
 
                 <div className={styles["sub-heading"]}>Service Tile Data</div>
 
                 <div className={styles['page-section']}>
-                    <TextIn state={f} mid="tile-order" label="order (where the service is placed on services grid)" />
-                    <TextIn state={f} mid="tile-name" label="name" />
-                    <TextAr state={f} mid="tile-desc" label="description" />
-                    <TextIn state={f} mid="tile-img" label="background image" />
-                    <TextIn state={f} mid="tile-img-alt" label="text if image fails to load" />
+                    <Text name="tile-order" label="order (where the service is placed on services grid)" />
+                    <Text name="tile-name" label="name" />
+                    <TextArea name="tile-desc" label="description" />
+                    <Text name="tile-img" label="background image" />
+                    <Text name="tile-img-alt" label="text if image fails to load" />
                 </div>
 
                 <div className={styles["sub-heading"]}>Service Page Data</div>
 
                 <div className={styles["sub-sub-heading"]}>Section 1: intro</div>
                 <div className={styles['page-section']}>
-                    <TextIn state={f} mid="intro-name" label="name" />
-                    <TextAr state={f} mid="intro-desc" label="description" />
-                    <TextIn state={f} mid="intro-img" label="background image" />
-                    <TextIn state={f} mid="intro-img-alt" label="text if image fails to load" />
+                    <Text name="intro-name" label="name" />
+                    <TextArea name="intro-desc" label="description" />
+                    <Text name="intro-img" label="background image" />
+                    <Text name="intro-img-alt" label="text if image fails to load" />
                 </div>
 
                 <div className={styles["sub-sub-heading"]}>Section 2: summary (dark background)</div>
                 <div className={styles['page-section']}>
                     <div className={""}>Statements (part 1)</div>
-                    <TextIn state={f} mid="summary-s1" label="statement1" />
-                    <TextIn state={f} mid="summary-s2" label="statement2" />
-                    <TextIn state={f} mid="summary-s3" label="statement3" />
-                    <TextIn state={f} mid="summary-img1" label="statement image (image 1)" />
-                    <TextIn state={f} mid="summary-img1-alt" label={`text if image will not load (alt)`} />
+                    <Text name="summary-s1" label="statement1" />
+                    <Text name="summary-s2" label="statement2" />
+                    <Text name="summary-s3" label="statement3" />
+                    <Text name="summary-img1" label="statement image (image 1)" />
+                    <Text name="summary-img1-alt" label={`text if image will not load (alt)`} />
                     <Space />
                     <div className={""}>What (part 2)</div>
-                    <TextIn state={f} mid="summary-img2" label="image (image 2)" />
-                    <TextIn state={f} mid="summary-img2-alt" label={`text if image will not load (alt)`} />
-                    <TextAr state={f} mid="summary-what" label="text" />
+                    <TextArea name="summary-what" label="text" />
+                    <Text name="summary-img2" label="image (image 2)" />
+                    <Text name="summary-img2-alt" label={`text if image will not load (alt)`} />
+
                     <Space />
                     <div className={""}>Why (part 3)</div>
-                    <TextIn state={f} mid="summary-img3" label="image (image 2)" />
-                    <TextIn state={f} mid="summary-img3-alt" label={`text if image will not load (alt)`} />
-                    <TextAr state={f} mid="summary-why" label="text" />
+                    <TextArea name="summary-why" label="text" />
+                    <Text name="summary-img3" label="image (image 3)" />
+                    <Text name="summary-img3-alt" label={`text if image will not load (alt)`} />
+
                 </div>
 
                 <div className={styles["sub-sub-heading"]}>Section 3: Our Process</div>
                 <div className={styles['page-section']}>
-                    <TextAr state={f} mid="process-intro" label="intro text" />
-                    <DynamicInputList f={f} conatinerName={"process-steps"} item_template={step} item_name={"Step"}>
+                    <TextArea name="process-intro" label="intro text" />
+                    <ListIn f={f} conatinerName={"process-steps"} item_template={step} item_name={"Step"}>
                         {(i) =>{return <div>
-                            <TextIn state={f} path={["process-steps", i, 'step-name']} i={i} label={`step ${i+1} title`} key={i}/>
-                            <TextIn state={f} path={["process-steps", i, 'step-desc']} i={i} label={`step ${i+1} description`} key={i}/>
-                            <TextIn state={f} path={["process-steps", i, 'step-img']} i={i} label={`step ${i+1} image`} key={i}/>
-                            <TextIn state={f} path={["process-steps", i, 'step-img-alt']} i={i} label={`text if image will not load (alt)`} key={i}/>
+                            <Text path={["process-steps", i, 'step-name']} i={i} label={`step ${i+1} title`} key={i}/>
+                            <Text path={["process-steps", i, 'step-desc']} i={i} label={`step ${i+1} description`} key={i}/>
+                            <Text path={["process-steps", i, 'step-img']} i={i} label={`step ${i+1} image`} key={i}/>
+                            <Text path={["process-steps", i, 'step-img-alt']} i={i} label={`text if image will not load (alt)`} key={i}/>
                         </div>}}
-                    </DynamicInputList>
+                    </ListIn>
                 </div>
 
                 <div className={styles["sub-sub-heading"]}>Section 4: Info/Faq</div>
                 <div className={styles['page-section']}>
-                    <TextAr state={f} mid="faq-intro" label="intro text" />
-                    <DynamicInputList f={f} conatinerName={"faq-items"} item_template={question} item_name={"Question"}>
+                    <TextArea name="faq-intro" label="intro text" />
+                    <ListIn f={f} conatinerName={"faq-items"} item_template={question} item_name={"Question"}>
                         {(i) =>{return <div>
-                            <TextIn state={f} path={["faq-items", i, 'faq-question']} i={i} label={`question`} key={i}/>
-                            <TextAr state={f} path={["faq-items", i, 'faq-answer']} i={i} label={`answer`} key={i}/>
+                            <Text path={["faq-items", i, 'faq-question']} i={i} label={`question`} key={i}/>
+                            <TextArea path={["faq-items", i, 'faq-answer']} i={i} label={`answer`} key={i}/>
                         </div>}}
-                    </DynamicInputList>
+                    </ListIn>
                 </div>
 
                 <div className={styles["submit-section"]}>
-                    <button type="submit" className={styles["submit"]}>.Submit.</button>   
+                    <button type="submit" className={styles["submit"]}>Create Service</button>   
                 </div>
 
 
@@ -179,7 +181,7 @@ Create.defaultProps = {
     
 }
 
-function DynamicInputList({f, conatinerName, children, item_template, item_name}){
+function ListIn({f, conatinerName, children, item_template, item_name}){
     const editStep = (i, item) =>{
         const newSteps = f.values[conatinerName]
         item ? newSteps.splice(i, 0, item):newSteps.splice(i, 1)
@@ -205,144 +207,53 @@ function DynamicInputList({f, conatinerName, children, item_template, item_name}
     </>
  
 }
-//works if the id is the path (i.e 'process-steps.0.step-name') and the value is the object (i.e) f.values['process-steps'][0]['step-name']
-function TextIn2({label, ...props}){
+function Text({label, ...props}){
+    //get data
     const [field, meta] = useField(props)
+    const { submitCount } = useFormikContext()
 
-    const val = field.value
-    const errs = meta.error
-    const touched = meta.touched
-    //determine error messages
-    const isSubmited = props.state.submitCount
+    //determine errors
     let isErr
-    if(isSubmited){ isErr = errs}
-    else{ isErr = errs==='required' ? false:errs && (touched || val || val===0) }
+    if(submitCount){ isErr = meta.error }
+    else{ isErr = meta.error==='required' ? false:meta.error && (meta.touched || field.value || field.value===0) }
     const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
 
     return <div className={styles["section"]}>
         <label className={styles["label"]} htmlFor={props.id || props.name}>
             <p>{`${label}`}</p>
-            {isErr ? <pre className={styles['label-err']}>{` - ${errs}`}</pre>:null}
+            {isErr ? <pre className={styles['label-err']}>{` - ${meta.error}`}</pre>:null}
         </label>
         <input className={input_css} type="text" {...field} {...props}/>    
     </div>
 }
 
+function TextArea({label, ...props}){
+    //get data
+    const [field, meta] = useField(props)
+    const { submitCount } = useFormikContext()
 
-//works if the id is the path (i.e 'process-steps.0.step-name') and the value is the object (i.e) f.values['process-steps'][0]['step-name']
-function TextIn({state, mid, path, label}){
-
-    //create missing props from supplied ones
-    if(!path){path = [mid]}
-    else{if(!mid){mid=path.join('.')}}
-
-    //get data based on the path supplied
-    let vals = state.values
-    let errs = state.errors
-    let touched = state.touched
-    path.forEach((entry)=>{
-        if(vals){vals = vals[entry]}
-        if(errs){errs = errs[entry]}
-        if(touched){touched = touched[entry]}
-    })
+    //determine errors
     let isErr
-    //determine if error messages should be displayed based on data
-    if(errs==='required'){
-        if(state.submitCount){isErr = errs}
-        else{isErr = false}
-    }
-    else{ 
-        isErr = errs && touched 
-    }
-    // if(mid == 'url'){console.log('REEEEEEEEE', isErr, state.vals, state.errs, state.touched, state)}
-    const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
-
-    return <div className={styles["section"]}>
-        <label className={styles["label"]} htmlFor={mid}>
-            <p>{`${label}`}</p>
-            {isErr ? <pre className={styles['label-err']}>{` - ${errs}`}</pre>:null}
-        </label>
-        <input 
-            id={mid}
-            className={input_css} 
-            type="text" 
-            value={vals}
-            onChange={state.handleChange}
-            onBlur={state.handleBlur}
-         />    
-    </div>
-}
-
-function TextAr({state, mid, path, label}){
-
-    //create missing props from supplied ones
-    if(!path){path = [mid]}
-    else{if(!mid){mid=path.join('.')}}
-
-    //get data based on the path supplied
-    let vals = state.values
-    let errs = state.errors
-    let touched = state.touched
-    path.forEach((entry)=>{
-        if(vals){vals = vals[entry]}
-        if(errs){errs = errs[entry]}
-        if(touched){touched = touched[entry]}
-    })
-
-    //determine if error messages should be displayed based on data
-    const isErr = errs && touched
+    if(submitCount){ isErr = meta.error }
+    else{ isErr = meta.error==='required' ? false:meta.error && (meta.touched || field.value || field.value===0) }
     const input_css = classNames(styles["textarea-big"], {[styles["textarea-err"]]: isErr})
 
     return <div className={styles["section"]}>
-        <label className={styles["label"]} htmlFor={mid}>
+        <label className={styles["label"]} htmlFor={props.id || props.name}>
             <p>{`${label}`}</p>
-            {isErr ? <pre className={styles['label-err']}>{` - ${errs}`}</pre>:null}
+            {isErr ? <pre className={styles['label-err']}>{` - ${meta.error}`}</pre>:null}
         </label>
-        <textarea 
-            id={mid}
-            className={input_css} 
-            type="text" 
-            value={vals}
-            onChange={state.handleChange}
-            onBlur={state.handleBlur}
-         />    
+        <textarea className={input_css} type="text" {...field} {...props}/>    
     </div>
 }
 
-function CheckBox({state, mid, path, label}){
-
-    //create missing props from supplied ones
-    if(!path){path = [mid]}
-    else{if(!mid){mid=path.join('.')}}
-
-    //get data based on the path supplied
-    let vals = state.values
-    // let errs = state.errors
-    // let touched = state.touched
-    path.forEach((entry)=>{
-        if(vals){vals = vals[entry]}
-        // if(errs){errs = errs[entry]}
-        // if(touched){touched = touched[entry]}
-    })
-
-    //determine if error messages should be displayed based on data
-    // const isErr = errs && touched
-    // const input_css = classNames(styles["textarea-big"], {[styles["textarea-err"]]: isErr})
-
+function CheckBox({label, ...props}){
+    const [field, meta] = useField(props)
     return <div className={styles["section-checkbox"]}>
-        <input 
-            id={mid}
-            className={styles["checkbox"]} 
-            type="checkbox" 
-            value={vals}
-            onChange={state.handleChange}
-            onBlur={state.handleBlur}
-            checked={vals}
-         />    
-        <label className={styles["label"]} htmlFor={mid}>
+        <input className={styles["checkbox"]} type="checkbox" {...field} {...props} checked={field.value}/>  
+        <label className={styles["label"]} htmlFor={props.id || props.name}>
             <p>{`${label}`}</p>
         </label>
-
     </div>
 }
 function Space({}){
