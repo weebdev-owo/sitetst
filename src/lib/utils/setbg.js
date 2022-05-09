@@ -43,5 +43,33 @@ const SetBg = (elemRef) => {
     
 
 }
+export const SetBgInv = (elemRef) => {
 
+    useEffect(() => {
+
+        const initial_bg=getComputedStyle(document.body).background
+        const initial_scroll_col = getComputedStyle(document.body).getPropertyValue("--scroll-col")
+        const initial_scroll_hover_col = getComputedStyle(document.body).getPropertyValue("--scroll-hover-col")
+
+        let obsElemRef;
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {setBgCol(!entry.isIntersecting)})
+        })
+        
+        if (elemRef.current){
+            obsElemRef = elemRef.current
+            observer.observe(elemRef.current)
+        }
+  
+        return () => {
+            if(obsElemRef && observer){observer.unobserve(obsElemRef)}
+            document.body.style.background = initial_bg
+            document.body.style.setProperty("--scroll-col", initial_scroll_col)
+            document.body.style.setProperty("--scroll-hover-col", initial_scroll_hover_col)
+        }
+
+    }, []);
+    
+
+}
 export default SetBg

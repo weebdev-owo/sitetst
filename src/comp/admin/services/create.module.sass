@@ -33,6 +33,7 @@
     display: flex
     flex-direction: column
     padding-bottom: 2vh
+    padding-left: 10px
 
 .section-checkbox
     display: flex
@@ -43,6 +44,9 @@
 .label
     color: grey
     display: flex
+    align-items: center
+
+    // justify-content: center
 .label-err
     color: red
     
@@ -62,7 +66,7 @@
     padding: 15px 20px 15px 20px
     color: grey
     box-shadow: 2px 5px 3px rgba(0,0,0,0.2) inset
-    background-color: rgba(0,0,0,0.1)
+    // background-color: rgba(0,0,0,0.1)
 
 
 .submit
@@ -105,6 +109,9 @@
     border-radius: 10px
     border: 1px solid black
     font-size: 18px
+    &::selection 
+        color: white
+        background: black
 
 .textarea-smol
     width: 40vw
@@ -116,6 +123,9 @@
     border-radius: 10px
     border: 1px solid black
     font-size: 18px
+    &::selection 
+        color: white
+        background: black
 
 .textarea-err
         border: 1px solid red !important
@@ -133,14 +143,14 @@
     font-size: 20px
     padding: 10px 13px 10px 13px
     border-radius: 10px
-    border: 1px solid white
+    border: 1px solid #454545
     color: white
     background-color: black
-    transition: 200ms
+    transition: 300ms
     &:hover
         cursor: pointer
         // background-color: white
-        transition: 200ms
+        transition: 300ms
         color: #55ff00
         border: 1px solid black
 
@@ -150,14 +160,14 @@
     font-size: 20px
     padding: 10px 13px 10px 13px
     border-radius: 10px
-    border: 1px solid white
+    border: 1px solid #454545
     color: white
     background-color: black
-    transition: 200ms
+    transition: 300ms
     &:hover
         cursor: pointer
         // background-color: white
-        transition: 200ms
+        transition: 300ms
         color: #ff3232
         border: 1px solid black
 
@@ -167,14 +177,14 @@
     font-size: 20px
     padding: 10px
     border-radius: 10px
-    border: 1px solid white
+    border: 1px solid #454545
     color: white
     background-color: black
-    transition: 200ms
+    transition: 300ms
     &:hover
         cursor: pointer
         background-color: transparent
-        transition: 200ms
+        transition: 300ms
         color: #55ff00
         border: 1px solid black
 
@@ -188,16 +198,75 @@
     overflow: hidden
 
 .page-section
-    border: 1px solid white
+    border: 1px solid #454545
     // padding: 10px 20px 10px 20px
     padding: 40px
     margin-bottom: 40px
     margin-top: 20px
-    background: black
     border-radius: 20px
     color: white
     font-size: 20px
-    filter: brightness(90%)
+    // filter: brightness(90%)
 
-.form-cont
-    background-color: black
+
+
+.image-cont
+    display: grid
+    grid-column: 100%
+    align-content: center
+    justify-content: center
+    align-items: center
+    justify-items: center
+    row-gap: 20px
+
+.drop-zone-cont
+    border-radius: 20px
+    border: 1px solid #454545
+    margin: 10px
+    padding: 10px 60px 10px 60px
+    width: fit-content
+    transition: 300ms
+    &:hover
+        cursor: pointer
+        // color: #55ff00
+        border: 1px solid white
+        transition: 300ms
+
+
+.image-controls-cont
+    display: flex
+
+.image-button
+
+.drop-zone-input
+
+
+.crop-modal-cont
+    position: absolute
+
+.crop-modal
+    overflow-y: overlay
+    position: fixed
+    // min-height: 100vh
+    // min-width: 100vw
+    z-index: 1000
+    background: black
+    top: 0
+    left: 0
+    height: fit-content
+    width: 100vw
+    height: 100vh
+
+.image-editor-controls
+    position: fixed
+    top: 0
+    right: 0
+    margin: 14px 30px 
+
+.dropzone-error-cont
+    display: flex
+    width: 100%
+    justify-content: center
+    align-items: center
+.dropzone-error
+    color: red

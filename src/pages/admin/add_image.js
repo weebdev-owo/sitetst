@@ -1,8 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
-import { useDropzone } from "react-dropzone"
+
 import {memo, useCallback, useState, useEffect, useRef} from 'react'
 import { Field, Formik } from 'formik';
 // import styles from '/src/css/UploadImages.module.sass'
+import { useDropzone } from "react-dropzone"
 import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import CropImage from '/src/lib/image/crop/cropImage'
@@ -11,13 +12,9 @@ import styles from '/src/styles/dropzone.module.sass'
 function UploadImages({}){
 
     return <>
-    <Formik initaialValues={{}} onSubmit={() => {}} >
-        {({values, errors}) => (
-            <DropZone > 
-                <p>Place files or click to select from folder</p>
-            </DropZone>
-        )}
-    </Formik>
+        <DropZone > 
+            <p>Place files or click to select from folder</p>
+        </DropZone>
     </>
 
 }
@@ -37,10 +34,10 @@ function DropZone({children}){
         <div {...getRootProps()} className={styles['drop-zone-cont']}>
             <input {...getInputProps()} className={styles['drop-zone-input']}/>
             {children}
-            {files.map((fileWrap, i) => {
-                    return <FileDisplay file={fileWrap.file} key={i}/>
-            })}
         </div>
+        {files.map((fileWrap, i) => {
+            return <FileDisplay file={fileWrap.file} key={i}/>
+        })}
     </>
 }
 
@@ -56,11 +53,7 @@ function FileDisplay({file}){
     },[])
 
     return <>
-    <div>
-        {/* image preview */}
         <CropImage file={file} />
-        {/* {`${progress} %`} */}
-    </div>
     </>
 }
 
