@@ -8,10 +8,12 @@ import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import CropImage from '/src/lib/image/crop/cropImageForm'
 import FileImage from '/src/lib/image/preview/fileImage'
+import ContainFileImage from '/src/lib/image/preview/containFileImage'
 import {SetBgInv} from '/src/lib/utils/setbg'
 import useToggleScroll from '/src/lib/utils/toggleScroll'
 import image_styles from '/src/styles/images.module.sass'
-import uploadImage from '/src/lib/utils/uploadImage'
+import axios from 'axios'
+// import uploadImage from '/src/lib/utils/uploadImage'
 
 //layout form data
 const img = {
@@ -71,6 +73,9 @@ const initialValues = {
     "isEditorOpen": false,
     "editorFileName": "",
     "editorPreviewStyle": null,
+
+    'isSubmitOpen': false,
+
 }
 
 //setup form validation
@@ -168,55 +173,146 @@ const getImg = (obj, path) => {
 }
 const setImg = (obj, path, newval) => {
     let res = obj
-    const img_key = path.pop()
+    console.log(path)
+    const final = path.pop()
     path.forEach((entry) =>{res = res[entry]})
-    res[img_key] = newval
+    res[final] = newval
+}
+
+// const paths = []
+const upload_images = []
+const imgs = []
+const isImg = new RegExp('^img', 'i')
+function get_imgs(data, path, paths){  
+    if (typeof data === 'object' && data != null){
+        if (Array.isArray(data)){   //array
+            for(let i=0; i<data.length; i++){
+                get_imgs(data[i], path.concat([i]), paths)
+            }
+        }
+        else {  
+            const keys = Object.keys(data) //object
+            for (let i=0; i<keys.length; i++){
+                if (isImg.test(keys[i])){paths.push(path.concat([keys[i]]))}
+                else {get_imgs(data[keys[i]], path.concat([keys[i]]), paths)}
+            }
+        }
+    }
+    return paths
+}
+async function upload_image(values, path, i){
+    const img_data = getImg(values, path)
+    console.log('uploading', i, img_data['remote-url'])
+    //handle uploading and uploading display
+    if (!img_data['remote-url']){
+        try{
+            console.log('uploaddd strt', i )
+            const res = await axios.post(
+                'http://localhost:3000/api/uploadSingleImage', 
+                {image: img_data['cropped']}, 
+                {headers: 
+                    {'Content-Type': 'multipart/form-data'},
+                    onUploadProgress: (progressEvent) => {
+                        const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+                        // console.log("onUploadProgress", totalLength);
+                        if (totalLength !== null) {
+                            const progressData = Math.round( (progressEvent.loaded * 100) / totalLength );
+                            console.log(`progress ${i}: `,progressData)
+                            // setProgressBar(progressData)
+                        }
+                    }
+                }
+            )
+            console.log('uploaded', i, res.data)
+            setImg(values, path.concat(['remote-url']), res.data.url)
+            return [path, res.data.url]
+        }
+        catch (e){
+            console.log(`error uploading ${i}`, e)
+        }
+    }
+    else {
+        return true
+    }
 }
 
 function Create(){
-
+    const [isSubmitOpen, setSubmitOpen] = useState(false)
     //Change body background and scroll when ref onscreen
     const elemRef = useRef(null)
     SetBgInv(elemRef)
 
     const sendToAPI = async (values) => {
+
+        console.log('submmiting', values)
+        //UPLOAD IMAGES
+        //scan values for the key "img*"
+        await setSubmitOpen(true)
+
+        let paths = get_imgs(values, [], [])
+        console.log('paths', paths)
+
+        // send images to api
+        try{
+            const failed = false
+            const uploaded_images = await Promise.all(paths.map(async (path, i) => upload_image(values, path, i)))
+            for (const res of uploaded_images){if(!res){throw 'failed to upload'}}
+            console.log('Upload Sucsess', uploaded_images)
+            const payload = JSON.parse(JSON.stringify(values))
+            for (const path of paths){
+                const img = getImg(values, path)
+                setImg(payload, path, {
+                    url: img['remote-url'],
+                    alt: img['alt']
+                })
+            }
+            console.log('modified payload', payload)
+        }
+        catch (e){
+            console.log(e)
+        }
+            
+        
+
+
+    }
+
+    const sendToAPI2 = async (values) => {
         console.log('submmiting', values)
         //UPLOAD IMAGES
         //scan values for the key "img*"
 
         //send to api for update/storage
-        const paths = []
+        // const paths = []
+        const img_data = getImg(values, [])
+        console.log('ree', img_data)
         const imgs = []
-        const isImg = new RegExp('^img', 'i')
-        function get_imgs(data, path){  
-            if (typeof data === 'object' && data != null){
-                if (Array.isArray(data)){   //array
-                    for(let i=0; i<data.length; i++){
-                        get_imgs(data[i], path.concat([i]))
-                    }
-                }
-                else {  
-                    const keys = Object.keys(data) //object
-                    for (let i=0; i<keys.length; i++){
-                        if (isImg.test(keys[i])){paths.push(path.concat([keys[i]]))}
-                        else {get_imgs(data[keys[i]], path.concat([keys[i]]))}
-                    }
-                }
-            }
-        }
- 
+
+        paths = []
         get_imgs(values, [])
-        await paths.forEach(async (path, i) => {
+        console.log(paths)
+        //concurrent image upload
+        
+        const uploaded_images = []
+        // const uploaded_images = await Promise.all(paths.map(async (path, i) => {
+        await Promise.all(paths.forEach(async (path, i) => {
+
             const img_data = getImg(values, path)
+            console.log('uploading', i, img_data['remote-url'])
             if (!img_data['remote-url']){
-                await uploadImage()
+                try{
+                    console.log('upload strt', i )
+                    const res = await axios.post('http://localhost:3000/api/uploadSingleImage', {image: img_data['cropped']}, {headers: {'Content-Type': 'multipart/form-data'}})
+                    console.log('uploaded', i, res.data)
+                    uploaded_images.push(res)
+                    console.log('nnnn')
+                }
+                catch (e){
+                    console.log(e)
+                }
             }
-
-        })
-        console.log('REEEEEEE', paths, imgs)
-
-        
-        
+        }))
+        console.log('REEEEEEE', uploaded_images)
     }
 
     return <>
@@ -297,6 +393,7 @@ function Create(){
                 </div>
 
             {f.values['isEditorOpen'] ? <ImageEditor />: null}
+            {isSubmitOpen ? <Uploader setOpen={setSubmitOpen}/>: null}
 
             </form>
 
@@ -493,6 +590,10 @@ function FImage({name, label, styleIn, ...props}){
 
 }
 
+function Space({}){
+    return <div className={styles["space"]}></div>
+}
+
 function ImageEditor({}){
     const { values, setFieldValue } = useFormikContext()
 
@@ -524,8 +625,62 @@ function ImageEditor({}){
 
 }
 
-function Space({}){
-    return <div className={styles["space"]}></div>
+function Uploader({action, setOpen, paths}){
+    const { values, setFieldValue } = useFormikContext()
+    const tst = () =>{
+
+    }
+    return <>
+        <div className={styles['crop-modal']}>
+            <button type="button" className={styles["elem-button-del"]} onClick={()=>{setOpen(false)}}>Close</button>
+            <UploadImagesDisplay files={upload_images}/>
+            {action==='uploading-images' && <div className={styles['progress-uploading']}>
+            
+            </div>}
+
+            {action==='processing' && <div className={styles['progress-processing']}>
+                
+            </div>}
+
+            {action==='uploaded' && <div className={styles['progress-uploaded']}>
+                
+            </div>}
+        </div>
+    </>
+}
+
+function UploadImagesDisplay({files, progresses, actions}){
+
+    return <>
+    <div className={styles['upload-images-display']}></div>
+    {files.map((file, i) =>{
+        return <UploadImageDisplay file={file} key={i} />     
+    })}
+    </>
+}
+function UploadImageDisplay({file, progress, action}){
+    return <>
+
+        <ContainFileImage file={file}/>
+        <ProgressBar status={0} />
+    
+    </>
+}
+
+function ProgressBar({progress}){
+
+    {action==='uploading' && <div className={styles['progress-uploading']}>
+            
+    </div>}
+
+    {action==='processing' && <div className={styles['progress-processing']}>
+        
+    </div>}
+    
+    {action==='uploaded' && <div className={styles['progress-uploaded']}>
+        
+    </div>}
+
 }
 
 export default Create
