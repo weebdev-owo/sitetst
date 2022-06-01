@@ -1,13 +1,16 @@
 import {useEffect} from 'react'
 
+let initial_scroll_y
+let inital_scroll_x
+let initial_scroll
 
 const useToggleScroll = (disableScroll) => {
 
     useEffect(() => {
 
-        const initial_scroll_y = getComputedStyle(document.body)['overflow-y']
-        const inital_scroll_x = getComputedStyle(document.body)['overflow-x']
-        const initial_scroll = getComputedStyle(document.body)['overflow']
+        initial_scroll_y = getComputedStyle(document.body)['overflow-y']
+        inital_scroll_x = getComputedStyle(document.body)['overflow-x']
+        initial_scroll = getComputedStyle(document.body)['overflow']
   
         return () => {
             document.body.style['overflow-y'] = initial_scroll_y

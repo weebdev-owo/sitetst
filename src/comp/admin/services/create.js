@@ -1,10 +1,9 @@
-import {memo, useRef, useState, useCallback, useEffect} from 'react'
+import React, {memo, useRef, useState, useCallback, useEffect} from 'react'
 import styles from './create.module.sass'
 import {useField, useFormikContext, useFormik, Formik,getIn} from 'formik'
 import * as Yup from 'yup'
 import  classNames  from 'classnames';
 import { useDropzone } from "react-dropzone"
-import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import CropImage from '/src/lib/image/crop/cropImageForm'
 import FileImage from '/src/lib/image/preview/fileImage'
@@ -13,14 +12,15 @@ import {SetBgInv} from '/src/lib/utils/setbg'
 import useToggleScroll from '/src/lib/utils/toggleScroll'
 import image_styles from '/src/styles/images.module.sass'
 import axios from 'axios'
+let cnt = 0
 // import uploadImage from '/src/lib/utils/uploadImage'
 
 //layout form data
 const img = {
     "original": null,
     "cropped": null,
-    "remote-url": "",
-    "alt": ""
+    "url": "",
+    "alt": "edit for better seo"
 }
 const step = {
     "name": "",           
@@ -28,10 +28,67 @@ const step = {
     "img": img,
 }
 const question = {
-    "faq-question": "",           
-    "faq-answer": "",
+    "question": "",           
+    "answer": "",
 }
+
 const initialValues = {
+    "url": "ghtf",
+    "disable": false,
+    "booking":true,
+
+    services: {
+        tile: {
+            "order":1,
+            "name":"gdr",
+            "desc":"drg",
+            "img": img,
+        },
+    },
+
+    // service:{
+    //     intro: {
+    //         "name":"drg",
+    //         "desc":"drg",
+    //         "img": img,
+    //     },
+    //     summary: {
+    //         "s1":"drg",
+    //         "s2":"drg",
+    //         "s3":"drg",
+    //         "img1": img,
+    //         "what":"drg",
+    //         "img2": img,
+    //         "why":"drg",
+    //         "img3": img,
+    //     },
+    //     process:{
+    //         "intro":"drg",
+    //         "steps": [{
+    //             "name": "drg",           
+    //             "desc": "drg",
+    //             "img": img,
+    //         }],
+    //     },
+    //     faq: {
+    //         "intro":"drg",
+    //         "items": [{
+    //             "question": "fth",           
+    //             "answer": "ftfth",
+    //         }],
+    //     },
+    // },
+    
+
+    "isEditorOpen": false,
+    "editorFileName": "",
+    "editorPreviewStyle": null,
+
+    'isSubmitOpen': false,
+
+}
+
+const initialValues2 = {
     "url": "",
     "disable": false,
     "booking":true,
@@ -166,6 +223,8 @@ const yup_validation = Yup.object({
    
 })
 
+const yup_validation2 = Yup.object()
+
 const getImg = (obj, path) => {
     let res = obj
     path.forEach(entry =>{res = res[entry]})
@@ -200,81 +259,89 @@ function get_imgs(data, path, paths){
     }
     return paths
 }
-async function upload_image(values, path, i){
-    const img_data = getImg(values, path)
-    console.log('uploading', i, img_data['remote-url'])
-    //handle uploading and uploading display
-    if (!img_data['remote-url']){
+
+
+function Create(){
+    const [beginUpload, setBeginUpload] = useState(0)
+    const [images_data, setImagesData] = useState([])
+    //Change body background and scroll when ref onscreen
+    const elemRef = useRef(null)
+    SetBgInv(elemRef)
+    const upload_image = useCallback(async (img, i) => {
+        console.log('uploading', i)
+        //handle uploading and uploading display
         try{
-            console.log('uploaddd strt', i )
+            console.log('uploaddd strt', i)
             const res = await axios.post(
                 'http://localhost:3000/api/uploadSingleImage', 
-                {image: img_data['cropped']}, 
+                {image: img['cropped']}, 
                 {headers: 
                     {'Content-Type': 'multipart/form-data'},
-                    onUploadProgress: (progressEvent) => {
-                        const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
-                        // console.log("onUploadProgress", totalLength);
+                    onUploadProgress: async (e) => {
+                        console.log('HMMMMMMM', images_data)
+                        const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
                         if (totalLength !== null) {
-                            const progressData = Math.round( (progressEvent.loaded * 100) / totalLength );
-                            console.log(`progress ${i}: `,progressData)
-                            // setProgressBar(progressData)
+                            const progressData = [e.loaded, totalLength];
+                            console.log(`progress: `,progressData)
+                            await setImagesData((images_data) =>{
+                                const data = [...images_data]
+                                data[i][1] = progressData
+                                data[i].push(cnt)
+                                cnt += 1
+                                console.log('insidQQQQQQQQQ', data)
+                                return data
+                            })
                         }
                     }
                 }
             )
             console.log('uploaded', i, res.data)
-            setImg(values, path.concat(['remote-url']), res.data.url)
-            return [path, res.data.url]
+            img['url'] =  res.data.url
+            return true
         }
         catch (e){
             console.log(`error uploading ${i}`, e)
         }
-    }
-    else {
-        return true
-    }
-}
-
-function Create(){
-    const [isSubmitOpen, setSubmitOpen] = useState(false)
-    //Change body background and scroll when ref onscreen
-    const elemRef = useRef(null)
-    SetBgInv(elemRef)
-
+    })
+    
     const sendToAPI = async (values) => {
-
         console.log('submmiting', values)
         //UPLOAD IMAGES
         //scan values for the key "img*"
-        await setSubmitOpen(true)
-
+        await setBeginUpload(beginUpload+1)
+        await setImagesData([])
+        console.log('reeeeee', images_data)
         let paths = get_imgs(values, [], [])
-        console.log('paths', paths)
+        const upload_paths = paths.map((path) =>{
+            if (!getImg(values, path)['url']){return path}
+        })
+        console.log('upload paths', upload_paths)
+        const new_images_data = upload_paths.map((path) =>{
+            return [getImg(values, path)['cropped'], 0]
+        })
+        console.log('NEWWW DATA', new_images_data)
+        await setImagesData(new_images_data)
+        console.log('NEWWW DATA', images_data)
 
         // send images to api
         try{
-            const failed = false
-            const uploaded_images = await Promise.all(paths.map(async (path, i) => upload_image(values, path, i)))
+            const uploaded_images = await Promise.all(upload_paths.map(async (path, i) => upload_image(getImg(values, path), i)))
             for (const res of uploaded_images){if(!res){throw 'failed to upload'}}
             console.log('Upload Sucsess', uploaded_images)
             const payload = JSON.parse(JSON.stringify(values))
             for (const path of paths){
                 const img = getImg(values, path)
                 setImg(payload, path, {
-                    url: img['remote-url'],
+                    url: img['url'],
                     alt: img['alt']
                 })
             }
             console.log('modified payload', payload)
+            console.log('hhmhm', images_data)
         }
         catch (e){
-            console.log(e)
+            console.log('Error uploading images', e)
         }
-            
-        
-
-
     }
 
     const sendToAPI2 = async (values) => {
@@ -298,8 +365,8 @@ function Create(){
         await Promise.all(paths.forEach(async (path, i) => {
 
             const img_data = getImg(values, path)
-            console.log('uploading', i, img_data['remote-url'])
-            if (!img_data['remote-url']){
+            console.log('uploading', i, img_data['url'])
+            if (!img_data['url']){
                 try{
                     console.log('upload strt', i )
                     const res = await axios.post('http://localhost:3000/api/uploadSingleImage', {image: img_data['cropped']}, {headers: {'Content-Type': 'multipart/form-data'}})
@@ -318,7 +385,7 @@ function Create(){
     return <>
         <div id={'Create'} className={styles["form-cont"]} ref={elemRef}>
             <div className={styles["heading"]}>Create Service</div>
-            <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={yup_validation}>{(f) =>{console.log(f.errors);return <>
+            <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={yup_validation2}>{(f) =>{console.log();return <>
             <form className={styles["form"]} onSubmit={f.handleSubmit} autoComplete="off">
 
                 <div className={styles['page-section']}>
@@ -337,7 +404,7 @@ function Create(){
                     <FImage name="services.tile.img" label="background image" styleIn={image_styles['service-tile']}/>
                     
                 </div>
-
+{/* 
                 <div className={styles["sub-heading"]}>Service Page Data</div>
 
                 <div className={styles["sub-sub-heading"]}>Section 1: intro</div>
@@ -370,9 +437,9 @@ function Create(){
                     <TextArea name="service.process.intro" label="intro" />
                     <List name={"service.process.steps"} item_template={step} item_label={"Step"}>
                         {(i, list_name) => <div>
-                            <Text name={`${list_name}.${i}.name`} label={`step ${i+1} title`} key={i}/>
-                            <TextArea name={`${list_name}.${i}.desc`} label={`step ${i+1} description`} key={i}/>
-                            <FImage name={`${list_name}.${i}.img`} label={`step ${i+1} image`} styleIn={image_styles['step']} key={i}/>
+                            <Text name={`${list_name}.${i}.name`} label={`title`} key={i}/>
+                            <TextArea name={`${list_name}.${i}.desc`} label={`description`} key={i}/>
+                            <FImage name={`${list_name}.${i}.img`} label={`image`} styleIn={image_styles['step']} key={i}/>
                         </div> }
                     </List>
                 </div>
@@ -386,17 +453,16 @@ function Create(){
                             <TextArea name={`${list_name}.${i}.answer`} i={i} label={`answer`} key={i}/>
                         </div>}
                     </List>
-                </div>
+                </div> */}
 
                 <div className={styles["submit-section"]}>
                     <button type="submit" className={styles["submit"]}>Create Service</button>   
                 </div>
 
-            {f.values['isEditorOpen'] ? <ImageEditor />: null}
-            {isSubmitOpen ? <Uploader setOpen={setSubmitOpen}/>: null}
+                {f.values['isEditorOpen'] && <ImageEditor />}
+                {/* <UploadDisplay trigger={beginUpload}/> */}
 
             </form>
-
             </>}}</Formik>
 
             
@@ -515,7 +581,7 @@ function FImage({name, label, styleIn, ...props}){
     const [dropzoneErr, setDropzoneErr] = useState(false)
     const [field, meta, helpers] = useField(`${name}`)
     const [crop_field, crop_meta, crop_helpers] = useField(`${name}.cropped`)
-    // const [name_Field, name_meta, name_helpers] = useField(`${name}.remote-url`)
+    // const [name_Field, name_meta, name_helpers] = useField(`${name}.url`)
     const cropped_file = crop_field.value
 
     //on every drop get called with the files that were just added (not all the files in the dropzone), valid = passed validation of react-dropzone (not yup yet)
@@ -526,7 +592,7 @@ function FImage({name, label, styleIn, ...props}){
             setFile(valid[0])
             setFieldValue(`${name}.original`, valid[0])
             setFieldValue(`${name}.cropped`, valid[0])
-            setFieldValue(`${name}.remote-url`, null)
+            setFieldValue(`${name}.url`, null)
         }
         else{`file must be less than ${MAX_FILE_SIZE/mb}mb`
             const code = invalid[0].errors[0].code
@@ -607,7 +673,7 @@ function ImageEditor({}){
 
     const setCroped = async (file) => {
         setFieldValue(`${name}.cropped`, file)
-        setFieldValue(`${name}.remote-url`, null)
+        setFieldValue(`${name}.url`, null)
         setFieldValue('isEditorOpen', false)
     }
 
@@ -625,60 +691,74 @@ function ImageEditor({}){
 
 }
 
-function Uploader({action, setOpen, paths}){
-    const { values, setFieldValue } = useFormikContext()
-    const tst = () =>{
+function UploadDisplay({trigger, action, images_data}){
+    const [open, setOpen] = useState(false)
+    useEffect(() =>{
+        console.log('callehjhy', trigger)
+        trigger ? setOpen(true):setOpen(false)
+    }, [trigger])
+    useToggleScroll(open)
 
+    if (open){
+        return <>
+            <div className={styles['crop-modal']}>
+                <button type="button" className={styles["elem-button-del"]} onClick={()=>{setOpen(false)}}>Close</button>
+                
+                {action==='error' && <div className={styles['upload-display-error']}>
+                    
+                </div>}
+
+                {action==='images' && <div className={styles['upload-images']}>
+                    <UploadImagesDisplay images={images_data} />
+                </div>}
+
+                {action==='db' && <div className={styles['upload-db']}>
+                    
+                </div>}
+
+                {action==='complete' && <div className={styles['upload-complete']}>
+                    
+                </div>}
+
+            </div>
+        </>
     }
+    else{
+        return null
+    }
+
+}
+
+function UploadImagesDisplay({data}){
+    const { values, setFieldValue } = useFormikContext()
+
     return <>
-        <div className={styles['crop-modal']}>
-            <button type="button" className={styles["elem-button-del"]} onClick={()=>{setOpen(false)}}>Close</button>
-            <UploadImagesDisplay files={upload_images}/>
-            {action==='uploading-images' && <div className={styles['progress-uploading']}>
-            
-            </div>}
-
-            {action==='processing' && <div className={styles['progress-processing']}>
-                
-            </div>}
-
-            {action==='uploaded' && <div className={styles['progress-uploaded']}>
-                
-            </div>}
-        </div>
+        <div className={styles['upload-images-display']}></div>
+        {data.map(([file, progress], i) =>{
+            return <UploadImageDisplay file={file} progress={progress} key={i} />     
+        })}
     </>
 }
 
-function UploadImagesDisplay({files, progresses, actions}){
-
+function UploadImageDisplay({file, progress}){
     return <>
-    <div className={styles['upload-images-display']}></div>
-    {files.map((file, i) =>{
-        return <UploadImageDisplay file={file} key={i} />     
-    })}
-    </>
-}
-function UploadImageDisplay({file, progress, action}){
-    return <>
-
         <ContainFileImage file={file}/>
-        <ProgressBar status={0} />
-    
+        <ProgressBar status={0} progress={progress}/>
     </>
 }
 
 function ProgressBar({progress}){
 
     {action==='uploading' && <div className={styles['progress-uploading']}>
-            
+        {'sending file to server'}
     </div>}
 
     {action==='processing' && <div className={styles['progress-processing']}>
-        
+        {'processing on cloudinary'}
     </div>}
     
     {action==='uploaded' && <div className={styles['progress-uploaded']}>
-        
+        {'uploaded'}
     </div>}
 
 }
