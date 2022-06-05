@@ -18,7 +18,7 @@ const SetBg = (elemRef) => {
 
     useEffect(() => {
 
-        const initial_bg=getComputedStyle(document.body).background
+        const initial_bg = getComputedStyle(document.body).background
         const initial_scroll_col = getComputedStyle(document.body).getPropertyValue("--scroll-col")
         const initial_scroll_hover_col = getComputedStyle(document.body).getPropertyValue("--scroll-hover-col")
 
@@ -47,9 +47,9 @@ export const SetBgInv = (elemRef) => {
 
     useEffect(() => {
 
-        const initial_bg=getComputedStyle(document.body).background
+        const initial_bg = 'white'
         const initial_scroll_col = getComputedStyle(document.body).getPropertyValue("--scroll-col")
-        const initial_scroll_hover_col = getComputedStyle(document.body).getPropertyValue("--scroll-hover-col")
+        const initial_scroll_hover_col = "black"
 
         let obsElemRef;
         const observer = new IntersectionObserver(entries => {

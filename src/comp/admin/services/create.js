@@ -12,6 +12,11 @@ import {SetBgInv} from '/src/lib/utils/setbg'
 import useToggleScroll from '/src/lib/utils/toggleScroll'
 import image_styles from '/src/styles/images.module.sass'
 import axios from 'axios'
+import serviceSchema from '/src/lib/validations/service'
+import Spinner from '/src/lib/comps/spinner/spinner'
+import Link from 'next/link'
+import {useRouter} from 'next/router'
+
 let cnt = 0
 // import uploadImage from '/src/lib/utils/uploadImage'
 
@@ -32,65 +37,9 @@ const question = {
     "answer": "",
 }
 
-const initialValues = {
-    "url": "ghtf",
-    "disable": false,
-    "booking":true,
-
-    services: {
-        tile: {
-            "order":1,
-            "name":"gdr",
-            "desc":"drg",
-            "img": img,
-        },
-    },
-
-    // service:{
-    //     intro: {
-    //         "name":"drg",
-    //         "desc":"drg",
-    //         "img": img,
-    //     },
-    //     summary: {
-    //         "s1":"drg",
-    //         "s2":"drg",
-    //         "s3":"drg",
-    //         "img1": img,
-    //         "what":"drg",
-    //         "img2": img,
-    //         "why":"drg",
-    //         "img3": img,
-    //     },
-    //     process:{
-    //         "intro":"drg",
-    //         "steps": [{
-    //             "name": "drg",           
-    //             "desc": "drg",
-    //             "img": img,
-    //         }],
-    //     },
-    //     faq: {
-    //         "intro":"drg",
-    //         "items": [{
-    //             "question": "fth",           
-    //             "answer": "ftfth",
-    //         }],
-    //     },
-    // },
-    
-
-    "isEditorOpen": false,
-    "editorFileName": "",
-    "editorPreviewStyle": null,
-
-    'isSubmitOpen': false,
-
-}
-
 const initialValues2 = {
     "url": "",
-    "disable": false,
+    "enabled": true,
     "booking":true,
     services: {
         tile: {
@@ -134,97 +83,94 @@ const initialValues2 = {
     'isSubmitOpen': false,
 
 }
-
-//setup form validation
-const b = 8
-const kb = 1000
-const mb = 1000*kb
-const MAX_FILE_SIZE = 10*mb
-const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/gif", "image/png"];
-const SUPPORTED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif']
-const title = 30
-const short = 60
-const para = 400
-
-const valid_num = (min, max) => Yup.number()
-    .typeError('must be a number')
-    .min(min, `must be ${min} or greater`)
-    .max(max, `must be ${max} or smaller`)
-    .required('required')
-const restricted_name = num_chars => Yup.string()
-    .max(num_chars,`max length ${num_chars} chars`)
-    .matches(/^(?![0-9]*$)[a-zA-Z0-9]+$/, "only letters or numbers allowed")
-    .matches(/^[A-Za-z].*/, "file name should not start with special characters")
-    .matches(/^[^\\/:\*\?"<>\|]+$/,' forbidden characters \ / : * ? " < > |')
-    .matches(/^(?!\.)(?!com[0-9]$)(?!con$)(?!lpt[0-9]$)(?!nul$)(?!aux$)(?!prn$)[^\|\*\?\\:<>/$"]*[^\.\|\*\?\\:<>/$"]+$/, 'forbidden file name')
-    .required("required")
-const brief_text = (num_chars) => Yup.string()
-    .matches(/^[\.a-zA-Z0-9,!? ]*$/, "only letters, numbers, spaces and punctuation allowed")
-    .max(num_chars, `max length ${num_chars} chars`)
-    .required("required")
-const valid_array = (label, min, max, item) => Yup.array().of(Yup.object(item))
-    .min(1, `must have more than ${min} ${label}`)
-    .max(50, `can only have up to ${max} ${label}`)
-    .required('requred')
-const valid_img_file = Yup.mixed() 
-    .test('fileSize', `file must be less than ${MAX_FILE_SIZE/mb}mb`, value => value ? value.size<=MAX_FILE_SIZE:true) 
-    .test('fileType', `file must be a ${SUPPORTED_FILE_EXTENSIONS}`, value => value ? SUPPORTED_FORMATS.includes(value.type):true)
-    .required('required')
-const img_data = Yup.object({
-    cropped: valid_img_file,
-    alt: brief_text(short)
-})
-
-const yup_validation = Yup.object({
-    "url": restricted_name(20),
-    "disable": Yup.boolean(),
-    "booking": Yup.boolean(),
-    services: Yup.object({
-        tile: Yup.object({
-            "order": valid_num(0, 100),
-            "name": brief_text(title),
-            "desc": brief_text(short), 
-            "img": img_data,
-        }),
-    }),
-    service: Yup.object({
-        intro: Yup.object({
-            "name": brief_text(title),
-            "desc": brief_text(para), 
-            "img": img_data,
-        }),
-        summary: Yup.object({
-            "s1": brief_text(title),
-            "s2": brief_text(title),
-            "s3": brief_text(title),
-            "img1": img_data,
-            "what": brief_text(para), 
-            "img2": img_data,
-            "why": brief_text(para), 
-            "img3": img_data,
-        }),
-        process: Yup.object({
-            "intro": brief_text(para), 
-            "steps": valid_array('steps', 0, 50, {
-                "name": brief_text(short),           
-                "desc": brief_text(para),  
-                "img": img_data,  
-            }),
-        }),
-        faq: Yup.object({
-            "intro": brief_text(para), 
-            "items": valid_array('questions', 0, 50, {
-                'question': brief_text(short),  
-                'answer': brief_text(para),  
-            }),
-        }),
-    })
-    
-   
-})
-
-const yup_validation2 = Yup.object()
-
+const yup_validation2 = Yup.object({})
+const initialValues = {
+    "url": "thrh",
+    "enabled": true,
+    "booking": true,
+    "services": {
+        "tile": {
+            "order": "4",
+            "name": "drh",
+            "desc": "drgh",
+            "img": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            }
+        }
+    },
+    "service": {
+        "intro": {
+            "name": "drgh",
+            "desc": "drh",
+            "img": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            }
+        },
+        "summary": {
+            "s1": "drh",
+            "s2": "drh",
+            "s3": "drh",
+            "img1": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            },
+            "what": "drh",
+            "img2": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            },
+            "why": "drh",
+            "img3": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            }
+        },
+        "process": {
+            "intro": "drh",
+            "steps": [
+                {
+                    "name": "drh",
+                    "desc": "drh",
+                    "img": {
+                        "original": null,
+                        "cropped": null,
+                        "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                        "alt": "edit for better seo"
+                    }
+                }
+            ]
+        },
+        "faq": {
+            "intro": "drh",
+            "items": [
+                {
+                    "question": "drh",
+                    "answer": "drh"
+                },
+                {
+                    "question": "drg",
+                    "answer": "rg"
+                }
+            ]
+        }
+    },
+    "isEditorOpen": false,
+    "editorFileName": "",
+    "editorPreviewStyle": null,
+    "isSubmitOpen": false
+}
 const getImg = (obj, path) => {
     let res = obj
     path.forEach(entry =>{res = res[entry]})
@@ -238,9 +184,6 @@ const setImg = (obj, path, newval) => {
     res[final] = newval
 }
 
-// const paths = []
-const upload_images = []
-const imgs = []
 const isImg = new RegExp('^img', 'i')
 function get_imgs(data, path, paths){  
     if (typeof data === 'object' && data != null){
@@ -262,14 +205,25 @@ function get_imgs(data, path, paths){
 
 
 function Create(){
+    //upload display
     const [beginUpload, setBeginUpload] = useState(0)
-    const [images_data, setImagesData] = useState([])
+    //images
+    const [uploadImages, setUploadImages] = useState([])
+    const [uploadImagesProgress, setUploadImagesProgress] = useState([])
+    const [uploadImagesErrors, setUploadImagesErrors] = useState([])
+    const [uploadActions, setUploadActions] = useState([])
+    const [uploadAction, setUploadAction] = useState([])
+    //database
+    const [uploadDataErrors, setUploadDataErrors] = useState([])
+    const [uploadDataErrorTypes, setUploadDataErrorTypes] = useState({validation: false, types: false})
+    const [uploadDataProgress, setUploadDataProgress] = useState([0,0])
+
     //Change body background and scroll when ref onscreen
     const elemRef = useRef(null)
     SetBgInv(elemRef)
+
     const upload_image = useCallback(async (img, i) => {
         console.log('uploading', i)
-        //handle uploading and uploading display
         try{
             console.log('uploaddd strt', i)
             const res = await axios.post(
@@ -277,18 +231,14 @@ function Create(){
                 {image: img['cropped']}, 
                 {headers: 
                     {'Content-Type': 'multipart/form-data'},
-                    onUploadProgress: async (e) => {
-                        console.log('HMMMMMMM', images_data)
+                    onUploadProgress: (e) => {
                         const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
                         if (totalLength !== null) {
                             const progressData = [e.loaded, totalLength];
                             console.log(`progress: `,progressData)
-                            await setImagesData((images_data) =>{
-                                const data = [...images_data]
-                                data[i][1] = progressData
-                                data[i].push(cnt)
-                                cnt += 1
-                                console.log('insidQQQQQQQQQ', data)
+                            setUploadImagesProgress((progress) =>{
+                                const data = [...progress]
+                                data[i] = progressData
                                 return data
                             })
                         }
@@ -297,37 +247,74 @@ function Create(){
             )
             console.log('uploaded', i, res.data)
             img['url'] =  res.data.url
+            setUploadActions((actions) =>{
+                const data = [...actions]
+                data[i] = 'uploaded'
+                return data
+            })
             return true
         }
         catch (e){
             console.log(`error uploading ${i}`, e)
+            setUploadImagesErrors((errs) =>{
+                const data = [...errs]
+                data[i] = e
+                return data
+            })
+            return false
         }
-    })
+    }, [])
     
     const sendToAPI = async (values) => {
         console.log('submmiting', values)
-        //UPLOAD IMAGES
-        //scan values for the key "img*"
-        await setBeginUpload(beginUpload+1)
-        await setImagesData([])
-        console.log('reeeeee', images_data)
-        let paths = get_imgs(values, [], [])
-        const upload_paths = paths.map((path) =>{
-            if (!getImg(values, path)['url']){return path}
-        })
-        console.log('upload paths', upload_paths)
-        const new_images_data = upload_paths.map((path) =>{
-            return [getImg(values, path)['cropped'], 0]
-        })
-        console.log('NEWWW DATA', new_images_data)
-        await setImagesData(new_images_data)
-        console.log('NEWWW DATA', images_data)
+        setBeginUpload(beginUpload+1)
+        
 
-        // send images to api
-        try{
-            const uploaded_images = await Promise.all(upload_paths.map(async (path, i) => upload_image(getImg(values, path), i)))
-            for (const res of uploaded_images){if(!res){throw 'failed to upload'}}
-            console.log('Upload Sucsess', uploaded_images)
+        //IMAGES UPLOAD
+        let image_sucsess = true
+        let data_sucsess = false
+
+        //scan values for the key "img*"
+        let paths = get_imgs(values, [], [])
+        const upload_paths = []
+        paths.forEach((path) =>{
+            if (!getImg(values, path)['url']){upload_paths.push(path)}
+        })
+        console.log('upload paths', paths, upload_paths)
+
+        //SETUP DISPLAY
+        //images
+        setUploadImages(upload_paths.map(path => getImg(values, path)['cropped']))
+        setUploadImagesProgress(upload_paths.map(() => [0,0]))
+        setUploadActions(upload_paths.map(() => 'uploading'))
+        setUploadImagesErrors(upload_paths.map(() => false))
+        //data
+        setUploadDataErrors([])
+        setUploadDataErrorTypes({validation: false, types: false})
+        setUploadDataProgress([0,0])
+
+        //do image uploads if required
+        
+        if(upload_paths.length){
+            setUploadAction('images')
+            // send images to api
+            try{
+                const uploaded_images = await Promise.all(upload_paths.map(async (path, i) => upload_image(getImg(values, path), i)))
+                for (const res of uploaded_images){if(!res){throw 'failed to upload'}}
+                console.log('Upload Sucsess', uploaded_images)
+            }
+            catch (e){
+                console.log('Error uploading images', e)
+                image_sucsess = false
+            }
+        }
+
+        console.log('upload paths2', upload_paths)
+
+        //DB UPLOAD
+        if(image_sucsess){
+            setUploadAction('db')
+            //clone and modify form data
             const payload = JSON.parse(JSON.stringify(values))
             for (const path of paths){
                 const img = getImg(values, path)
@@ -336,50 +323,47 @@ function Create(){
                     alt: img['alt']
                 })
             }
+            delete payload["isEditorOpen"]
+            delete payload["editorFileName"]
+            delete payload["editorPreviewStyle"]
+            delete payload["isSubmitOpen"]
             console.log('modified payload', payload)
-            console.log('hhmhm', images_data)
-        }
-        catch (e){
-            console.log('Error uploading images', e)
-        }
-    }
 
-    const sendToAPI2 = async (values) => {
-        console.log('submmiting', values)
-        //UPLOAD IMAGES
-        //scan values for the key "img*"
-
-        //send to api for update/storage
-        // const paths = []
-        const img_data = getImg(values, [])
-        console.log('ree', img_data)
-        const imgs = []
-
-        paths = []
-        get_imgs(values, [])
-        console.log(paths)
-        //concurrent image upload
-        
-        const uploaded_images = []
-        // const uploaded_images = await Promise.all(paths.map(async (path, i) => {
-        await Promise.all(paths.forEach(async (path, i) => {
-
-            const img_data = getImg(values, path)
-            console.log('uploading', i, img_data['url'])
-            if (!img_data['url']){
-                try{
-                    console.log('upload strt', i )
-                    const res = await axios.post('http://localhost:3000/api/uploadSingleImage', {image: img_data['cropped']}, {headers: {'Content-Type': 'multipart/form-data'}})
-                    console.log('uploaded', i, res.data)
-                    uploaded_images.push(res)
-                    console.log('nnnn')
-                }
-                catch (e){
-                    console.log(e)
-                }
+            //send data to api
+            try{
+                const res = await axios.post(
+                    'http://localhost:3000/api/cmsCreate', 
+                    {data: payload}, 
+                    {headers: 
+                        {'Content-Type': 'application/json'},
+                        onUploadProgress: (e) => {
+                            const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
+                            if (totalLength !== null) {
+                                const progressData = [e.loaded, totalLength];
+                                console.log(`progress: `,progressData)
+                                setUploadDataProgress(progressData)
+                            }
+                        }
+                    }
+                )
+                data_sucsess = true
             }
-        }))
-        console.log('REEEEEEE', uploaded_images)
+            catch (err) {
+                const messages = err.response.data.error.messages
+                const types = err.response.data.error.types
+                console.log('error uploading data', err)
+                setUploadDataErrorTypes({...types})
+                setUploadDataErrors([...messages])
+            }
+        }
+
+        if(data_sucsess){
+            setUploadAction('sucsess')
+        }
+
+        
+        
+
     }
 
     return <>
@@ -390,11 +374,11 @@ function Create(){
 
                 <div className={styles['page-section']}>
                     <Text name="url" label="name (https://domain/serivices/'name')" />
-                    <CheckBox name="disable" label="disabled (stored in database but will not appear on website)" />
-                    <CheckBox name="booking" label="show in booking form (selectable in booking form services)" />
+                    <CheckBox name="enabled" label="enabled (if not enabled service will not appear on website)" />
+                    <CheckBox name="booking" label="show in booking form (selectable in booking form services if the service is enabled)" />
                 </div>
 
-                <div className={styles["sub-heading"]}>Services Page Data</div>
+                <div className={styles["sub-heading"]}>Services Data</div>
 
                 <div className={styles["sub-sub-heading"]}>Service Tile</div>
                 <div className={styles['page-section']}>
@@ -404,7 +388,7 @@ function Create(){
                     <FImage name="services.tile.img" label="background image" styleIn={image_styles['service-tile']}/>
                     
                 </div>
-{/* 
+
                 <div className={styles["sub-heading"]}>Service Page Data</div>
 
                 <div className={styles["sub-sub-heading"]}>Section 1: intro</div>
@@ -453,14 +437,24 @@ function Create(){
                             <TextArea name={`${list_name}.${i}.answer`} i={i} label={`answer`} key={i}/>
                         </div>}
                     </List>
-                </div> */}
+                </div>
 
                 <div className={styles["submit-section"]}>
                     <button type="submit" className={styles["submit"]}>Create Service</button>   
                 </div>
 
                 {f.values['isEditorOpen'] && <ImageEditor />}
-                {/* <UploadDisplay trigger={beginUpload}/> */}
+                <UploadDisplay 
+                    trigger={beginUpload} 
+                    action={uploadAction}
+                    files={uploadImages}
+                    progress={uploadImagesProgress} 
+                    actions={uploadActions} 
+                    errors={uploadImagesErrors}
+                    dataErrorMessages={uploadDataErrors}
+                    dataErrorTypes={uploadDataErrorTypes}
+                    dataProgress={uploadDataProgress}
+                />
 
             </form>
             </>}}</Formik>
@@ -556,7 +550,6 @@ function List({name, children, item_template, item_label, ...props}){
         </label>
         {getIn(values, name).map((unneed, i) =>{
             return <>
-                <Space />
                 <div className={styles['elem-topbar']}>
                     {`${item_label} ${i+1}.`} 
                     <div>
@@ -565,6 +558,7 @@ function List({name, children, item_template, item_label, ...props}){
                     </div>
                 </div>
                 {children(i, name)}
+                <Space />
             </>
         })}
         <button type="button" className={styles["list-add"]} onClick={() => {push()}}>{`+ Add ${item_label}`}</button> 
@@ -691,10 +685,9 @@ function ImageEditor({}){
 
 }
 
-function UploadDisplay({trigger, action, images_data}){
+function UploadDisplay({trigger, action, files, progress, actions, errors, dataErrorMessages, dataErrorTypes, dataProgress}){
     const [open, setOpen] = useState(false)
     useEffect(() =>{
-        console.log('callehjhy', trigger)
         trigger ? setOpen(true):setOpen(false)
     }, [trigger])
     useToggleScroll(open)
@@ -702,22 +695,28 @@ function UploadDisplay({trigger, action, images_data}){
     if (open){
         return <>
             <div className={styles['crop-modal']}>
-                <button type="button" className={styles["elem-button-del"]} onClick={()=>{setOpen(false)}}>Close</button>
-                
-                {action==='error' && <div className={styles['upload-display-error']}>
-                    
-                </div>}
 
                 {action==='images' && <div className={styles['upload-images']}>
-                    <UploadImagesDisplay images={images_data} />
+                    <UploadImagesDisplay 
+                        files={files} 
+                        progress={progress} 
+                        actions={actions} 
+                        errors={errors} 
+                        setOpen={setOpen}
+                    />
                 </div>}
 
                 {action==='db' && <div className={styles['upload-db']}>
-                    
+                    <UploadDataDisplay 
+                        messages={dataErrorMessages} 
+                        types={dataErrorTypes} 
+                        progress={dataProgress} 
+                        setOpen={setOpen}
+                    />
                 </div>}
 
-                {action==='complete' && <div className={styles['upload-complete']}>
-                    
+                {action==='sucsess' && <div className={styles['upload-complete']}>
+                    <UploadSucsessDisplay />
                 </div>}
 
             </div>
@@ -729,38 +728,169 @@ function UploadDisplay({trigger, action, images_data}){
 
 }
 
-function UploadImagesDisplay({data}){
-    const { values, setFieldValue } = useFormikContext()
-
+function UploadImagesDisplay({files, progress, actions, errors, setOpen}){
+    let error = false
+    for(const err of errors){error = err ? true:false}
     return <>
-        <div className={styles['upload-images-display']}></div>
-        {data.map(([file, progress], i) =>{
-            return <UploadImageDisplay file={file} progress={progress} key={i} />     
-        })}
+        <div className={styles['heading']}>{!error ? 'Uploading Images':'Error Uploading Images'}</div>
+        {error && <div className={styles['sub-heading']}>{`check server status and configuration`}</div>}
+        {error && <button type="button" className={styles["upload-close"]} onClick={()=>{setOpen(false)}}>x</button>}
+        <div className={styles['upload-images-display']}>
+            {files.map((file, i) =>{
+                return <UploadImageDisplay file={file} progress={progress[i]} action={actions[i]} error={errors[i]} key={i} />     
+            })}
+        </div>
     </>
 }
 
-function UploadImageDisplay({file, progress}){
-    return <>
+function UploadImageDisplay({file, progress, action, error}){
+    return <div>
         <ContainFileImage file={file}/>
-        <ProgressBar status={0} progress={progress}/>
+        {error ? 
+            <div className={styles['upload-image-error']}>{`${error}`}</div>
+        :
+            progress && progress.length && <ProgressBar progress={progress} action={action}/>
+        }
+        
+    </div>
+}
+
+function ProgressBar({progress, action}){
+    let [loaded, total] = progress
+    let unit = ''
+    if (total>100000){
+        loaded = (loaded/1000000).toFixed(2)
+        total = (total/1000000).toFixed(2)
+        unit='mb'
+    }
+    else if(total>100) {
+        loaded = (loaded/1000).toFixed(2)
+        total = (total/1000).toFixed(2)
+        unit='kb'
+    }
+    else{
+        loaded = (loaded/1).toFixed(2)
+        total = (total/1).toFixed(2)
+        unit='bytes'
+    }
+
+    return <div className={styles['upload-image-progress']}>
+
+        {action==='uploading' && <div className={styles['progress-uploading']}>
+            <Bar progress={Math.floor((loaded*100)/total)} />
+            {total!=loaded ? 
+                `${loaded}/${total} ${unit}`
+            :
+            <div className={styles['upload-image-optimizing']}><div className={styles['upload-image-optimizing-text']}>{`Optimizing`}</div><Spinner h={20}/></div>
+            }
+        </div>}
+        
+        {action==='uploaded' && <div className={styles['progress-uploaded']}>
+            <div className={styles['upload-image-optimizing']}><div className={styles['upload-image-optimizing-text']}>{`Uploaded`}</div></div>
+        </div>}
+    </div>
+}
+
+function ProgressBar2({progress}){
+    let [loaded, total] = progress
+    let unit = ''
+    if (total>100000){
+        loaded = (loaded/1000000).toFixed(2)
+        total = (total/1000000).toFixed(2)
+        unit='mb'
+    }
+    else if(total>100) {
+        loaded = (loaded/1000).toFixed(2)
+        total = (total/1000).toFixed(2)
+        unit='kb'
+    }
+    else{
+        loaded = (loaded/1).toFixed(2)
+        total = (total/1).toFixed(2)
+        unit='bytes'
+    }
+
+    return <div className={styles['upload-image-progress']}>
+
+        <div className={styles['progress-uploading']}>
+            <Bar progress={Math.floor((loaded*100)/total)} />
+            <div>{`${loaded}/${total} ${unit}`}</div>
+        </div>
+        
+    </div>
+}
+
+
+function Bar({progress}){
+    return <>
+        <div style={{
+            height: '5px', 
+            width: '200px',
+            backgroundColor: 'black',
+            borderRadius: '20px',
+            border: '1px solid white'
+        }}>
+            <div style={{
+                height: '100%', 
+                width: `${progress}%`,
+                backgroundColor: 'white',
+                borderRadius: '20px'
+            }}>
+
+            </div>
+        </div>
     </>
 }
 
-function ProgressBar({progress}){
+function UploadDataDisplay({types, messages, setOpen, progress}){
+    console.log('REEEEEEEEEE', types, messages)
+    return <>
+        <div className={styles['heading']}>{!messages.length ? 'Uploading Data to Server':'Error Uploading Data to Server'}</div>
+        {types.validation ? <div className={styles['sub-heading']}>{`change form data`}</div>:null}
+        {types.server ? <div className={styles['sub-heading']}>{`check server status and configuration`}</div>:null}
+        {messages.length ? <div className={styles['upload-data-errors']}>{messages.map((message, i) => <span className={styles['upload-data-error']} key={i}>{`${message}`}</span>)}</div>:null}
+        {messages.length ? <button type="button" className={styles["upload-close"]} onClick={()=>{setOpen(false)}}>x</button>:null}
+        {!messages.length ? <div className={styles['upload-data-inprogress']}><div className={styles['upload-data-inprogress-text']}>{`In Progress`}</div><Spinner h={60}/></div>:null}
+        {!messages.length ? <ProgressBar2 progress={progress} />:null}
+    </>
 
-    {action==='uploading' && <div className={styles['progress-uploading']}>
-        {'sending file to server'}
-    </div>}
+}
 
-    {action==='processing' && <div className={styles['progress-processing']}>
-        {'processing on cloudinary'}
-    </div>}
-    
-    {action==='uploaded' && <div className={styles['progress-uploaded']}>
-        {'uploaded'}
-    </div>}
+function UploadSucsessDisplay({}){
+    const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
+    const router = useRouter()
+    const forceReload = () =>{
+        router.reload()
+    }
 
+    return <>
+        <div className={styles['heading']} style={{"color":'#39C16C'}}>Upload Sucsess</div>
+        <div className={styles['sucsess-links']}>
+            <div className={styles["sucsess-section"]}>
+                <Link href={'http://localhost:3000/services'}>
+                    <a className={styles["sucsess-link"]}>Admin Home</a> 
+                </Link>   
+            </div>
+
+            <div className={styles["sucsess-section"]}>
+                <Link href={'http://localhost:3000'}>
+                    <a className={styles["sucsess-link"]}>Preview {`${values.url}`}</a> 
+                </Link>  
+            </div>
+
+            <div className={styles["sucsess-section"]}>
+                <Link href={''}>
+                    <a className={styles["sucsess-link"]}>Edit {`${values.url}`}</a> 
+                </Link>     
+            </div>
+
+            <div className={styles["sucsess-section"]}>
+                <Link href={'http://localhost:3000/admin/services/create'}>
+                    <a className={styles["sucsess-link"]} onClick={forceReload}>Create New Service</a> 
+                </Link>     
+            </div>
+        </div>
+    </>
 }
 
 export default Create

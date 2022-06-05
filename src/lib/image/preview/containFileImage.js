@@ -14,7 +14,7 @@ function FileImage({file, w, h, alt, styleIn}){
     const container = styleIn? {position: "relative", "max-width": '50vw', "max-height": "50vh"} : {position: "relative", width: `${w}`,height: `${h}`}
     return <> {src &&
         <div className={styleIn} style={container}>
-            <div className={styles['bg-image']}>
+            <div className={styles['bg-image2']}>
                 <Image 
                     src={src}
                     alt={alt}
@@ -30,8 +30,8 @@ function FileImage({file, w, h, alt, styleIn}){
 FileImage = memo(FileImage)
 FileImage.defaultProps = {
     alt: "image did not load",
-    w: '30vw',
-    h: '30vh',
+    w: '200px',
+    h: '200px',
 }
 export default FileImage
 

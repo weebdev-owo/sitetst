@@ -1,12 +1,4 @@
-
-// /lib/dbConnect.js
 import mongoose from 'mongoose'
-
-/** 
-Source : 
-https://github.com/vercel/next.js/blob/canary/examples/with-mongodb-mongoose/utils/dbConnect.js 
-**/
-
 
 const MONGODB_URI = process.env.CONTENT_DB_URI
 
@@ -28,28 +20,25 @@ if (!cached) {
 }
 
 async function dbConnect () {
-  if (cached.conn) {
-    return cached.conn
-  }
 
-  if (!cached.promise) {
-    const opts = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      bufferCommands: false,
-      // bufferMaxEntries: 0,
-      // useFindAndModify: true,
-      // useCreateIndex: true
+    if (cached.conn) {return cached.conn}
+
+    if (!cached.promise) {
+        cached.promise = await mongoose.connect(MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            bufferCommands: false,
+        })
     }
 
-    // cached.promise = mongoose.connect(MONGODB_URI, opts).then(mongoose => {
-    //   return mongoose
-    // })
-    cached.promise = await mongoose.connect(MONGODB_URI, opts)
-    // cached.promise = await mongoose2
-  }
-  cached.conn = await cached.promise
-  return cached.conn
+    try{
+        cached.conn = await cached.promise
+        return cached.conn
+    }
+    catch (error){
+        cached.conn = false
+        throw error
+    }
 }
 
 export default dbConnect
