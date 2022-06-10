@@ -1,4 +1,4 @@
-import React, {memo, useRef, useState, useCallback, useEffect, useReducer, useMemo} from 'react'
+import React, {memo, useRef, useState, useCallback, useEffect} from 'react'
 import styles from './create.module.sass'
 import {useField, useFormikContext, useFormik, Formik,getIn} from 'formik'
 import * as Yup from 'yup'
@@ -16,25 +16,9 @@ import serviceSchema from '/src/lib/validations/service'
 import Spinner from '/src/lib/comps/spinner/spinner'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
-import {QueryClient, QueryClientProvider as QueryProvider, useQuery} from 'react-query'
-
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries:{
-            // onSucsess: 
-            // refetchInterval,
-            // refetchIntervalInBackground,
-            refetchOnMount: false,
-            refetchOnReconnect: false,
-            refetchOnWindowFocus: false,
-            retry: 0
-        }
-    }
-})
 
 let cnt = 0
 // import uploadImage from '/src/lib/utils/uploadImage'
-
 
 //layout form data
 const img = {
@@ -187,7 +171,6 @@ const initialValues = {
     "editorPreviewStyle": null,
     "isSubmitOpen": false
 }
-
 const getImg = (obj, path) => {
     let res = obj
     path.forEach(entry =>{res = res[entry]})
@@ -199,20 +182,6 @@ const setImg = (obj, path, newval) => {
     const final = path.pop()
     path.forEach((entry) =>{res = res[entry]})
     res[final] = newval
-}
-
-const getByPath = (obj, path) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    path.forEach(entry =>{res = res[entry]})
-    return res
-}
-const setByPath = (obj, path, val) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    const final = path.pop()
-    path.forEach((entry) =>{res = res[entry]})
-    res[final] = val
 }
 
 const isImg = new RegExp('^img', 'i')
@@ -234,99 +203,166 @@ function get_imgs(data, path, paths){
     return paths
 }
 
-//reducers for stores
-const initialEditorStore = {
-    open: false,
-    fileName: "",
-    previewStyle: null,
-}
-function editorReducer(state, action, value){
-    switch (action){
-        case 'open': state.open = value; return state
-        case 'fileName': state.fileName = value; return state
-        case 'previewStyle': state.previewStyle = value; return state
-        default: throw new Error()
-    }
-}
-
-const initialUploadStore = {
-    action: "",
-
-    images: {
-        // enabled: false, //enables display
-        num_uploaded: 0, //complete when num_uploaded === files.length
-        files: [], //triggers upload
-        uploaded: false,
-        error: false
-    },
-
-    db: { //triggered by image upload completion
-        // enabled: false, //enables display
-        complete: false,
-        errors: [],
-        errorTypes: { validation: false, types: false}
-    },
-}
-
-function uploadReducer(state, data){
-    console.log('reducer called', data)
-    const assign = typeof data === 'string'
-    const action = assign ? data:data[0]
-    const value = assign ? null:data[1]
-
-    switch (action){
-        case 'reset': return initialUploadStore
-        case 'close': return initialUploadStore
-        case 'images':
-            console.log('did this', value)
-            return { action: "images", db: initialUploadStore.db,
-                images: {
-                    num_uploaded: 0,
-                    files: value,
-                    uploaded: false,
-                    error: false
-                },
-            }
-        case 'image_error': 
-            state.images.error = true
-            return {...state}
-        case 'image_sucsess':
-            state.images.num_uploaded += 1
-            state.images.uploaded = state.images.files.length <= state.images.num_uploaded
-            return {...state}
-        case 'db': return state
-
-    }
-}
-
-const deepcopy = (obj) => JSON.parse(JSON.stringify(obj))
-
 
 function Create(){
-    const [editorStore, setEditor] = useReducer(editorReducer, initialEditorStore)
-    const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
-    console.log('store outside', uploadStore)
-
+    //upload display
+    const [beginUpload, setBeginUpload] = useState(0)
+    //images
+    const [uploadImages, setUploadImages] = useState([])
+    const [uploadImagesProgress, setUploadImagesProgress] = useState([])
+    const [uploadImagesErrors, setUploadImagesErrors] = useState([])
+    const [uploadActions, setUploadActions] = useState([])
+    const [uploadAction, setUploadAction] = useState([])
+    //database
+    const [uploadDataErrors, setUploadDataErrors] = useState([])
+    const [uploadDataErrorTypes, setUploadDataErrorTypes] = useState({validation: false, types: false})
+    const [uploadDataProgress, setUploadDataProgress] = useState([0,0])
 
     //Change body background and scroll when ref onscreen
     const elemRef = useRef(null)
     SetBgInv(elemRef)
+
+    const upload_image = useCallback(async (img, i) => {
+        console.log('uploading', i)
+        try{
+            console.log('uploaddd strt', i)
+            const res = await axios.post(
+                'http://localhost:3000/api/uploadSingleImage', 
+                {image: img['cropped']}, 
+                {headers: 
+                    {'Content-Type': 'multipart/form-data'},
+                    onUploadProgress: (e) => {
+                        const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
+                        if (totalLength !== null) {
+                            const progressData = [e.loaded, totalLength];
+                            console.log(`progress: `,progressData)
+                            setUploadImagesProgress((progress) =>{
+                                const data = [...progress]
+                                data[i] = progressData
+                                return data
+                            })
+                        }
+                    }
+                }
+            )
+            console.log('uploaded', i, res.data)
+            img['url'] =  res.data.url
+            setUploadActions((actions) =>{
+                const data = [...actions]
+                data[i] = 'uploaded'
+                return data
+            })
+            return true
+        }
+        catch (e){
+            console.log(`error uploading ${i}`, e)
+            setUploadImagesErrors((errs) =>{
+                const data = [...errs]
+                data[i] = e
+                return data
+            })
+            return false
+        }
+    }, [])
     
     const sendToAPI = async (values) => {
         console.log('submmiting', values)
-  
+        setBeginUpload(beginUpload+1)
+        
+
+        //IMAGES UPLOAD
+        let image_sucsess = true
+        let data_sucsess = false
+
         //scan values for the key "img*"
         let paths = get_imgs(values, [], [])
         const upload_paths = []
         paths.forEach((path) =>{
-            if (!getByPath(values, path)['url']){upload_paths.push(path)}
+            if (!getImg(values, path)['url']){upload_paths.push(path)}
         })
         console.log('upload paths', paths, upload_paths)
 
-        const images = upload_paths.map((path) => getImg(values, path)['cropped'])
-        console.log(images)
-        setUpload(['images', images])
-        console.log('worku')
+        //SETUP DISPLAY
+        //images
+        setUploadImages(upload_paths.map(path => getImg(values, path)['cropped']))
+        setUploadImagesProgress(upload_paths.map(() => [0,0]))
+        setUploadActions(upload_paths.map(() => 'uploading'))
+        setUploadImagesErrors(upload_paths.map(() => false))
+        //data
+        setUploadDataErrors([])
+        setUploadDataErrorTypes({validation: false, types: false})
+        setUploadDataProgress([0,0])
+
+        //do image uploads if required
+        
+        if(upload_paths.length){
+            setUploadAction('images')
+            // send images to api
+            try{
+                const uploaded_images = await Promise.all(upload_paths.map(async (path, i) => upload_image(getImg(values, path), i)))
+                for (const res of uploaded_images){if(!res){throw 'failed to upload'}}
+                console.log('Upload Sucsess', uploaded_images)
+            }
+            catch (e){
+                console.log('Error uploading images', e)
+                image_sucsess = false
+            }
+        }
+
+        console.log('upload paths2', upload_paths)
+
+        //DB UPLOAD
+        if(image_sucsess){
+            setUploadAction('db')
+            //clone and modify form data
+            const payload = JSON.parse(JSON.stringify(values))
+            for (const path of paths){
+                const img = getImg(values, path)
+                setImg(payload, path, {
+                    url: img['url'],
+                    alt: img['alt']
+                })
+            }
+            delete payload["isEditorOpen"]
+            delete payload["editorFileName"]
+            delete payload["editorPreviewStyle"]
+            delete payload["isSubmitOpen"]
+            console.log('modified payload', payload)
+
+            //send data to api
+            try{
+                const res = await axios.post(
+                    'http://localhost:3000/api/cmsCreate', 
+                    {data: payload}, 
+                    {headers: 
+                        {'Content-Type': 'application/json'},
+                        onUploadProgress: (e) => {
+                            const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
+                            if (totalLength !== null) {
+                                const progressData = [e.loaded, totalLength];
+                                console.log(`progress: `,progressData)
+                                setUploadDataProgress(progressData)
+                            }
+                        }
+                    }
+                )
+                data_sucsess = true
+            }
+            catch (err) {
+                const messages = err.response.data.error.messages
+                const types = err.response.data.error.types
+                console.log('error uploading data', err)
+                setUploadDataErrorTypes({...types})
+                setUploadDataErrors([...messages])
+            }
+        }
+
+        if(data_sucsess){
+            setUploadAction('sucsess')
+        }
+
+        
+        
 
     }
 
@@ -408,14 +444,24 @@ function Create(){
                 </div>
 
                 {f.values['isEditorOpen'] && <ImageEditor />}
-                {/* <UploadDisplay /> */}
-                <Upload store={uploadStore} update={setUpload} />
+                <UploadDisplay 
+                    trigger={beginUpload} 
+                    action={uploadAction}
+                    files={uploadImages}
+                    progress={uploadImagesProgress} 
+                    actions={uploadActions} 
+                    errors={uploadImagesErrors}
+                    dataErrorMessages={uploadDataErrors}
+                    dataErrorTypes={uploadDataErrorTypes}
+                    dataProgress={uploadDataProgress}
+                />
 
             </form>
             </>}}</Formik>
 
             
         </div>
+
     </>
 }
 
@@ -424,7 +470,6 @@ Create.defaultProps = {
     
 }
 
-//FORM PRIMITIVES//
 function Text({label, ...props}){
     //get data
     const [field, meta] = useField(props)
@@ -609,7 +654,6 @@ function Space({}){
     return <div className={styles["space"]}></div>
 }
 
-//IMAGE EDITOR//
 function ImageEditor({}){
     const { values, setFieldValue } = useFormikContext()
 
@@ -641,216 +685,77 @@ function ImageEditor({}){
 
 }
 
-//UPLOAD//
-function Upload({store, update}){
-    if(store.action==='images'){
-        console.log('FILES HERE', store.images.files)
-        return <>
-            <QueryProvider client={queryClient}>
-                <div className={styles['crop-modal']}>
-                    <UploadImages 
-                        files={store.images.files} 
-                        error={store.images.error} 
-                        uploaded={store.images.uploaded}
-                        update={update} 
-                    />
-                </div>
-            </QueryProvider>
-        </>
-    }
-    if(store.action==='db'){
-        return <>
-            <QueryProvider client={queryClient}>
-                <div className={styles['crop-modal']}>
-                    <UploadData update={update} />
-                </div>
-            </QueryProvider>
-        </>
-    }
-    if(store.action==='sucsess'){
+function UploadDisplay({trigger, action, files, progress, actions, errors, dataErrorMessages, dataErrorTypes, dataProgress}){
+    const [open, setOpen] = useState(false)
+    useEffect(() =>{
+        trigger ? setOpen(true):setOpen(false)
+    }, [trigger])
+    useToggleScroll(open)
+
+    if (open){
         return <>
             <div className={styles['crop-modal']}>
-                <UploadComplete id={'service id'} />
+
+                {action==='images' && <div className={styles['upload-images']}>
+                    <UploadImagesDisplay 
+                        files={files} 
+                        progress={progress} 
+                        actions={actions} 
+                        errors={errors} 
+                        setOpen={setOpen}
+                    />
+                </div>}
+
+                {action==='db' && <div className={styles['upload-db']}>
+                    <UploadDataDisplay 
+                        messages={dataErrorMessages} 
+                        types={dataErrorTypes} 
+                        progress={dataProgress} 
+                        setOpen={setOpen}
+                    />
+                </div>}
+
+                {action==='sucsess' && <div className={styles['upload-complete']}>
+                    <UploadSucsessDisplay />
+                </div>}
+
             </div>
-        </>
-    }
-    return null
-}
-
-//upload images and display
-function UploadImages({files, error, uploaded, update}){
-    const images = useMemo(() => {
-        return files.map((image, i) => <UploadImage file={image} update={update} sucsess={uploaded} failed={error} key={i}/>)
-    }, [files])
-    console.log('DOES RENDER ??', error)
-
-    const [close, setClose] = useState(false)
-    useEffect(()=>{setClose(error || uploaded)}, [])
-    useEffect(() => {if (close){update('close')}}, [close])
-
-    if(close){
-        console.log(error, uploaded, close)
-        update('close')
-        return null
-    }
-
-    if (!error){
-        return <>
-            <div className={styles['heading']}>{'Uploading Images'}</div>
-            <div className={styles['upload-images-display']}>{images}</div>
         </>
     }
     else{
-        return <>
-            <div className={styles['heading']}>{'Error Uploading Images'}</div>
-            <div className={styles['sub-heading']}>{`check server status and configuration`}</div>
-            <button type="button" className={styles["upload-close"]} onClick={()=>{update('close')}}>x</button>
-            <div className={styles['upload-images-display']}>{images}</div>
-        </>
+        return null
     }
 
-
-}; UploadImages = memo(UploadImages)
-
-const postImage = (file, setProgress) =>{
-    console.log("UPLOADING IMAGE: ", file.name)
-    return axios.post(
-        'http://localhost:3000/api/uploadSingleImage', 
-        {image: file}, 
-        {headers: 
-            {'Content-Type': 'multipart/form-data'},
-            onUploadProgress: (e) => {
-                const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
-                if (totalLength !== null) {
-                    const progressData = [e.loaded, totalLength];
-                    console.log(`progress: `,progressData)
-                    setProgress(progressData)
-                }
-            }
-        }
-    )
 }
 
-function UploadImage({file, sucsess, failed, update}) {
-    console.log('rendering image', file.name)
-    const { values } = useFormikContext()
-    const [progress, setProgress] = useState([0, 0])
-    const {data, isLoading, isError, isFetching, status, error} = useQuery(['image'], () => postImage(file, setProgress), {enabled: !sucsess && !failed})
-    useEffect(() =>{
-        if(data && !isError){
-            console.log('data changed means upload completed: ', file.name)
-            //set values res url
-            //set images.num_uploaded += 1
-            update('image_sucsess')
-        }
-    }, [data, isError])
-    useEffect(() =>{
-        if(isError){
-            console.log('error occured uploading: ', file.name)
-            update('image_error')
-        }
-    }, [isError])
-
-    //create image and rember it
-    const image = useMemo(() => <ContainFileImage file={file}/>, [file])
-
-    //display response error
-    if (isError){
-        return <>
-            <div>
-                {image}
-                <div className={styles['upload-image-error']}>{`${error}`}</div>
-            </div> 
-        </>
-    }
-
-    //display request in progress
-    if (isLoading){
-
-        //optimizing
-        if(progress[0] === progress[1]){
-            return <>
-                <div>
-                    {image}
-                    <div className={styles['upload-image-optimizing']}>
-                        <div className={styles['upload-image-optimizing-text']}>{`Optimizing`}</div>
-                        <Spinner h={20} />
-                    </div>
-                </div>
- 
-            </>             
-        }
-
-        //progress
-        else{
-            return <>
-                <div>
-                    {image}
-                    <ProgressBar progress={progress} />
-                </div>
-            </>
-        }
-        
-    }
-
-    //display response sucsess
+function UploadImagesDisplay({files, progress, actions, errors, setOpen}){
+    let error = false
+    for(const err of errors){error = err ? true:false}
     return <>
-        <div>
-            {image}
-            <div className={styles['upload-image-optimizing']}>
-                <div className={styles['upload-image-optimizing-text']}>{`Uploaded`}</div>
-            </div>
+        <div className={styles['heading']}>{!error ? 'Uploading Images':'Error Uploading Images'}</div>
+        {error && <div className={styles['sub-heading']}>{`check server status and configuration`}</div>}
+        {error && <button type="button" className={styles["upload-close"]} onClick={()=>{setOpen(false)}}>x</button>}
+        <div className={styles['upload-images-display']}>
+            {files.map((file, i) =>{
+                return <UploadImageDisplay file={file} progress={progress[i]} action={actions[i]} error={errors[i]} key={i} />     
+            })}
         </div>
     </>
-}; UploadImage = memo(UploadImage)
-
-//upload data and display
-async function postData(){
-    //send data to api
-    try{
-        const res = await axios.post(
-            'http://localhost:3000/api/cmsCreate', 
-            {data: payload}, 
-            {headers: 
-                {'Content-Type': 'application/json'},
-                onUploadProgress: (e) => {
-                    const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
-                    if (totalLength !== null) {
-                        const progressData = [e.loaded, totalLength];
-                        console.log(`progress: `,progressData)
-                        setUploadDataProgress(progressData)
-                    }
-                }
-            }
-        )
-        data_sucsess = true
-    }
-    catch (err) {
-        const messages = err.response.data.error.messages
-        const types = err.response.data.error.types
-        console.log('error uploading data', err)
-        setUploadDataErrorTypes({...types})
-        setUploadDataErrors([...messages])
-    }
 }
 
-function UploadData({update}){
-    const payload = JSON.parse(JSON.stringify(values))
-    for (const path of paths){
-        const img = getByPath(values, path)
-        setByPath(payload, path, {
-            url: img['url'],
-            alt: img['alt']
-        })
-    }
-}; UploadData = memo(UploadData)
+function UploadImageDisplay({file, progress, action, error}){
+    return <div>
+        <ContainFileImage file={file}/>
+        {error ? 
+            <div className={styles['upload-image-error']}>{`${error}`}</div>
+        :
+            progress && progress.length && <ProgressBar progress={progress} action={action}/>
+        }
+        
+    </div>
+}
 
-//upload complete menu 
-function UploadComplete({}){
-
-}; UploadComplete = memo(UploadComplete)
-
-function ProgressBar({progress}){
+function ProgressBar({progress, action}){
     let [loaded, total] = progress
     let unit = ''
     if (total>100000){
@@ -868,12 +773,53 @@ function ProgressBar({progress}){
         total = (total/1).toFixed(2)
         unit='bytes'
     }
-    <div className={styles['progress-uploading']}>
-        <Bar progress={Math.floor((loaded*100)/total)} />
-        <div>{`${loaded}/${total} ${unit}`}</div>
-    </div>
 
+    return <div className={styles['upload-image-progress']}>
+
+        {action==='uploading' && <div className={styles['progress-uploading']}>
+            <Bar progress={Math.floor((loaded*100)/total)} />
+            {total!=loaded ? 
+                `${loaded}/${total} ${unit}`
+            :
+            <div className={styles['upload-image-optimizing']}><div className={styles['upload-image-optimizing-text']}>{`Optimizing`}</div><Spinner h={20}/></div>
+            }
+        </div>}
+        
+        {action==='uploaded' && <div className={styles['progress-uploaded']}>
+            <div className={styles['upload-image-optimizing']}><div className={styles['upload-image-optimizing-text']}>{`Uploaded`}</div></div>
+        </div>}
+    </div>
 }
+
+function ProgressBar2({progress}){
+    let [loaded, total] = progress
+    let unit = ''
+    if (total>100000){
+        loaded = (loaded/1000000).toFixed(2)
+        total = (total/1000000).toFixed(2)
+        unit='mb'
+    }
+    else if(total>100) {
+        loaded = (loaded/1000).toFixed(2)
+        total = (total/1000).toFixed(2)
+        unit='kb'
+    }
+    else{
+        loaded = (loaded/1).toFixed(2)
+        total = (total/1).toFixed(2)
+        unit='bytes'
+    }
+
+    return <div className={styles['upload-image-progress']}>
+
+        <div className={styles['progress-uploading']}>
+            <Bar progress={Math.floor((loaded*100)/total)} />
+            <div>{`${loaded}/${total} ${unit}`}</div>
+        </div>
+        
+    </div>
+}
+
 
 function Bar({progress}){
     return <>

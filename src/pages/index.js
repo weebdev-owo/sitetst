@@ -9,20 +9,29 @@ import Services from '/src/comp/home/services/services'
 import About from '/src/comp/home/about/about'
 import Book from '/src/comp/book/book'
 import ScrollNav from '/src/comp/scrollnav/scrollnav'
+import { setBgCol } from '/src/lib/utils/setbg'
 
-export default function Home(){
+export default function Home({services}){
 
   //Reset Nav and url
   const empty_reset = () => () => {}
   const [reset, setReset] = useState(empty_reset)
-  useEffect(() => {reset()},[])
+    useEffect(() => {
+        reset()
+        setBgCol(true)
+    },[])
 
+  const service_tiles = services.map((service) =>{
+    return [service.name, service.desc, service.img.url, service.img.alt, `http://localhost:3000/services/${service.url}`]
+  })
+  console.log(service_tiles)
+  
   return <>
     <div className={styles.home}>
       <TopBar />
       <Car>{carousel.imgs.map((img, i) =>{return <CarImage img={img} key={i}/>})}</Car>
       <Counters />
-      <Services services={services.items} />
+      <Services services={service_tiles} />
       <About />
       <Book services={book.services} />
       <ScrollNav setReset={setReset} />
@@ -35,20 +44,35 @@ const carousel = {
   imgs: ["/car2.jpg", "/car1.jpg"]
 }
 
-const services = {
-  items: [
-    ['Service-1', 'Description', "/dnt1.jpg", 'inai', '/services'],
-    ['Service-2', 'Description', "/dnt1.jpg", 'inai', '/services'],
-    ['Service-3', 'Description', "/dnt1.jpg", 'inai', '/services'],
-    ['Service-4', 'Description', "/dnt1.jpg", 'inai', '/services'],
-    ['Service-5', 'Description', "/dnt1.jpg", 'inai', '/services'],
-    ['Service-6', 'Description', "/dnt1.jpg", 'inai', '/services'],
-    ['Service-7', 'Description', "/dnt1.jpg", 'inai', '/services'],
-    ['Service-8', 'Description', "/dnt1.jpg", 'inai', '/services'],
-    ['Service-9', 'Description', "/dnt1.jpg", 'inai', '/services'],
-  ]
-}
-
 const book = {
   services: ['loreum ipsum', 'loreum ipsum' , 'loreum ipsum']
 }
+
+import dbConnect from '/src/lib/api/db/mongoose_connect'
+import Service from '/src/lib/api/db/models/service'
+
+export async function getStaticProps(){
+  let services = []
+  let data = false
+  try {
+      const connection = await dbConnect()
+      data = await Service.find()
+          .select(['data.url', 'data.enabled', 'data.services.tile'])
+          .where('data.enabled').eq(true)
+          .sort({'data.services.tile.order':1})
+      services = data.map((service, i) => {
+          return {...service.data.services.tile, url: service.data.url}
+      })
+      console.log('inside static props', services, JSON.parse(JSON.stringify(services)))
+      return {
+          props: {
+              services: JSON.parse(JSON.stringify(services))
+          }
+      }
+  } 
+  catch (error) {
+      console.log('inside static props error', error)
+      return {notFound: true}
+  }
+}
+

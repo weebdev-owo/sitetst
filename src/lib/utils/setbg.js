@@ -1,5 +1,5 @@
 import {useEffect} from 'react'
-const setBgCol = (val) => {
+export const setBgCol = (val) => {
     if (val){
         // console.log("vis")
         document.body.style.background = "#fff"
