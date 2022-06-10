@@ -18,6 +18,12 @@ import Link from 'next/link'
 import {useRouter} from 'next/router'
 import {QueryClient, QueryClientProvider as QueryProvider, useQuery} from 'react-query'
 
+let num_images = 0;
+function unique_query_id(){
+    num_images += 1
+    return `image${num_images}`
+}
+
 const queryClient = new QueryClient({
     defaultOptions: {
         queries:{
@@ -27,14 +33,10 @@ const queryClient = new QueryClient({
             refetchOnMount: false,
             refetchOnReconnect: false,
             refetchOnWindowFocus: false,
-            retry: 0
+            retry: false
         }
     }
 })
-
-let cnt = 0
-// import uploadImage from '/src/lib/utils/uploadImage'
-
 
 //layout form data
 const img = {
@@ -256,15 +258,14 @@ const initialUploadStore = {
         // enabled: false, //enables display
         num_uploaded: 0, //complete when num_uploaded === files.length
         files: [], //triggers upload
+        paths: [],
         uploaded: false,
         error: false
     },
 
     db: { //triggered by image upload completion
-        // enabled: false, //enables display
-        complete: false,
-        errors: [],
-        errorTypes: { validation: false, types: false}
+        uploaded: false,
+        error: false
     },
 }
 
@@ -277,25 +278,34 @@ function uploadReducer(state, data){
     switch (action){
         case 'reset': return initialUploadStore
         case 'close': return initialUploadStore
+
         case 'images':
-            console.log('did this', value)
             return { action: "images", db: initialUploadStore.db,
                 images: {
                     num_uploaded: 0,
-                    files: value,
+                    files: value[0],
+                    paths: value[1],
                     uploaded: false,
                     error: false
                 },
             }
-        case 'image_error': 
-            state.images.error = true
-            return {...state}
+        case 'image_error': state.images.error = true; return {...state}
         case 'image_sucsess':
             state.images.num_uploaded += 1
             state.images.uploaded = state.images.files.length <= state.images.num_uploaded
             return {...state}
-        case 'db': return state
 
+        case 'db': 
+            return { action: "db", images: initialUploadStore.images,
+                db: {
+                    uploaded: false,
+                    error: false,
+                }
+            }
+        case 'db_error': state.db.error = true; return {...state}
+        case 'db_sucsess': state.db.uploaded = true; return {...state}
+
+        case 'complete': state.action = 'complete'; return {...state}
     }
 }
 
@@ -321,12 +331,16 @@ function Create(){
         paths.forEach((path) =>{
             if (!getByPath(values, path)['url']){upload_paths.push(path)}
         })
-        console.log('upload paths', paths, upload_paths)
+        // console.log('upload paths', paths, upload_paths)
+        if(upload_paths.length){
+            const images = upload_paths.map((path) => getImg(values, path)['cropped'])
+            setUpload(['images', [images, upload_paths]])
+        }
+        else{
+            // console.log('XXXXXDDDDDDDD')
+            setUpload('db')
+        }
 
-        const images = upload_paths.map((path) => getImg(values, path)['cropped'])
-        console.log(images)
-        setUpload(['images', images])
-        console.log('worku')
 
     }
 
@@ -349,7 +363,7 @@ function Create(){
                     <Text name="services.tile.order" label="order (where the service is placed on services grid)" />
                     <Text name="services.tile.name" label="name" />
                     <TextArea name="services.tile.desc" label="description" />
-                    <FImage name="services.tile.img" label="background image" styleIn={image_styles['service-tile']}/>
+                    <CmsImage name="services.tile.img" label="background image" styleIn={image_styles['service-tile']}/>
                     
                 </div>
 
@@ -564,6 +578,7 @@ function FImage({name, label, styleIn, ...props}){
         await setFieldValue('editorFileName', name)
         await setFieldValue('editorPreviewStyle', styleIn)
         setFieldValue('isEditorOpen', true)
+        // update('open', [name, styleIn])
     }
 
     //determine errors
@@ -583,7 +598,7 @@ function FImage({name, label, styleIn, ...props}){
             {cropped_file ? <>
                     <FileImage file={cropped_file} styleIn={styleIn}/>
                     <div className={styles['image-controls-cont']}>
-                        <div type="button"onClick={crop}><p className={styles["elem-button-add"]}>Crop</p></div>
+                        <div type="button" onClick={crop}><p className={styles["elem-button-add"]}>Crop</p></div>
                         <div {...getRootProps()} >
                             <input {...getInputProps()}/>
                             <p className={styles["elem-button-del"]}><u>Drag file here</u> or <u>Click</u> to replace</p>
@@ -605,6 +620,91 @@ function FImage({name, label, styleIn, ...props}){
 
 }
 
+function CmsImage({name, label, styleIn, ...props}){
+    const mb = 1000*1000
+    const MAX_FILE_SIZE = props.max_size || 10*mb
+    const SUPPORTED_FILE_EXTENSIONS = props.sf || ['.jpg', '.jpeg', '.png', '.gif']
+    const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
+    const [file, setFile] = useState(null)
+    const [dropzoneErr, setDropzoneErr] = useState(false)
+    const [field, meta, helpers] = useField(`${name}`)
+    const [crop_field, crop_meta, crop_helpers] = useField(`${name}.cropped`)
+    // const [name_Field, name_meta, name_helpers] = useField(`${name}.url`)
+    const cropped_file = crop_field.value
+
+    //on every drop get called with the files that were just added (not all the files in the dropzone), valid = passed validation of react-dropzone (not yup yet)
+    const onDrop = useCallback(async (valid, invalid) => {
+        await setFieldTouched(name, true)
+        await setDropzoneErr(false)
+        if(valid.length){
+            setFile(valid[0])
+            setFieldValue(`${name}.original`, valid[0])
+            setFieldValue(`${name}.cropped`, valid[0])
+            setFieldValue(`${name}.url`, null)
+        }
+        else{`file must be less than ${MAX_FILE_SIZE/mb}mb`
+            const code = invalid[0].errors[0].code
+            if(code==='file-invalid-type'){setDropzoneErr(`file must be a ${SUPPORTED_FILE_EXTENSIONS}`)}
+            if(code==='file-too-large'){setDropzoneErr(`file must be less than ${MAX_FILE_SIZE/mb}mb`)}
+            if(cropped_file){setTimeout(()=>{setDropzoneErr(false)}, 4000)}
+        }
+    }, [cropped_file])
+
+    const {getRootProps, getInputProps} = useDropzone({
+        onDrop, 
+        multiple:false, 
+        accept: {'image/*': SUPPORTED_FILE_EXTENSIONS},
+        maxSize: MAX_FILE_SIZE,
+        minSize: 10
+    })
+
+
+    //IMAGE EDITOR
+    //setup image editor for crop
+    const [editorOpen, setEditorOpen] = useState(false)
+    const crop = async () =>{
+        setEditorOpen(true)
+    }
+
+    //determine errors
+    let isErr
+    let error = typeof crop_meta.error === 'string' ? crop_meta.error:''
+    error = dropzoneErr && !cropped_file ? dropzoneErr:error
+    if(submitCount){ isErr = error }
+    else{ isErr = error==='required' ? false : error }
+    const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
+
+    return <>
+        {editorOpen ? <ImageEditor2 name={name} imageStyle={styleIn} setOpen={setEditorOpen} />:null}
+        <label className={styles["label"]} htmlFor={props.id || name}>
+            <p>{`${label}`}</p>
+            {isErr ? <pre className={styles['label-err']}>{` - ${error}`}</pre>:null}
+        </label>
+        <div className={styles['image-cont']}>
+            {cropped_file ? <>
+                    <FileImage file={cropped_file} styleIn={styleIn}/>
+                    <div className={styles['image-controls-cont']}>
+                        <div type="button" onClick={crop}><p className={styles["elem-button-add"]}>Crop</p></div>
+                        <div {...getRootProps()} >
+                            <input {...getInputProps()}/>
+                            <p className={styles["elem-button-del"]}><u>Drag file here</u> or <u>Click</u> to replace</p>
+                        </div>
+                    </div>
+                </>
+            :        
+                <div {...getRootProps()} className={styles['drop-zone-cont']}>
+                    <input {...getInputProps()} className={styles['drop-zone-input']}/>
+                    <div className={styles['drop-text']}><p><u>Drag file here</u> or <u>Click</u> to select</p></div> 
+                </div>
+            }
+        </div>
+        <div className={styles["dropzone-error-cont"]}>
+            {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
+        </div>
+        <Text name={`${name}.alt`} label={`text if image will not load (alt)`} />
+    </>
+}
+
 function Space({}){
     return <div className={styles["space"]}></div>
 }
@@ -616,26 +716,53 @@ function ImageEditor({}){
     //disable body scroll on editor open (reset when leave this page)
     useToggleScroll(values['isEditorOpen'])
 
-    const [saveCnt, saveCropped] = useState(0)
+    const [saveTrigger, triggerSave] = useState(0)
 
     const name = values['editorFileName']
     const file = getIn(values, `${name}.original`)
 
-    const setCroped = async (file) => {
+    const saveCroped = async (file) => {
         setFieldValue(`${name}.cropped`, file)
         setFieldValue(`${name}.url`, null)
         setFieldValue('isEditorOpen', false)
     }
 
+    return <>
+        <div className={styles['crop-modal']}>
+            <CropImage file={file} styleIn={values['editorPreviewStyle']} saveCroppedFile={saveCroped} save={saveTrigger}/>
+            <div className={styles['image-editor-controls']}>
+                <button type="button" className={styles["elem-button-add"]} onClick={()=>{triggerSave(cur => cur+1)}}>Save</button>
+                <button type="button" className={styles["elem-button-del"]} onClick={()=>{update('close')}}>Close</button>
+            </div>
+        </div>  
+    </>
+
+}
+
+function ImageEditor2({name, imageStyle, setOpen}){
+    const { values, setFieldValue } = useFormikContext()
+
+    //disable body scroll on editor open (reset when leave this page)
+    useToggleScroll(values['isEditorOpen'])
+
+    const [saveTrigger, triggerSave] = useState(0)
+
+    const file = getIn(values, `${name}.original`)
+
+    const saveCroped = async (file) => {
+        setFieldValue(`${name}.cropped`, file)
+        setFieldValue(`${name}.url`, null)
+        setOpen(false)
+    }
+
 
     return <>
         <div className={styles['crop-modal']}>
-            <CropImage file={file} styleIn={values['editorPreviewStyle']} saveCroppedFile={setCroped} save={saveCnt}/>
+            <CropImage file={file} styleIn={imageStyle} saveCroppedFile={saveCroped} save={saveTrigger}/>
             <div className={styles['image-editor-controls']}>
-                <button type="button" className={styles["elem-button-add"]} onClick={()=>{saveCropped(cur => cur+1)}}>Save</button>
-                <button type="button" className={styles["elem-button-del"]} onClick={()=>{setFieldValue('isEditorOpen', false)}}>Close</button>
+                <button type="button" className={styles["elem-button-add"]} onClick={()=>{triggerSave(cur => cur+1)}}>Save</button>
+                <button type="button" className={styles["elem-button-del"]} onClick={()=>{setOpen(false)}}>Close</button>
             </div>
-            
         </div>  
     </>
 
@@ -643,6 +770,20 @@ function ImageEditor({}){
 
 //UPLOAD//
 function Upload({store, update}){
+    const { values } = useFormikContext()
+    console.log("CURRENT VALUES", values, num_images)
+    useEffect(() =>{
+        if(store.images.uploaded){
+            update('db')
+        }
+    }, [store.images.uploaded])
+
+    useEffect(() =>{
+        if(store.db.uploaded){
+            update('complete')
+        }
+    }, [store.db.uploaded])
+
     if(store.action==='images'){
         console.log('FILES HERE', store.images.files)
         return <>
@@ -650,6 +791,7 @@ function Upload({store, update}){
                 <div className={styles['crop-modal']}>
                     <UploadImages 
                         files={store.images.files} 
+                        paths={store.images.paths}
                         error={store.images.error} 
                         uploaded={store.images.uploaded}
                         update={update} 
@@ -662,12 +804,16 @@ function Upload({store, update}){
         return <>
             <QueryProvider client={queryClient}>
                 <div className={styles['crop-modal']}>
-                    <UploadData update={update} />
+                    <UploadData 
+                        sucsess={store.db.uploaded}
+                        failed={store.db.error}
+                        update={update} 
+                    />
                 </div>
             </QueryProvider>
         </>
     }
-    if(store.action==='sucsess'){
+    if(store.action==='complete'){
         return <>
             <div className={styles['crop-modal']}>
                 <UploadComplete id={'service id'} />
@@ -678,21 +824,26 @@ function Upload({store, update}){
 }
 
 //upload images and display
-function UploadImages({files, error, uploaded, update}){
+function UploadImages({files, paths, error, uploaded, update}){
+    //close if already tried request and component refreshed
+    let close = false
+    useEffect(()=>{if(uploaded || error){update('close')}; close=true}, [])
+
     const images = useMemo(() => {
-        return files.map((image, i) => <UploadImage file={image} update={update} sucsess={uploaded} failed={error} key={i}/>)
+        return files.map((image, i) => 
+        <UploadImage 
+            idx={i}
+            file={image} 
+            path={paths[i]} 
+            update={update} 
+            sucsess={uploaded} 
+            failed={error} 
+            key={i}
+        />)
     }, [files])
-    console.log('DOES RENDER ??', error)
 
-    const [close, setClose] = useState(false)
-    useEffect(()=>{setClose(error || uploaded)}, [])
-    useEffect(() => {if (close){update('close')}}, [close])
 
-    if(close){
-        console.log(error, uploaded, close)
-        update('close')
-        return null
-    }
+    if(close){ return null }
 
     if (!error){
         return <>
@@ -713,7 +864,7 @@ function UploadImages({files, error, uploaded, update}){
 }; UploadImages = memo(UploadImages)
 
 const postImage = (file, setProgress) =>{
-    console.log("UPLOADING IMAGE: ", file.name)
+    console.log("UPLOADING IMAGEU: ", file.name)
     return axios.post(
         'http://localhost:3000/api/uploadSingleImage', 
         {image: file}, 
@@ -723,7 +874,6 @@ const postImage = (file, setProgress) =>{
                 const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
                 if (totalLength !== null) {
                     const progressData = [e.loaded, totalLength];
-                    console.log(`progress: `,progressData)
                     setProgress(progressData)
                 }
             }
@@ -731,24 +881,18 @@ const postImage = (file, setProgress) =>{
     )
 }
 
-function UploadImage({file, sucsess, failed, update}) {
-    console.log('rendering image', file.name)
+function UploadImage({idx, file, path, sucsess, failed, update}) {
     const { values } = useFormikContext()
     const [progress, setProgress] = useState([0, 0])
-    const {data, isLoading, isError, isFetching, status, error} = useQuery(['image'], () => postImage(file, setProgress), {enabled: !sucsess && !failed})
+    const [queryId, setQueryId] = useState(unique_query_id())
+    const {data, isLoading, isError, isFetching, status, error} = useQuery(queryId, () => postImage(file, setProgress), {enabled: !sucsess && !failed})
+    
     useEffect(() =>{
-        if(data && !isError){
-            console.log('data changed means upload completed: ', file.name)
-            //set values res url
-            //set images.num_uploaded += 1
-            update('image_sucsess')
-        }
+        if(data && !isError){ setByPath(values, path.concat(['url']), data.data.url); update('image_sucsess')}
     }, [data, isError])
+
     useEffect(() =>{
-        if(isError){
-            console.log('error occured uploading: ', file.name)
-            update('image_error')
-        }
+        if(isError){ update('image_error') }
     }, [isError])
 
     //create image and rember it
@@ -802,40 +946,13 @@ function UploadImage({file, sucsess, failed, update}) {
             </div>
         </div>
     </>
+
 }; UploadImage = memo(UploadImage)
 
 //upload data and display
-async function postData(){
-    //send data to api
-    try{
-        const res = await axios.post(
-            'http://localhost:3000/api/cmsCreate', 
-            {data: payload}, 
-            {headers: 
-                {'Content-Type': 'application/json'},
-                onUploadProgress: (e) => {
-                    const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
-                    if (totalLength !== null) {
-                        const progressData = [e.loaded, totalLength];
-                        console.log(`progress: `,progressData)
-                        setUploadDataProgress(progressData)
-                    }
-                }
-            }
-        )
-        data_sucsess = true
-    }
-    catch (err) {
-        const messages = err.response.data.error.messages
-        const types = err.response.data.error.types
-        console.log('error uploading data', err)
-        setUploadDataErrorTypes({...types})
-        setUploadDataErrors([...messages])
-    }
-}
-
-function UploadData({update}){
+function createPayload(values){
     const payload = JSON.parse(JSON.stringify(values))
+    const paths = get_imgs(payload, [], [])
     for (const path of paths){
         const img = getByPath(values, path)
         setByPath(payload, path, {
@@ -843,12 +960,123 @@ function UploadData({update}){
             alt: img['alt']
         })
     }
+    console.log('PAYLOAD', payload)
+    return payload
+}
+
+async function postData(payload, setProgress){
+    console.log('UPLOADING DATA', )
+    return axios.post(
+        'http://localhost:3000/api/cmsCreate', 
+        {data: payload}, 
+        {headers: 
+            {'Content-Type': 'application/json'},
+            onUploadProgress: (e) => {
+                const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
+                if (totalLength !== null) {
+                    const progressData = [e.loaded, totalLength];
+                    setProgress(progressData)
+                }
+            }
+        }
+    )
+
+}
+
+function UploadData({sucsess, failed, update}){
+    
+    //close if already tried request and component refreshed
+    let close = false
+    useEffect(()=>{if(sucsess || failed){update('close')}; close=true}, [])
+
+    const { values } = useFormikContext()
+    // const payload = createPayload(values)
+    const [progress, setProgress] = useState([0, 0])
+    const {data, isLoading, isError, isFetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress), {enabled: !sucsess && !failed})
+
+    useEffect(() =>{
+        if(data && !isError){ update('db_sucsess') }
+    }, [data, isError])
+
+    useEffect(() =>{
+        if(isError){ update('db_error') }
+    }, [isError])
+
+    if(close){ return null }
+
+    if(isError){
+        const types = error.response.data.error.types
+        const messages = error.response.data.error.messages
+        return <>
+            <div className={styles['heading']}>{'Error Uploading Data to Server'}</div>
+            {types.validation ? <div className={styles['sub-heading']}>{`change form data`}</div>:null}
+            {types.server ? <div className={styles['sub-heading']}>{`check server status and configuration`}</div>:null}
+            <div className={styles['upload-data-errors']}>{messages.map((message, i) => 
+                <span className={styles['upload-data-error']} key={i}>{`${message}`}</span>
+            )}</div>
+            <button type="button" className={styles["upload-close"]} onClick={()=>{update('close')}}>x</button>
+        </>
+    }
+
+    if(isLoading){
+        return <>
+            <div className={styles['heading']}>{'Uploading Data to Server'}</div>
+            <div className={styles['upload-data-inprogress']}>
+                <div className={styles['upload-data-inprogress-text']}>{`In Progress`}</div>
+                <Spinner h={60}/>
+            </div>
+            {/* <ProgressBar progress={progress} /> */}
+        </>
+    }
+
+    console.log("COMPLETED DATA UPLOAD", data)
+    return <>
+        <div className={styles['heading']}>{'Uploading Data to Server'}</div>
+        <div className={styles['upload-data-inprogress']}>
+            <div className={styles['upload-data-inprogress-text']}>{`Complete`}</div>
+        </div>
+    </>
+
 }; UploadData = memo(UploadData)
 
 //upload complete menu 
-function UploadComplete({}){
+function UploadComplete({id}){
+    const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
+    const router = useRouter()
+    const forceReload = () =>{
+        router.reload()
+    }
 
-}; UploadComplete = memo(UploadComplete)
+    return <>
+        <div className={styles['heading']} style={{"color":'#39C16C'}}>Upload Sucsess</div>
+        <div className={styles['sucsess-links']}>
+            <div className={styles["sucsess-section"]}>
+                <Link href={'http://localhost:3000/admin'}>
+                    <a className={styles["sucsess-link"]}>Admin Home</a> 
+                </Link>   
+            </div>
+
+            <div className={styles["sucsess-section"]}>
+                <Link href={`http://localhost:3000/services/${values.url}`}>
+                    <a className={styles["sucsess-link"]}>View {`${values.url}`}</a> 
+                </Link>  
+            </div>
+
+            <div className={styles["sucsess-section"]}>
+                <Link href={''}>
+                    <a className={styles["sucsess-link"]}>Edit {`${values.url}`}</a> 
+                </Link>     
+            </div>
+
+            <div className={styles["sucsess-section"]}>
+                <Link href={'http://localhost:3000/admin/services/create'}>
+                    <a className={styles["sucsess-link"]} onClick={forceReload}>Create New Service</a> 
+                </Link>     
+            </div>
+        </div>
+    </>
+} UploadComplete = memo(UploadComplete)
+
 
 function ProgressBar({progress}){
     let [loaded, total] = progress
@@ -891,57 +1119,6 @@ function Bar({progress}){
                 borderRadius: '20px'
             }}>
 
-            </div>
-        </div>
-    </>
-}
-
-function UploadDataDisplay({types, messages, setOpen, progress}){
-    console.log('REEEEEEEEEE', types, messages)
-    return <>
-        <div className={styles['heading']}>{!messages.length ? 'Uploading Data to Server':'Error Uploading Data to Server'}</div>
-        {types.validation ? <div className={styles['sub-heading']}>{`change form data`}</div>:null}
-        {types.server ? <div className={styles['sub-heading']}>{`check server status and configuration`}</div>:null}
-        {messages.length ? <div className={styles['upload-data-errors']}>{messages.map((message, i) => <span className={styles['upload-data-error']} key={i}>{`${message}`}</span>)}</div>:null}
-        {messages.length ? <button type="button" className={styles["upload-close"]} onClick={()=>{setOpen(false)}}>x</button>:null}
-        {!messages.length ? <div className={styles['upload-data-inprogress']}><div className={styles['upload-data-inprogress-text']}>{`In Progress`}</div><Spinner h={60}/></div>:null}
-        {!messages.length ? <ProgressBar2 progress={progress} />:null}
-    </>
-
-}
-
-function UploadSucsessDisplay({}){
-    const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const router = useRouter()
-    const forceReload = () =>{
-        router.reload()
-    }
-
-    return <>
-        <div className={styles['heading']} style={{"color":'#39C16C'}}>Upload Sucsess</div>
-        <div className={styles['sucsess-links']}>
-            <div className={styles["sucsess-section"]}>
-                <Link href={'http://localhost:3000/admin'}>
-                    <a className={styles["sucsess-link"]}>Admin Home</a> 
-                </Link>   
-            </div>
-
-            <div className={styles["sucsess-section"]}>
-                <Link href={`http://localhost:3000/services/${values.url}`}>
-                    <a className={styles["sucsess-link"]}>View {`${values.url}`}</a> 
-                </Link>  
-            </div>
-
-            <div className={styles["sucsess-section"]}>
-                <Link href={''}>
-                    <a className={styles["sucsess-link"]}>Edit {`${values.url}`}</a> 
-                </Link>     
-            </div>
-
-            <div className={styles["sucsess-section"]}>
-                <Link href={'http://localhost:3000/admin/services/create'}>
-                    <a className={styles["sucsess-link"]} onClick={forceReload}>Create New Service</a> 
-                </Link>     
             </div>
         </div>
     </>
