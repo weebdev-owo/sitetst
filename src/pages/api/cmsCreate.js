@@ -1,6 +1,6 @@
 import dbConnect from '/src/lib/api/db/mongoose_connect'
 import Service from '/src/lib/api/db/models/service'
-import serviceSchema from '/src/lib/validations/service_server'
+import serviceSchema from '/src/cms/service/serverSchema'
 
 function process_errors(error){
 
@@ -34,11 +34,11 @@ async function dbConnect2(res){
 
 export default async function handler (req, res) {
     const data = req.body.data
+
+    //validate request
     let valid = false
     try{
-        const validated_data = await serviceSchema.validate(data,{
-            strict: false
-        })
+        const validated_data = await serviceSchema.validate(data, {strict: false})
         valid = true
     }
     catch (error) {
@@ -51,6 +51,7 @@ export default async function handler (req, res) {
         res.status(400).json(process_errors(formated_error))
     }
 
+    //create in database
     if(valid){
         try {
             const connection = await dbConnect2()

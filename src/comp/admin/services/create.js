@@ -12,7 +12,7 @@ import {SetBgInv} from '/src/lib/utils/setbg'
 import useToggleScroll from '/src/lib/utils/toggleScroll'
 import image_styles from '/src/styles/images.module.sass'
 import axios from 'axios'
-import serviceSchema from '/src/lib/validations/service'
+import serviceSchema from '/src/lib/cms/data/validations/service'
 import Spinner from '/src/lib/comps/spinner/spinner'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
@@ -37,6 +37,9 @@ const queryClient = new QueryClient({
         }
     }
 })
+
+
+
 
 //layout form data
 const img = {
@@ -236,21 +239,6 @@ function get_imgs(data, path, paths){
     return paths
 }
 
-//reducers for stores
-const initialEditorStore = {
-    open: false,
-    fileName: "",
-    previewStyle: null,
-}
-function editorReducer(state, action, value){
-    switch (action){
-        case 'open': state.open = value; return state
-        case 'fileName': state.fileName = value; return state
-        case 'previewStyle': state.previewStyle = value; return state
-        default: throw new Error()
-    }
-}
-
 const initialUploadStore = {
     action: "",
 
@@ -363,7 +351,7 @@ function Create(){
                     <Text name="services.tile.order" label="order (where the service is placed on services grid)" />
                     <Text name="services.tile.name" label="name" />
                     <TextArea name="services.tile.desc" label="description" />
-                    <CmsImage name="services.tile.img" label="background image" styleIn={image_styles['service-tile']}/>
+                    <FImage name="services.tile.img" label="background image" styleIn={image_styles['service-tile']}/>
                     
                 </div>
 
@@ -578,7 +566,6 @@ function FImage({name, label, styleIn, ...props}){
         await setFieldValue('editorFileName', name)
         await setFieldValue('editorPreviewStyle', styleIn)
         setFieldValue('isEditorOpen', true)
-        // update('open', [name, styleIn])
     }
 
     //determine errors
@@ -598,7 +585,7 @@ function FImage({name, label, styleIn, ...props}){
             {cropped_file ? <>
                     <FileImage file={cropped_file} styleIn={styleIn}/>
                     <div className={styles['image-controls-cont']}>
-                        <div type="button" onClick={crop}><p className={styles["elem-button-add"]}>Crop</p></div>
+                        <div type="button"onClick={crop}><p className={styles["elem-button-add"]}>Crop</p></div>
                         <div {...getRootProps()} >
                             <input {...getInputProps()}/>
                             <p className={styles["elem-button-del"]}><u>Drag file here</u> or <u>Click</u> to replace</p>
@@ -618,91 +605,6 @@ function FImage({name, label, styleIn, ...props}){
         <Text name={`${name}.alt`} label={`text if image will not load (alt)`} />
     </>
 
-}
-
-function CmsImage({name, label, styleIn, ...props}){
-    const mb = 1000*1000
-    const MAX_FILE_SIZE = props.max_size || 10*mb
-    const SUPPORTED_FILE_EXTENSIONS = props.sf || ['.jpg', '.jpeg', '.png', '.gif']
-    const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const [file, setFile] = useState(null)
-    const [dropzoneErr, setDropzoneErr] = useState(false)
-    const [field, meta, helpers] = useField(`${name}`)
-    const [crop_field, crop_meta, crop_helpers] = useField(`${name}.cropped`)
-    // const [name_Field, name_meta, name_helpers] = useField(`${name}.url`)
-    const cropped_file = crop_field.value
-
-    //on every drop get called with the files that were just added (not all the files in the dropzone), valid = passed validation of react-dropzone (not yup yet)
-    const onDrop = useCallback(async (valid, invalid) => {
-        await setFieldTouched(name, true)
-        await setDropzoneErr(false)
-        if(valid.length){
-            setFile(valid[0])
-            setFieldValue(`${name}.original`, valid[0])
-            setFieldValue(`${name}.cropped`, valid[0])
-            setFieldValue(`${name}.url`, null)
-        }
-        else{`file must be less than ${MAX_FILE_SIZE/mb}mb`
-            const code = invalid[0].errors[0].code
-            if(code==='file-invalid-type'){setDropzoneErr(`file must be a ${SUPPORTED_FILE_EXTENSIONS}`)}
-            if(code==='file-too-large'){setDropzoneErr(`file must be less than ${MAX_FILE_SIZE/mb}mb`)}
-            if(cropped_file){setTimeout(()=>{setDropzoneErr(false)}, 4000)}
-        }
-    }, [cropped_file])
-
-    const {getRootProps, getInputProps} = useDropzone({
-        onDrop, 
-        multiple:false, 
-        accept: {'image/*': SUPPORTED_FILE_EXTENSIONS},
-        maxSize: MAX_FILE_SIZE,
-        minSize: 10
-    })
-
-
-    //IMAGE EDITOR
-    //setup image editor for crop
-    const [editorOpen, setEditorOpen] = useState(false)
-    const crop = async () =>{
-        setEditorOpen(true)
-    }
-
-    //determine errors
-    let isErr
-    let error = typeof crop_meta.error === 'string' ? crop_meta.error:''
-    error = dropzoneErr && !cropped_file ? dropzoneErr:error
-    if(submitCount){ isErr = error }
-    else{ isErr = error==='required' ? false : error }
-    const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
-
-    return <>
-        {editorOpen ? <ImageEditor2 name={name} imageStyle={styleIn} setOpen={setEditorOpen} />:null}
-        <label className={styles["label"]} htmlFor={props.id || name}>
-            <p>{`${label}`}</p>
-            {isErr ? <pre className={styles['label-err']}>{` - ${error}`}</pre>:null}
-        </label>
-        <div className={styles['image-cont']}>
-            {cropped_file ? <>
-                    <FileImage file={cropped_file} styleIn={styleIn}/>
-                    <div className={styles['image-controls-cont']}>
-                        <div type="button" onClick={crop}><p className={styles["elem-button-add"]}>Crop</p></div>
-                        <div {...getRootProps()} >
-                            <input {...getInputProps()}/>
-                            <p className={styles["elem-button-del"]}><u>Drag file here</u> or <u>Click</u> to replace</p>
-                        </div>
-                    </div>
-                </>
-            :        
-                <div {...getRootProps()} className={styles['drop-zone-cont']}>
-                    <input {...getInputProps()} className={styles['drop-zone-input']}/>
-                    <div className={styles['drop-text']}><p><u>Drag file here</u> or <u>Click</u> to select</p></div> 
-                </div>
-            }
-        </div>
-        <div className={styles["dropzone-error-cont"]}>
-            {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
-        </div>
-        <Text name={`${name}.alt`} label={`text if image will not load (alt)`} />
-    </>
 }
 
 function Space({}){
@@ -716,53 +618,26 @@ function ImageEditor({}){
     //disable body scroll on editor open (reset when leave this page)
     useToggleScroll(values['isEditorOpen'])
 
-    const [saveTrigger, triggerSave] = useState(0)
+    const [saveCnt, saveCropped] = useState(0)
 
     const name = values['editorFileName']
     const file = getIn(values, `${name}.original`)
 
-    const saveCroped = async (file) => {
+    const setCroped = async (file) => {
         setFieldValue(`${name}.cropped`, file)
         setFieldValue(`${name}.url`, null)
         setFieldValue('isEditorOpen', false)
     }
 
-    return <>
-        <div className={styles['crop-modal']}>
-            <CropImage file={file} styleIn={values['editorPreviewStyle']} saveCroppedFile={saveCroped} save={saveTrigger}/>
-            <div className={styles['image-editor-controls']}>
-                <button type="button" className={styles["elem-button-add"]} onClick={()=>{triggerSave(cur => cur+1)}}>Save</button>
-                <button type="button" className={styles["elem-button-del"]} onClick={()=>{update('close')}}>Close</button>
-            </div>
-        </div>  
-    </>
-
-}
-
-function ImageEditor2({name, imageStyle, setOpen}){
-    const { values, setFieldValue } = useFormikContext()
-
-    //disable body scroll on editor open (reset when leave this page)
-    useToggleScroll(values['isEditorOpen'])
-
-    const [saveTrigger, triggerSave] = useState(0)
-
-    const file = getIn(values, `${name}.original`)
-
-    const saveCroped = async (file) => {
-        setFieldValue(`${name}.cropped`, file)
-        setFieldValue(`${name}.url`, null)
-        setOpen(false)
-    }
-
 
     return <>
         <div className={styles['crop-modal']}>
-            <CropImage file={file} styleIn={imageStyle} saveCroppedFile={saveCroped} save={saveTrigger}/>
+            <CropImage file={file} styleIn={values['editorPreviewStyle']} saveCroppedFile={setCroped} save={saveCnt}/>
             <div className={styles['image-editor-controls']}>
-                <button type="button" className={styles["elem-button-add"]} onClick={()=>{triggerSave(cur => cur+1)}}>Save</button>
-                <button type="button" className={styles["elem-button-del"]} onClick={()=>{setOpen(false)}}>Close</button>
+                <button type="button" className={styles["elem-button-add"]} onClick={()=>{saveCropped(cur => cur+1)}}>Save</button>
+                <button type="button" className={styles["elem-button-del"]} onClick={()=>{setFieldValue('isEditorOpen', false)}}>Close</button>
             </div>
+            
         </div>  
     </>
 
@@ -1123,5 +998,7 @@ function Bar({progress}){
         </div>
     </>
 }
+
+
 
 export default Create

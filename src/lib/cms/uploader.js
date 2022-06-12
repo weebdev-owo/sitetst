@@ -1,4 +1,4 @@
-import React, {memo, useRef, useState, useCallback, useEffect, useReducer, useMemo} from 'react'
+import React, {memo, useRef, useState, useCallback, useEffect, useReducer, useMemo, useContext} from 'react'
 import styles from './cms.module.sass'
 import {useFormikContext} from 'formik'
 import  classNames  from 'classnames';
@@ -9,11 +9,46 @@ import Spinner from '/src/lib/comps/spinner/spinner'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
 import {QueryClient, QueryClientProvider as QueryProvider, useQuery} from 'react-query'
+import { ConfigContext } from './configContext'
+
+
+const getByPath = (obj, path) => {
+    if (typeof path==='string'){path = path.split(".")}
+    let res = obj
+    path.forEach(entry =>{res = res[entry]})
+    return res
+}
+const setByPath = (obj, path, val) => {
+    if (typeof path==='string'){path = path.split(".")}
+    let res = obj
+    const final = path.pop()
+    path.forEach((entry) =>{res = res[entry]})
+    res[final] = val
+}
 
 let num_images = 0;
 function unique_query_id(){
     num_images += 1
     return `image${num_images}`
+}
+
+const isImg = new RegExp('^img', 'i')
+function get_imgs(data, path, paths){  
+    if (typeof data === 'object' && data != null){
+        if (Array.isArray(data)){   //array
+            for(let i=0; i<data.length; i++){
+                get_imgs(data[i], path.concat([i]), paths)
+            }
+        }
+        else {  
+            const keys = Object.keys(data) //object
+            for (let i=0; i<keys.length; i++){
+                if (isImg.test(keys[i])){paths.push(path.concat([keys[i]]))}
+                else {get_imgs(data[keys[i]], path.concat([keys[i]]), paths)}
+            }
+        }
+    }
+    return paths
 }
 
 const queryClient = new QueryClient({
@@ -29,7 +64,6 @@ const queryClient = new QueryClient({
         }
     }
 })
-
 
 //give me a upload store and an update reducer and a formik values object, and ill do some image uploads to cloudinary, then mutate values, and then send the modified values to a database
 function Upload({store, update}){
@@ -48,9 +82,8 @@ function Upload({store, update}){
     }, [store.db.uploaded])
 
     if(store.action==='images'){
-        console.log('FILES HERE', store.images.files)
         return <>
-            <QueryProvider client={queryClient}>
+            {/* <QueryProvider client={queryClient}> */}
                 <div className={styles['crop-modal']}>
                     <UploadImages 
                         files={store.images.files} 
@@ -60,7 +93,7 @@ function Upload({store, update}){
                         update={update} 
                     />
                 </div>
-            </QueryProvider>
+            {/* </QueryProvider> */}
         </>
     }
     if(store.action==='db'){
@@ -91,20 +124,28 @@ function UploadImages({files, paths, error, uploaded, update}){
     //close if already tried request and component refreshed
     let close = false
     useEffect(()=>{if(uploaded || error){update('close')}; close=true}, [])
+    useToggleScroll(!close)
 
     const images = useMemo(() => {
-        return files.map((image, i) => 
-        <UploadImage 
-            idx={i}
-            file={image} 
-            path={paths[i]} 
-            update={update} 
-            sucsess={uploaded} 
-            failed={error} 
-            key={i}
-        />)
+        if(files.length){
+            return files.map((image, i) => {
+                const imgClient = new QueryClient({ defaultOptions: {queries:{refetchOnMount: false,refetchOnReconnect: false,refetchOnWindowFocus: false, retry: false}}});
+                return <>
+                    <QueryProvider client={imgClient}>
+                        <UploadImage 
+                            file={image} 
+                            path={paths[i]} 
+                            update={update} 
+                            sucsess={uploaded} 
+                            failed={error} 
+                            key={i}
+                        />
+                    </QueryProvider>
+                </>
+            })
+        }
+        else {return []}
     }, [files])
-
 
     if(close){ return null }
 
@@ -123,13 +164,12 @@ function UploadImages({files, paths, error, uploaded, update}){
         </>
     }
 
-
 }; UploadImages = memo(UploadImages)
 
-const postImage = (file, setProgress) =>{
+const postImage = (file, setProgress, url) =>{
     console.log("UPLOADING IMAGEU: ", file.name)
     return axios.post(
-        'http://localhost:3000/api/uploadSingleImage', 
+        url, 
         {image: file}, 
         {headers: 
             {'Content-Type': 'multipart/form-data'},
@@ -144,12 +184,12 @@ const postImage = (file, setProgress) =>{
     )
 }
 
-function UploadImage({idx, file, path, sucsess, failed, update}) {
+function UploadImage({file, path, sucsess, failed, update}) {
     const { values } = useFormikContext()
+    const {imageUrl} = useContext(ConfigContext)
     const [progress, setProgress] = useState([0, 0])
-    const [queryId, setQueryId] = useState(unique_query_id())
-    const {data, isLoading, isError, isFetching, status, error} = useQuery(queryId, () => postImage(file, setProgress), {enabled: !sucsess && !failed})
-    
+    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('image', () => postImage(file, setProgress, imageUrl), {enabled: !sucsess && !failed})
+
     useEffect(() =>{
         if(data && !isError){ setByPath(values, path.concat(['url']), data.data.url); update('image_sucsess')}
     }, [data, isError])
@@ -163,10 +203,11 @@ function UploadImage({idx, file, path, sucsess, failed, update}) {
 
     //display response error
     if (isError){
+        console.log('ERROR UPLOADING FILE: ', file.name, error)
         return <>
             <div>
                 {image}
-                <div className={styles['upload-image-error']}>{`${error}`}</div>
+                <div className={styles['upload-image-error']}>{`${error.response.data.message || error.response.message}`}</div>
             </div> 
         </>
     }
@@ -227,10 +268,10 @@ function createPayload(values){
     return payload
 }
 
-async function postData(payload, setProgress){
+async function postData(payload, setProgress, url){
     console.log('UPLOADING DATA', )
     return axios.post(
-        'http://localhost:3000/api/cmsCreate', 
+        url, 
         {data: payload}, 
         {headers: 
             {'Content-Type': 'application/json'},
@@ -251,11 +292,12 @@ function UploadData({sucsess, failed, update}){
     //close if already tried request and component refreshed
     let close = false
     useEffect(()=>{if(sucsess || failed){update('close')}; close=true}, [])
+    useToggleScroll(!close)
 
     const { values } = useFormikContext()
-    // const payload = createPayload(values)
+    const {dbUrl} = useContext(ConfigContext)
     const [progress, setProgress] = useState([0, 0])
-    const {data, isLoading, isError, isFetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress), {enabled: !sucsess && !failed})
+    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl), {enabled: !sucsess && !failed})
 
     useEffect(() =>{
         if(data && !isError){ update('db_sucsess') }
@@ -268,6 +310,7 @@ function UploadData({sucsess, failed, update}){
     if(close){ return null }
 
     if(isError){
+        console.log('ERROR UPLOADING DATA', error)
         const types = error.response.data.error.types
         const messages = error.response.data.error.messages
         return <>
@@ -288,7 +331,8 @@ function UploadData({sucsess, failed, update}){
                 <div className={styles['upload-data-inprogress-text']}>{`In Progress`}</div>
                 <Spinner h={60}/>
             </div>
-            {/* <ProgressBar progress={progress} /> */}
+            <div className={styles['center-progress']}><ProgressBar progress={progress} /></div>
+            
         </>
     }
 
@@ -305,10 +349,12 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({id}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
+    const {cmsTitle} = useContext(ConfigContext)
     const router = useRouter()
     const forceReload = () =>{
         router.reload()
     }
+    useToggleScroll(true)
 
     return <>
         <div className={styles['heading']} style={{"color":'#39C16C'}}>Upload Sucsess</div>
@@ -326,14 +372,14 @@ function UploadComplete({id}){
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={''}>
+                <Link href={`http://localhost:3000/admin/services/${values.url}`}>
                     <a className={styles["sucsess-link"]}>Edit {`${values.url}`}</a> 
                 </Link>     
             </div>
 
             <div className={styles["sucsess-section"]}>
                 <Link href={'http://localhost:3000/admin/services/create'}>
-                    <a className={styles["sucsess-link"]} onClick={forceReload}>Create New Service</a> 
+                    <a className={styles["sucsess-link"]} onClick={forceReload}>{`Create New ${cmsTitle}`}</a> 
                 </Link>     
             </div>
         </div>
@@ -359,10 +405,13 @@ function ProgressBar({progress}){
         total = (total/1).toFixed(2)
         unit='bytes'
     }
-    <div className={styles['progress-uploading']}>
-        <Bar progress={Math.floor((loaded*100)/total)} />
-        <div>{`${loaded}/${total} ${unit}`}</div>
-    </div>
+    return <>
+        <div className={styles['progress-uploading']}>
+            <Bar progress={Math.floor((loaded*100)/total)} />
+            <div>{`${loaded}/${total} ${unit}`}</div>
+        </div>
+    </>
+
 
 }
 
