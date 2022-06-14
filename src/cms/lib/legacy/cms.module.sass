@@ -1,0 +1,433 @@
+.heading
+    font-size: 100px
+    width: 100%
+    text-align: center
+    padding: 100px
+    color: white
+
+.sub-heading
+    font-size: 40px
+    width: 100%
+    text-align: center
+    padding: 40px
+
+.sub-sub-heading
+    font-size: 20px
+    width: 100%
+    text-align: center
+    padding: 10px
+
+.form
+    top: 0
+    left: 0
+    // border: 1px solid black
+    width: 100vw
+    display: grid
+    justify-content: center
+    align-content: start
+    // justify-items: center
+    // align-items: center
+    color: white
+
+.section
+    display: flex
+    flex-direction: column
+    padding-bottom: 2vh
+    padding-left: 10px
+
+.section-checkbox
+    display: flex
+    padding-bottom: 2vh
+    align-items: center
+
+
+.label
+    color: grey
+    display: flex
+    align-items: center
+
+    // justify-content: center
+.label-err
+    color: red
+    
+.select
+    @extend .input
+    text-align: center
+
+.option
+    // text-align: center
+    color: black
+
+.input
+    font-size: 24px
+    border: white
+    border-radius: 20px
+    overflow: hidden
+    padding: 15px 20px 15px 20px
+    color: grey
+    box-shadow: 2px 5px 3px rgba(0,0,0,0.2) inset
+    // background-color: rgba(0,0,0,0.1)
+
+
+.submit
+    @extend .input
+    box-shadow: 0px 5px 0px rgba(0,0,0,0.2)
+    font-size: 24px
+    justify-self: center
+    width: 80%
+    height: 50px
+    text-align: center
+    padding: 10px
+    transition: 300ms
+    // padding-top: 20px
+    justify-self: center
+    align-self: center
+    color: white
+    background: black
+    border: 1px solid white
+
+    &:hover
+        cursor: pointer
+        color: #B29146
+        border: 1px solid black
+        background: white
+        // transition: 100ms
+        color: black
+
+.submit-section
+    @extend .section
+    padding-top: 2vh
+
+.textarea-big
+    width: 70vw
+    max-width: min(1400px, 90vw)
+
+    height: 160px
+    min-height: 100px
+    min-width: 200px
+    padding: 10px
+    border-radius: 10px
+    border: 1px solid black
+    font-size: 18px
+    &::selection 
+        color: white
+        background: black
+
+.textarea-smol
+    width: 40vw
+    max-width: 1400px
+    height: 50px
+    min-height: 50px
+    min-width: 200px
+    padding: 10px
+    border-radius: 10px
+    border: 1px solid black
+    font-size: 18px
+    &::selection 
+        color: white
+        background: black
+
+.textarea-err
+        border: 1px solid red !important
+.space
+    height: 60px
+
+.elem-topbar
+    display: flex
+    align-items: center
+    justify-content: space-between
+
+.elem-button-add
+    margin: 20px 0px 20px 30px
+    width: fit-content
+    font-size: 20px
+    padding: 10px 13px 10px 13px
+    border-radius: 10px
+    border: 1px solid #454545
+    color: white
+    background-color: black
+    transition: 300ms
+    &:hover
+        cursor: pointer
+        background-color: white
+        transition: 300ms
+        // color: #55ff00
+        color: black
+        border: 1px solid black
+
+.elem-button-del
+    margin: 20px 0px 20px 30px
+    width: fit-content
+    font-size: 20px
+    padding: 10px 13px 10px 13px
+    border-radius: 10px
+    border: 1px solid #454545
+    color: white
+    background-color: black
+    transition: 300ms
+    &:hover
+        cursor: pointer
+        background-color: white
+        transition: 300ms
+        // color: #ff3232
+        color: black
+        border: 1px solid black
+
+.list-add
+    margin: 20px
+    width: fit-content
+    font-size: 20px
+    padding: 10px
+    border-radius: 10px
+    border: 1px solid #454545
+    color: white
+    background-color: black
+    transition: 300ms
+    &:hover
+        cursor: pointer
+        background-color: transparent
+        transition: 300ms
+        color: #55ff00
+        border: 1px solid black
+
+.checkbox
+    height: 30px
+    width: 30px
+    margin-right: 15px
+    border-radius: 100px
+    border: 1px solid blue
+    font-size: 18px
+    overflow: hidden
+
+.page-section
+    border: 1px solid #454545
+    // padding: 10px 20px 10px 20px
+    padding: 40px
+    margin-bottom: 40px
+    margin-top: 20px
+    border-radius: 20px
+    color: white
+    font-size: 20px
+    // filter: brightness(90%)
+
+
+
+.image-cont
+    display: grid
+    grid-column: 100%
+    align-content: center
+    justify-content: center
+    align-items: center
+    justify-items: center
+    row-gap: 20px
+
+.drop-zone-cont
+    border-radius: 20px
+    border: 1px solid #454545
+    margin: 10px
+    padding: 10px 60px 10px 60px
+    width: fit-content
+    transition: 300ms
+    &:hover
+        cursor: pointer
+        // color: #55ff00
+        border: 1px solid black
+        background-color: white
+        color: black 
+        transition: 300ms
+
+
+.image-controls-cont
+    display: flex
+
+.image-button
+
+.drop-zone-input
+
+
+.crop-modal-cont
+    position: absolute
+
+.crop-modal
+    overflow-y: overlay
+    position: fixed
+    // min-height: 100vh
+    // min-width: 100vw
+    z-index: 1000
+    background: black
+    top: 0
+    left: 0
+    height: fit-content
+    width: 100vw
+    height: 100vh
+
+.image-editor-controls
+    position: fixed
+    top: 0
+    right: 0
+    margin: 14px 30px 
+
+.dropzone-error-cont
+    display: flex
+    width: 100%
+    justify-content: center
+    align-items: center
+.dropzone-error
+    color: red
+
+//upload display
+
+// .upload-images
+//     display: flex
+//     flex-direction: column
+//     justify-content: center
+//     align-items: center
+
+.upload-images-display-cont
+    display: flex
+    justify-content: center
+    align-items: center
+    border: 1px solid white
+
+.upload-images-display
+    display: grid
+    justify-content: center
+    justify-items: center
+    grid-template-columns: repeat(auto-fit, 200px)
+    padding: 100px 200px 300px 200px
+    column-gap: 40px
+    row-gap: 40px
+    // max-width: 1800px
+
+.upload-image-progress
+    padding-top: 5px
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    text-align: center
+
+.progress
+    color: white
+    font-size: 20px
+
+.progress-uploading
+    @extend .progress
+
+.progress-processing
+    @extend .progress
+
+.progress-uploaded
+    @extend .progress
+
+.upload-image-error
+    color:  #ff0033
+
+.upload-close
+    z-index: 10000
+    color: grey
+    position: fixed
+    top: 0
+    right: 0
+    font-size: 40px
+    background: transparent
+    margin: 40px 30px
+    border: 1px solid grey
+    border-radius: 200px
+    padding: 15px 30px 20px 30px
+    transform: scale(0.8)
+
+    &:hover
+        color: #ff0033
+        border: 1px solid #ff0033
+        cursor: pointer
+
+.upload-data-error
+    color: #ff0033
+    font-size: 20px
+    padding: 20px
+    text-align: center
+
+.upload-data-errors
+    @extend .sub-heading
+    font-size: 20px
+    padding: 80px
+    
+.upload-data-inprogress
+    // border: 1px solid white
+    margin-top: 10vh
+    display: flex
+    justify-content: center
+    align-items: center
+    color: #39C16C
+    font-size: 60px
+    
+.upload-data-inprogress-text
+    padding: 40px 30px 55px 30px
+    // border: 1px solid white
+    // transform: translateY(-8px)
+
+.upload-image-optimizing
+    // border: 1px solid white
+
+    display: flex
+    justify-content: center
+    align-items: center
+    color: #39C16C
+    font-size: 20px
+    
+.upload-image-optimizing-text
+    padding: 0px 5px 4px 8px
+    // border: 1px solid white
+    // transform: translateY(-8px)
+
+
+.sucsess-section
+    display: flex
+    flex-direction: column
+    // padding-bottom: 2vh
+    padding-left: 10px
+    padding-top: 2vh
+    justify-content: center
+    align-items: center
+    
+
+.sucsess-link
+    font-size: 24px
+
+    overflow: hidden
+    // padding: 15px 20px 15px 20px
+    color: grey
+    box-shadow: 2px 5px 3px rgba(0,0,0,0.2) inset
+    box-shadow: 0px 5px 0px rgba(0,0,0,0.2)
+    font-size: 24px
+    justify-self: center
+    width: 40%
+    // height: 50px
+    text-align: center
+    text-justify: center
+    padding: 20px 0px 20px 0px
+    transition: 300ms
+    // padding-top: 20px
+    // justify-self: center
+    // align-self: center
+    color: white
+    background: black
+    border-radius: 20px
+    border: 1px solid grey
+
+    &:hover
+        cursor: pointer
+        color: #B29146
+        border: 1px solid black
+        background: white
+        // transition: 100ms
+        color: black
+
+.sucsess-links
+    padding-bottom: 200px
+
+.center-progress
+    display: flex
+    justify-content: center
+    align-items: center

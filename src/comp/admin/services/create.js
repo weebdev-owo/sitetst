@@ -38,9 +38,6 @@ const queryClient = new QueryClient({
     }
 })
 
-
-
-
 //layout form data
 const img = {
     "original": null,
@@ -319,13 +316,11 @@ function Create(){
         paths.forEach((path) =>{
             if (!getByPath(values, path)['url']){upload_paths.push(path)}
         })
-        // console.log('upload paths', paths, upload_paths)
         if(upload_paths.length){
             const images = upload_paths.map((path) => getImg(values, path)['cropped'])
             setUpload(['images', [images, upload_paths]])
         }
         else{
-            // console.log('XXXXXDDDDDDDD')
             setUpload('db')
         }
 

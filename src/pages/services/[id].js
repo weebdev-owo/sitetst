@@ -1,8 +1,8 @@
+//frontend
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import {useRef, useState, useEffect} from 'react'
-import styles from '/src/styles/home.module.sass'
 import Intro from '/src/comp/services/intro'
 import Summary from '/src/comp/services/summary'
 import Process from '/src/comp/services/process'
@@ -10,6 +10,9 @@ import FAQ from '/src/comp/services/faq'
 import Book from '/src/comp/book/book'
 import ScrollNav from '/src/comp/scrollnav/scrollnav'
 import SetBg from '/src/lib/utils/setbg'
+//backend
+import dbConnect from '/src/lib/api/db/mongoose_connect'
+import Service from '/src/cms/service/model'
 
 const loreum1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
 const loreum2 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
@@ -32,9 +35,6 @@ export default function ServicePage({service}){
         intro: service.process.intro,
         steps: service.process.steps.map((step)=>[step.name, step.desc]),
         imgs: service.process.steps.map((step)=>step.img.url)
-
-        // [['Step Name', loreum1], ['Step Name', loreum1], ['Step Name', loreum1]],
-        // imgs: ['/tree.png', '/tree.png', '/tree.png']
     }
     
     const faq = {
@@ -57,21 +57,16 @@ export default function ServicePage({service}){
     SetBg(elemRef)
 
     return <>
-        <div className={styles.home}>
-            <Intro title={intro.title} desc={intro.desc} img={intro.img}/>
-            <ScrollNav setReset={setReset}/>
-            <Summary imgs={summary.imgs} statements={summary.statements} texts={summary.texts}/>
-            <div ref={elemRef}>
-                <Process steps={process.steps} imgs={process.imgs} intro={process.intro}/>
-                <FAQ intro={faq.intro} questions={faq.questions} answers={faq.answers} />
-                <Book services={book.services}/>
-            </div>
+        <Intro title={intro.title} desc={intro.desc} img={intro.img}/>
+        <ScrollNav setReset={setReset}/>
+        <Summary imgs={summary.imgs} statements={summary.statements} texts={summary.texts}/>
+        <div ref={elemRef}>
+            <Process steps={process.steps} imgs={process.imgs} intro={process.intro}/>
+            <FAQ intro={faq.intro} questions={faq.questions} answers={faq.answers} />
+            <Book services={book.services}/>
         </div>
     </>
 }
-
-import dbConnect from '/src/lib/api/db/mongoose_connect'
-import Service from '/src/lib/api/db/models/service'
 
 export async function getStaticProps(context){
     const id = context.params.id

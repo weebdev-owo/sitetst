@@ -177,6 +177,7 @@ function FormImage({name, label, styleIn, ...props}){
     //IMAGE EDITOR
     //setup image editor for crop
     const [editorOpen, setEditorOpen] = useState(false)
+    useToggleScroll(editorOpen)
     const crop = async () =>{
         setEditorOpen(true)
     }
@@ -205,6 +206,7 @@ function FormImage({name, label, styleIn, ...props}){
                             <p className={styles["elem-button-del"]}><u>Drag file here</u> or <u>Click</u> to replace</p>
                         </div>
                     </div>
+                    <Text name={`${name}.alt`} label={`text if image will not load (alt)`} />
                 </>
             :        
                 <div {...getRootProps()} className={styles['drop-zone-cont']}>
@@ -216,7 +218,7 @@ function FormImage({name, label, styleIn, ...props}){
         <div className={styles["dropzone-error-cont"]}>
             {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
         </div>
-        <Text name={`${name}.alt`} label={`text if image will not load (alt)`} />
+
     </>
 }
 

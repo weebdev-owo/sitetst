@@ -9,7 +9,7 @@ const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/gif", "image/png"];
 const SUPPORTED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif']
 const title = 30
 const short = 60
-const para = 1000
+const para = 400
 
 const valid_num = (min, max) => Yup.number()
     .typeError('must be a number')
@@ -35,8 +35,11 @@ const valid_img_file = Yup.mixed()
     .test('fileSize', `file must be less than ${MAX_FILE_SIZE/mb}mb`, value => value ? value.size<=MAX_FILE_SIZE:true) 
     .test('fileType', `file must be a ${SUPPORTED_FILE_EXTENSIONS}`, value => value ? SUPPORTED_FORMATS.includes(value.type):true)
     .required('required')
+const valid_url = Yup.string()
+    .required('required')
+
 const img_data = Yup.object({
-    cropped: valid_img_file,
+    url: Yup.string().url(),
     alt: brief_text(short)
 })
 
@@ -70,7 +73,7 @@ const serviceSchema = Yup.object({
         }),
         process: Yup.object({
             "intro": brief_text(para), 
-            "steps": valid_array('steps', 0, 100, {
+            "steps": valid_array('steps', 0, 50, {
                 "name": brief_text(short),           
                 "desc": brief_text(para),  
                 "img": img_data,  
@@ -78,7 +81,7 @@ const serviceSchema = Yup.object({
         }),
         faq: Yup.object({
             "intro": brief_text(para), 
-            "items": valid_array('questions', 0, 100, {
+            "items": valid_array('questions', 0, 50, {
                 'question': brief_text(short),  
                 'answer': brief_text(para),  
             }),

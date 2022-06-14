@@ -57,8 +57,8 @@ const queryClient = new QueryClient({
             // onSucsess: 
             // refetchInterval,
             // refetchIntervalInBackground,
-            refetchOnMount: false,
-            refetchOnReconnect: false,
+            refetchOnMount: true,
+            refetchOnReconnect: true,
             refetchOnWindowFocus: false,
             retry: false
         }
@@ -112,7 +112,7 @@ function Upload({store, update}){
     if(store.action==='complete'){
         return <>
             <div className={styles['crop-modal']}>
-                <UploadComplete id={'service id'} />
+                <UploadComplete isr_errors={store.complete.isr_errors} />
             </div>
         </>
     }
@@ -268,11 +268,20 @@ function createPayload(values){
     return payload
 }
 
-async function postData(payload, setProgress, url){
-    console.log('UPLOADING DATA', )
+async function postData(payload, setProgress, url, model_path, unique_id, revalidate){
+    const revalidate_paths = revalidate.map((revalidate_path) => {
+        if (typeof revalidate_path === 'string'){ return revalidate_path}
+        const new_revalidate_path = revalidate_path.map(entry => (entry === 'use id' ? unique_id:entry))
+        return '/'+new_revalidate_path.join('/')
+    })
+    console.log('UPLOADING DATA', revalidate_paths)
     return axios.post(
         url, 
-        {data: payload}, 
+        {
+            data: payload,
+            model_path: model_path,
+            revalidate: revalidate_paths
+        }, 
         {headers: 
             {'Content-Type': 'application/json'},
             onUploadProgress: (e) => {
@@ -295,12 +304,12 @@ function UploadData({sucsess, failed, update}){
     useToggleScroll(!close)
 
     const { values } = useFormikContext()
-    const {dbUrl} = useContext(ConfigContext)
+    const {dbUrl, model_path, id_path, revalidate} = useContext(ConfigContext)
     const [progress, setProgress] = useState([0, 0])
-    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl), {enabled: !sucsess && !failed})
+    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl, model_path, getByPath(values, id_path), revalidate), {enabled: !sucsess && !failed})
 
     useEffect(() =>{
-        if(data && !isError){ update('db_sucsess') }
+        if(data && !isError){ console.log('DATTTAAAA', data.data.isr_errors);update(['db_sucsess', data.data.isr_errors]) }
     }, [data, isError])
 
     useEffect(() =>{
@@ -347,38 +356,42 @@ function UploadData({sucsess, failed, update}){
 }; UploadData = memo(UploadData)
 
 //upload complete menu 
-function UploadComplete({id}){
+function UploadComplete({isr_errors}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle} = useContext(ConfigContext)
+    const {cmsTitle, viewUrl, editUrl} = useContext(ConfigContext)
     const router = useRouter()
     const forceReload = () =>{
         router.reload()
     }
     useToggleScroll(true)
+    console.log('VALIDATION_ERRORS', isr_errors)
 
     return <>
         <div className={styles['heading']} style={{"color":'#39C16C'}}>Upload Sucsess</div>
+        {isr_errors.length ? <div className={styles['upload-data-errors']}>{isr_errors.map((path, i) => 
+            <div key={i}><span className={styles['upload-data-error']}>{` on demand isr failed for: [ ${path} ] hence changes will not be displayed immediately`}</span></div>
+        )}</div>:null}  
         <div className={styles['sucsess-links']}>
             <div className={styles["sucsess-section"]}>
-                <Link href={'http://localhost:3000/admin'}>
+                <Link href={'/admin'}>
                     <a className={styles["sucsess-link"]}>Admin Home</a> 
                 </Link>   
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={`http://localhost:3000/services/${values.url}`}>
+                <Link href={viewUrl || `/services/${values.url}`}>
                     <a className={styles["sucsess-link"]}>View {`${values.url}`}</a> 
                 </Link>  
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={`http://localhost:3000/admin/services/${values.url}`}>
+                <Link href={editUrl || `/admin/edit-${cmsTitle.toLowerCase()}/${values.url}`}>
                     <a className={styles["sucsess-link"]}>Edit {`${values.url}`}</a> 
                 </Link>     
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={'http://localhost:3000/admin/services/create'}>
+                <Link href={`/admin/create-${cmsTitle.toLowerCase()}`}>
                     <a className={styles["sucsess-link"]} onClick={forceReload}>{`Create New ${cmsTitle}`}</a> 
                 </Link>     
             </div>

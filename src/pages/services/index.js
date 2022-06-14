@@ -2,7 +2,6 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import {useRef, useState, useEffect} from 'react'
-import styles from '/src/styles/home.module.sass'
 import Intro from '/src/comp/services/intro'
 import Summary from '/src/comp/services/summary'
 import Process from '/src/comp/services/process'
@@ -27,15 +26,13 @@ export default function Service(){
     SetBg(elemRef)
 
     return <>
-        <div className={styles.home}>
-            <Intro title={intro.title} desc={intro.desc} img={intro.img}/>
-            <ScrollNav setReset={setReset}/>
-            <Summary imgs={summary.imgs} statements={summary.statements} texts={summary.texts}/>
-            <div ref={elemRef}>
-                <Process steps={process.steps} imgs={process.imgs} intro={process.intro}/>
-                <FAQ intro={faq.intro} questions={faq.questions} answers={faq.answers} />
-                <Book services={book.services}/>
-            </div>
+        <Intro title={intro.title} desc={intro.desc} img={intro.img}/>
+        <ScrollNav setReset={setReset}/>
+        <Summary imgs={summary.imgs} statements={summary.statements} texts={summary.texts}/>
+        <div ref={elemRef}>
+            <Process steps={process.steps} imgs={process.imgs} intro={process.intro}/>
+            <FAQ intro={faq.intro} questions={faq.questions} answers={faq.answers} />
+            <Book services={book.services}/>
         </div>
     </>
 }

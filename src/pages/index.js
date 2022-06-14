@@ -1,18 +1,20 @@
+//frontend
 import Head from 'next/head'
 import {useState, useRef, useEffect} from 'react'
 import TopBar from '/src/comp/topbar/topbar'
 import Car from '/src/comp/home/carousel/small_car'
 import CarImage from "/src/comp/home/carousel/carimage"
-import styles from '/src/styles/home.module.sass'
 import Counters from '/src/comp/home/counters/counters'
 import Services from '/src/comp/home/services/services'
 import About from '/src/comp/home/about/about'
 import Book from '/src/comp/book/book'
 import ScrollNav from '/src/comp/scrollnav/scrollnav'
 import { setBgCol } from '/src/lib/utils/setbg'
+//backend
+import dbConnect from '/src/lib/api/db/mongoose_connect'
+import Service from '/src/cms/service/model'
 
 export default function Home({services}){
-
   //Reset Nav and url
   const empty_reset = () => () => {}
   const [reset, setReset] = useState(empty_reset)
@@ -27,15 +29,13 @@ export default function Home({services}){
   console.log(service_tiles)
   
   return <>
-    <div className={styles.home}>
-      <TopBar />
-      <Car>{carousel.imgs.map((img, i) =>{return <CarImage img={img} key={i}/>})}</Car>
-      <Counters />
-      <Services services={service_tiles} />
-      <About />
-      <Book services={book.services} />
-      <ScrollNav setReset={setReset} />
-    </div>
+    <TopBar />
+    <Car>{carousel.imgs.map((img, i) =>{return <CarImage img={img} key={i}/>})}</Car>
+    <Counters />
+    <Services services={service_tiles} />
+    <About />
+    <Book services={book.services} />
+    <ScrollNav setReset={setReset} />
   </>
 }
 
@@ -47,9 +47,6 @@ const carousel = {
 const book = {
   services: ['loreum ipsum', 'loreum ipsum' , 'loreum ipsum']
 }
-
-import dbConnect from '/src/lib/api/db/mongoose_connect'
-import Service from '/src/lib/api/db/models/service'
 
 export async function getStaticProps(){
   let services = []

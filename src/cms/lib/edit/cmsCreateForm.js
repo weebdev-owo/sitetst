@@ -101,7 +101,7 @@ function uploadReducer(state, data){
 }
 
 
-function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, children}){
+function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, model_path, children}){
     const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
 
     //Change body background and scroll when ref onscreen
@@ -129,7 +129,7 @@ function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTit
 
     return <>
         <div id={'Create'} className={styles["form-cont"]} ref={elemRef}>
-            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle}}>
+            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, model_path}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         { children }
@@ -144,7 +144,9 @@ function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTit
 CmsCreateForm = memo(CmsCreateForm)
 CmsCreateForm.defaultProps = {
     initialValues: {},
-    validationSchema: Yup.object({})
+    validationSchema: Yup.object({}),
+    viewUrl: false,
+    editUrl: false,
 }
 
 export default CmsCreateForm
