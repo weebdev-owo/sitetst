@@ -11,8 +11,8 @@ import Book from '/src/comp/book/book'
 import ScrollNav from '/src/comp/scrollnav/scrollnav'
 import SetBg from '/src/lib/utils/setbg'
 //backend
-import dbConnect from '/src/lib/api/db/mongoose_connect'
-import Service from '/src/cms/service/model'
+import dbConnect from '/src/cms/lib/api/mongoose_connect'
+import Service from '/src/cms/data/service/model'
 
 const loreum1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
 const loreum2 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
@@ -78,7 +78,7 @@ export async function getStaticProps(context){
             .select(['data.service'])
             .where('data.url').eq(id)
         if (data.length !== 1){throw 'Invalid number of objects matching this id'}
-        console.log('inside static props', data[0].data.service)
+        // console.log('inside static props', data[0].data.service)
         return {
             props: {
                 service: JSON.parse(JSON.stringify(data[0].data.service))
@@ -103,7 +103,7 @@ export async function getStaticPaths() {
                 params: {id: service.data.url}
             }
         })
-        console.log('inside static paths', services, JSON.parse(JSON.stringify(services)))
+        // console.log('inside static paths', services, JSON.parse(JSON.stringify(services)))
         return {
             paths: JSON.parse(JSON.stringify(services)),
             fallback: true

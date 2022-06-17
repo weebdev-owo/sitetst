@@ -4,7 +4,7 @@ import {Formik} from 'formik'
 import * as Yup from 'yup'
 import  classNames  from 'classnames';
 import 'react-image-crop/dist/ReactCrop.css'
-import {SetBgInv} from '/src/lib/utils/setbg'
+import {SetBgInv} from '/src/cms/lib/utils/setbg'
 import Upload from './uploader'
 import { ConfigContext } from './configContext'
 
@@ -159,13 +159,8 @@ function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTit
 
 CmsCreateForm = memo(CmsCreateForm)
 CmsCreateForm.defaultProps = {
-    initialValues:{
-        service:
-            {
-                process:{steps:[]},
-                faq: {items:[]},
-            }
-    },
+    imageUrl: '/api/uploadSingleImage',
+    dbUrl: '/api/cmsCreate',
     validationSchema: Yup.object({}),
     viewUrl: false,
     editUrl: false,

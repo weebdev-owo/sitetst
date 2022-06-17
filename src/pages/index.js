@@ -11,8 +11,8 @@ import Book from '/src/comp/book/book'
 import ScrollNav from '/src/comp/scrollnav/scrollnav'
 import { setBgCol } from '/src/lib/utils/setbg'
 //backend
-import dbConnect from '/src/lib/api/db/mongoose_connect'
-import Service from '/src/cms/service/model'
+import dbConnect from '/src/cms/lib/api/mongoose_connect'
+import Service from '/src/cms/data/service/model'
 
 export default function Home({services}){
   //Reset Nav and url
@@ -60,7 +60,7 @@ export async function getStaticProps(){
       services = data.map((service, i) => {
           return {...service.data.services.tile, url: service.data.url}
       })
-      console.log('inside static props', services, JSON.parse(JSON.stringify(services)))
+      // console.log('inside static props', services, JSON.parse(JSON.stringify(services)))
       return {
           props: {
               services: JSON.parse(JSON.stringify(services))

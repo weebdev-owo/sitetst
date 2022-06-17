@@ -2,10 +2,10 @@ import React, {memo, useRef, useState, useCallback, useEffect, useReducer, useMe
 import styles from './cms.module.sass'
 import {useFormikContext} from 'formik'
 import  classNames  from 'classnames';
-import ContainFileImage from '/src/lib/image/preview/containFileImage'
-import useToggleScroll from '/src/lib/utils/toggleScroll'
+import ContainFileImage from '/src/cms/lib/utils/preview/containFileImage'
+import useToggleScroll from '/src/cms/lib/utils/toggleScroll'
 import axios from 'axios'
-import Spinner from '/src/lib/comps/spinner/spinner'
+import Spinner from '/src/cms/lib/comps/spinner/spinner'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
 import {QueryClient, QueryClientProvider as QueryProvider, useQuery} from 'react-query'
@@ -67,8 +67,13 @@ const queryClient = new QueryClient({
 
 //give me a upload store and an update reducer and a formik values object, and ill do some image uploads to cloudinary, then mutate values, and then send the modified values to a database
 function Upload({store, update}){
-    const { values } = useFormikContext()
-    console.log("CURRENT VALUES", values, num_images)
+    const { values, errors } = useFormikContext()
+    console.log("CURRENT VALUES", 
+        values, 
+        errors,
+        // values.service.process.steps, 
+        // values.service.faq.items
+    )
     useEffect(() =>{
         if(store.images.uploaded){
             update('db')
@@ -167,7 +172,7 @@ function UploadImages({files, paths, error, uploaded, update}){
 }; UploadImages = memo(UploadImages)
 
 const postImage = (file, setProgress, url) =>{
-    console.log("UPLOADING IMAGEU: ", file.name)
+    // console.log("UPLOADING IMAGEU: ", file.name)
     return axios.post(
         url, 
         {image: file}, 
@@ -185,6 +190,7 @@ const postImage = (file, setProgress, url) =>{
 }
 
 function UploadImage({file, path, sucsess, failed, update}) {
+    // console.log('IMAGE FILE', path, file)
     const { values } = useFormikContext()
     const {imageUrl} = useContext(ConfigContext)
     const [progress, setProgress] = useState([0, 0])
@@ -264,7 +270,7 @@ function createPayload(values){
             alt: img['alt']
         })
     }
-    console.log('PAYLOAD', payload)
+    // console.log('PAYLOAD', payload)
     return payload
 }
 
@@ -274,7 +280,7 @@ async function postData(payload, setProgress, url, model_path, unique_id, revali
         const new_revalidate_path = revalidate_path.map(entry => (entry === 'use id' ? unique_id:entry))
         return '/'+new_revalidate_path.join('/')
     })
-    console.log('UPLOADING DATA', revalidate_paths)
+    // console.log('UPLOADING DATA', revalidate_paths)
     return axios.post(
         url, 
         {
@@ -309,7 +315,7 @@ function UploadData({sucsess, failed, update}){
     const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl, model_path, getByPath(values, id_path), revalidate), {enabled: !sucsess && !failed})
 
     useEffect(() =>{
-        if(data && !isError){ console.log('DATTTAAAA', data.data.isr_errors);update(['db_sucsess', data.data.isr_errors]) }
+        if(data && !isError){ update(['db_sucsess', data.data.isr_errors]) }
     }, [data, isError])
 
     useEffect(() =>{
@@ -319,7 +325,7 @@ function UploadData({sucsess, failed, update}){
     if(close){ return null }
 
     if(isError){
-        console.log('ERROR UPLOADING DATA', error)
+        // console.log('ERROR UPLOADING DATA', error)
         const types = error.response.data.error.types
         const messages = error.response.data.error.messages
         return <>
@@ -337,15 +343,18 @@ function UploadData({sucsess, failed, update}){
         return <>
             <div className={styles['heading']}>{'Uploading Data to Server'}</div>
             <div className={styles['upload-data-inprogress']}>
-                <div className={styles['upload-data-inprogress-text']}>{`In Progress`}</div>
+                {progress[0]<progress[1] ? 
+                    <div className={styles['upload-data-inprogress-text']}>{`Uploading Data`}</div>
+                :
+                    <div className={styles['upload-data-inprogress-text']}>{`Rebuilding Pages`}</div>
+                }
                 <Spinner h={60}/>
             </div>
             <div className={styles['center-progress']}><ProgressBar progress={progress} /></div>
-            
         </>
     }
 
-    console.log("COMPLETED DATA UPLOAD", data)
+    // console.log("COMPLETED DATA UPLOAD", data)
     return <>
         <div className={styles['heading']}>{'Uploading Data to Server'}</div>
         <div className={styles['upload-data-inprogress']}>
@@ -358,18 +367,18 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({isr_errors}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, viewUrl, editUrl} = useContext(ConfigContext)
+    const {cmsTitle, viewUrl, editUrl, id_path} = useContext(ConfigContext)
     const router = useRouter()
     const forceReload = () =>{
         router.reload()
     }
     useToggleScroll(true)
-    console.log('VALIDATION_ERRORS', isr_errors)
 
     return <>
         <div className={styles['heading']} style={{"color":'#39C16C'}}>Upload Sucsess</div>
+        {isr_errors.length ? <div className={styles['sub-heading']}>{`ISR error, changes will not be reflected immediately`}</div>:null}
         {isr_errors.length ? <div className={styles['upload-data-errors']}>{isr_errors.map((path, i) => 
-            <div key={i}><span className={styles['upload-data-error']}>{` on demand isr failed for: [ ${path} ] hence changes will not be displayed immediately`}</span></div>
+            <div key={i}><span className={styles['upload-data-error']}>{` on demand isr failed for page: [ ${path} ] hence changes will not be displayed immediately`}</span></div>
         )}</div>:null}  
         <div className={styles['sucsess-links']}>
             <div className={styles["sucsess-section"]}>
@@ -379,19 +388,19 @@ function UploadComplete({isr_errors}){
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={viewUrl || `/services/${values.url}`}>
-                    <a className={styles["sucsess-link"]}>View {`${values.url}`}</a> 
+                <Link href={viewUrl || `/services/${getByPath(values, id_path)}`}>
+                    <a className={styles["sucsess-link"]}>View {`${getByPath(values, id_path)}`}</a> 
                 </Link>  
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={editUrl || `/admin/edit-${cmsTitle.toLowerCase()}/${values.url}`}>
-                    <a className={styles["sucsess-link"]}>Edit {`${values.url}`}</a> 
+                <Link href={editUrl || `/admin/${cmsTitle.toLowerCase()}/edit/${getByPath(values, id_path)}`}>
+                    <a className={styles["sucsess-link"]}>Edit {`${getByPath(values, id_path)}`}</a> 
                 </Link>     
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={`/admin/create-${cmsTitle.toLowerCase()}`}>
+                <Link href={`/admin/${cmsTitle.toLowerCase()}/create`}>
                     <a className={styles["sucsess-link"]} onClick={forceReload}>{`Create New ${cmsTitle}`}</a> 
                 </Link>     
             </div>

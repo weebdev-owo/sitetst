@@ -4,8 +4,8 @@ import styles from '/src/styles/admin/home.module.sass'
 import {SetBgInv} from '/src/lib/utils/setbg'
 import Link from 'next/link'
 //backend
-import dbConnect from '/src/lib/api/db/mongoose_connect'
-import Service from '/src/cms/service/model'
+import dbConnect from '/src/cms/lib/api/mongoose_connect'
+import Service from '/src/cms/data/service/model'
 
 function AdminHome({services}){
 
@@ -24,18 +24,17 @@ function AdminHome({services}){
 
 function Home({}){
     return <>
-    <div className={styles['heading']}>Home</div>
-    <div className={styles["create-service-cont"]}>
-        <Link href={'/admin/home'}>
-            <a className={styles["create-service"]}>Edit Intro</a> 
-        </Link>     
-    </div>
+        <div className={styles['heading']}>Home</div>
+        <div className={styles["create-service-cont"]}>
+            <Link href={'/admin/home'}>
+                <a className={styles["create-service"]}>Edit Intro</a> 
+            </Link>     
+        </div>
     </>
 }
 
 //url, enabled, booking
 function Services({services}){
-    console.log('inside component', services)
     return <>
         <div className={styles['heading']}>Services</div>
         <div className={styles['services-table']}>
@@ -52,20 +51,19 @@ function Services({services}){
                     <div className={styles['services-table-item']} >{service['services']['tile']['order']}</div>
                     {service.enabled ? <Tick />:<Cross />}
                     {service.booking ? <Tick />:<Cross />}
-                    <Link href={`/admin/edit-service/${service.url}`}>
+                    <Link href={`/admin/service/edit/${service.url}`}>
                         <a className={styles['services-table-item']}>✎</a> 
                     </Link>  
                     <Link href={`/services/${service.url}`}>
                         <a className={styles['services-table-item']}>→</a> 
                     </Link>     
 
-                    {/* <a className={styles['services-table-item']} >→</a> */}
 
                 </>
             )}
         </div>
         <div className={styles["create-service-cont"]}>
-            <Link href={'/admin/create-service'}>
+            <Link href={'/admin/service/create'}>
                 <a className={styles["create-service"]}>Create New Service</a> 
             </Link>     
         </div>
@@ -128,7 +126,7 @@ export async function getStaticProps(context) {
         }
     } 
     catch (error) {
-        console.log('inside static props error', error)
+        // console.log('inside static props error', error)
         return {notFound: true}
     }
 }

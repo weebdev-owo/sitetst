@@ -1,5 +1,5 @@
 const fs = require('fs')
-const asyncParse = require('/src/lib/api/form/asyncParse')
+const asyncParse = require('/src/cms/lib/api/asyncParse')
 const cloudinary = require('cloudinary').v2
 const Yup = require('yup')
 const tmp = require('tmp')

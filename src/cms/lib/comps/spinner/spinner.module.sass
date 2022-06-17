@@ -1,0 +1,24 @@
+$height: 50px
+$bar-width: calc(min($height/6, 10px))
+
+@keyframes spinner 
+    0% 
+        transform: rotate(0deg)
+    100% 
+        transform: rotate(360deg)
+
+.spinner-loading 
+    // width: 50px
+    height: $height
+    aspect-ratio: 1/1
+    border: $bar-width solid #f3f3f3 
+    border-top: $bar-width solid #383636 
+    border-radius: 50%
+    animation: spinner 1.5s linear infinite
+
+.spinner-paused
+    height: $height
+    aspect-ratio: 1/1
+    border: $bar-width solid #f3f3f3 
+    border-top: $bar-width solid #383636 
+    border-radius: 50%

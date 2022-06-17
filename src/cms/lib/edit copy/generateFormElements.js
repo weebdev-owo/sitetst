@@ -1,5 +1,5 @@
 import styles from '/src/cms/lib/create/cms.module.sass'
-import {Text, TextArea, CheckBox, List, FormImage, Space} from '/src/cms/lib/create/primitives'
+import {Text, TextArea, CheckBox, List, FormImage, Space} from '/src/cms/lib/edit/primitives'
 import * as Yup from 'yup'
 
 function createByPath(obj, path, val){

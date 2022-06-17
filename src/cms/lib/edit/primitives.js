@@ -4,10 +4,10 @@ import {useField, useFormikContext, getIn} from 'formik'
 import  classNames  from 'classnames';
 import { useDropzone } from "react-dropzone"
 // import 'react-image-crop/dist/ReactCrop.css'
-import FileImage from '/src/lib/image/preview/fileImage'
+import FileImage from '/src/cms/lib/utils/preview/fileImage'
 import 'react-image-crop/dist/ReactCrop.css'
-import CropImage from '/src/lib/image/crop/cropImageForm'
-import useToggleScroll from '/src/lib/utils/toggleScroll'
+import CropImage from '/src/cms/lib/utils/crop/cropImageForm'
+import useToggleScroll from '/src/cms/lib/utils/toggleScroll'
 
 //FORM PRIMITIVES//
 function Text({label, ...props}){
@@ -63,7 +63,7 @@ function CheckBox({label, ...props}){
 function List({name, children, item_template, item_label, ...props}){
     const { values, setFieldValue, submitCount, setFieldTouched} = useFormikContext()
     const [field, meta] = useField(name) //list field
-
+    
     //define array functions
     const editStep = async (i, item) =>{
         await setFieldTouched(name, true)
@@ -84,9 +84,9 @@ function List({name, children, item_template, item_label, ...props}){
     const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
 
     return <>
-        <label className={styles["label"]} htmlFor={props.id || name}>
+        <label className={styles["section-desc"]} htmlFor={props.id || name}>
             <p>{`${item_label}s`}</p>
-            {isErr ? <pre className={styles['label-err']}>{` - ${meta.error}`}</pre>:null}
+            {isErr ? <pre className={styles['label-err']}>{` ${meta.error}`}</pre>:null}
         </label>
         {getIn(values, name).map((unneed, i) =>{
             return <>
@@ -135,7 +135,7 @@ function ImageEditor({name, imageStyle, setOpen}){
 
 }
 
-function FormImage({name, label, styleIn, ...props}){
+function FormImage({name, label, image_style, ...props}){
     const mb = 1000*1000
     const MAX_FILE_SIZE = props.max_size || 10*mb
     const SUPPORTED_FILE_EXTENSIONS = props.sf || ['.jpg', '.jpeg', '.png', '.gif']
@@ -159,7 +159,7 @@ function FormImage({name, label, styleIn, ...props}){
         }
         else{`file must be less than ${MAX_FILE_SIZE/mb}mb`
             const code = invalid[0].errors[0].code
-            if(code==='file-invalid-type'){setDropzoneErr(`file must be a ${SUPPORTED_FILE_EXTENSIONS}`)}
+            if(code==='file-invalid-type'){setDropzoneErr(`file must be of type: ${SUPPORTED_FILE_EXTENSIONS.join(', ')}`)}
             if(code==='file-too-large'){setDropzoneErr(`file must be less than ${MAX_FILE_SIZE/mb}mb`)}
             if(cropped_file){setTimeout(()=>{setDropzoneErr(false)}, 4000)}
         }
@@ -191,14 +191,14 @@ function FormImage({name, label, styleIn, ...props}){
     const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
 
     return <>
-        {editorOpen ? <ImageEditor name={name} imageStyle={styleIn} setOpen={setEditorOpen} />:null}
+        {editorOpen ? <ImageEditor name={name} imageStyle={image_style} setOpen={setEditorOpen} />:null}
         <label className={styles["label"]} htmlFor={props.id || name}>
             <p>{`${label}`}</p>
             {isErr ? <pre className={styles['label-err']}>{` - ${error}`}</pre>:null}
         </label>
         <div className={styles['image-cont']}>
             {cropped_file ? <>
-                    <FileImage file={cropped_file} styleIn={styleIn}/>
+                    <FileImage file={cropped_file} styleIn={image_style}/>
                     <div className={styles['image-controls-cont']}>
                         <div type="button" onClick={crop}><p className={styles["elem-button-add"]}>Crop</p></div>
                         <div {...getRootProps()} >
@@ -206,18 +206,25 @@ function FormImage({name, label, styleIn, ...props}){
                             <p className={styles["elem-button-del"]}><u>Drag file here</u> or <u>Click</u> to replace</p>
                         </div>
                     </div>
+                    <div className={styles["dropzone-error-cont"]}>
+                        {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
+                    </div>
                     <Text name={`${name}.alt`} label={`text if image will not load (alt)`} />
                 </>
             :        
+            <>
                 <div {...getRootProps()} className={styles['drop-zone-cont']}>
                     <input {...getInputProps()} className={styles['drop-zone-input']}/>
                     <div className={styles['drop-text']}><p><u>Drag file here</u> or <u>Click</u> to select</p></div> 
                 </div>
+                <div className={styles["dropzone-error-cont"]}>
+                    {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
+                </div>
+            </>
+
             }
         </div>
-        <div className={styles["dropzone-error-cont"]}>
-            {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
-        </div>
+
 
     </>
 }
