@@ -46,6 +46,7 @@ export default function ServicePage({service}){
     const book = {
         services: ['loreum ipsum', 'loreum ipsum' , 'loreum ipsum']
     }
+    console.log('DOOO DISSSSS:', service, intro)
 
     //Reset Nav and url
     const empty_reset = () => () => {}
@@ -69,7 +70,7 @@ export default function ServicePage({service}){
 }
 
 export async function getStaticProps(context){
-    const id = context.params.id
+const id = context.params.id
   let services = []
   let data = false
   try {
@@ -87,7 +88,11 @@ export async function getStaticProps(context){
   } 
   catch (error) {
         console.log('inside static props error', error)
-        return {notFound: true}
+        return {
+            props: {
+                service: JSON.parse(JSON.stringify({}))
+            }
+        }
   }
 }
 
@@ -111,6 +116,61 @@ export async function getStaticPaths() {
   } 
   catch (error) {
         console.log('inside static paths error', error)
-        return {notFound: true}
+        return {
+            paths: JSON.parse(JSON.stringify([])),
+            fallback: true
+        }
   }
 }
+
+// function ServicePage2({service}){
+//     const [initial, setInitial] = useState({
+//         intro:{
+//             title: service.initial.intro.name,
+//             desc: service.initial.intro.desc,
+//             img: service.initial.intro.img.url
+//         },
+//         summary: {
+//             imgs: [service.initial.summary.img1.url, service.initial.summary.img2.url, service.initial.summary.img3.url],
+//             statements: [service.initial.summary.s1,  service.initial.summary.s2, service.initial.summary.s3] ,
+//             texts: [service.initial.summary.what, service.initial.summary.why]
+//         },
+//         process: {
+//             intro: service.initial.process.intro,
+//             steps: service.initial.process.steps.map((step)=>[step.name, step.desc]),
+//             imgs: service.initial.process.steps.map((step)=>step.img.url)
+//         },
+//         faq: {
+//             intro: service.initial.faq.intro,
+//             questions: service.initial.faq.items.map((item)=>item.question),
+//             answers: service.initial.faq.items.map((item)=>item.answer),
+//         },
+//         book: {
+//             services: ['loreum ipsum', 'loreum ipsum' , 'loreum ipsum']
+//         }
+//     })
+
+//     //Reset Nav and url
+//     const empty_reset = () => () => {}
+//     const [reset, setReset] = useState(empty_reset)
+//     useEffect(() => {reset()},[])
+
+//     //Change body background and scroll when ref onscreen
+//     const elemRef = useRef(null)
+//     SetBg(elemRef)
+
+//     if(Service){
+//         return <>
+//             <Intro title={initial.intro.title} desc={initial.intro.desc} img={initial.intro.img}/>
+//             <ScrollNav setReset={setReset}/>
+//             <Summary imgs={initial.summary.imgs} statements={initial.summary.statements} texts={initial.summary.texts}/>
+//             <div ref={elemRef}>
+//                 <Process steps={initial.process.steps} imgs={initial.process.imgs} intro={initial.process.intro}/>
+//                 <FAQ intro={initial.faq.intro} questions={initial.faq.questions} answers={initial.faq.answers} />
+//                 <Book services={initial.book.services}/>
+//             </div>
+//         </>
+//     }
+//     return <></>
+
+// }
