@@ -55,3 +55,4 @@ async function dbConnectCms(res){
 }
 
 export default dbConnectCms
+export {mongoose}

@@ -51,119 +51,29 @@ function get_imgs(data, path, paths){
     return paths
 }
 
-
-
-const initialUploadStore = {
-    
-    action: "",
-
-    images: {
-        // enabled: false, //enables display
-        num_uploaded: 0, //complete when num_uploaded === files.length
-        files: [], //triggers upload
-        paths: [],
-        uploaded: false,
-        error: false
-    },
-
-    db: { //triggered by image upload completion
-        uploaded: false,
-        error: false
-    },
-
-    complete: {
-        isr_errors: []
-    }
-}
-function uploadReducer(state, data){
-    console.log('reducer called', data)
-    const assign = typeof data === 'string'
-    const action = assign ? data:data[0]
-    const value = assign ? null:data[1]
-
-    switch (action){
-        case 'reset': return initialUploadStore
-        case 'close': return initialUploadStore
-
-        case 'images':
-            return { action: "images", db: initialUploadStore.db, complete: initialUploadStore.complete,
-                images: {
-                    num_uploaded: 0,
-                    files: value[0],
-                    paths: value[1],
-                    uploaded: false,
-                    error: false
-                },
-            }
-        case 'image_error': state.images.error = true; return {...state}
-        case 'image_sucsess':
-            state.images.num_uploaded += 1
-            state.images.uploaded = state.images.files.length <= state.images.num_uploaded
-            return {...state}
-
-        case 'db': 
-            return { action: "db", images: initialUploadStore.images, complete: initialUploadStore.complete,
-                db: {
-                    uploaded: false,
-                    error: false,
-                }
-            }
-        case 'db_error': state.db.error = true; return {...state}
-        case 'db_sucsess': state.db.uploaded = true; return {...state}
-
-        case 'complete': 
-            return { action: "complete", images: initialUploadStore.images, db: initialUploadStore.db,
-                complete: {
-                    isr_errors: state.complete.isr_errors
-                }
-            }
-    }
-}
-
 //give me a upload store and an update reducer and a formik values object, and ill do some image uploads to cloudinary, then mutate values, and then send the modified values to a database
-function Upload({startUpload, setStartUpload, initialUrlId}){
+function Upload({store, update, initialUrlId}){
     const queryClient = useMemo(() => new QueryClient({
         defaultOptions: {
             queries:{
                 // onSucsess: 
                 // refetchInterval,
                 // refetchIntervalInBackground,
-                refetchOnMount: true,
-                refetchOnReconnect: true,
+                refetchOnMount: false,
+                refetchOnReconnect: false,
                 refetchOnWindowFocus: false,
                 retry: false
             }
         }
     }), [])
-    const [store, update] = useReducer(uploadReducer, initialUploadStore)
+
     const { values, errors } = useFormikContext()
     console.log("CURRENT VALUES", 
         values, 
         errors,
         // values.service.process.steps, 
         // values.service.faq.items
-    )
-
-    //
-    useEffect(() =>{
-        if(startUpload){
-            //scan values for the key "img*"
-            let paths = get_imgs(values, [], [])
-            const upload_paths = []
-            paths.forEach((path) =>{
-                if (!getByPath(values, path)['url']){upload_paths.push(path)}
-            })
-
-            if(upload_paths.length){
-                const images = upload_paths.map((path) => getByPath(values, path)['cropped'])
-                update(['images', [images, upload_paths]])
-            }
-            else{
-                update('db')
-            }
-            setStartUpload(false)
-        }
-    }, [startUpload])         
+    )   
 
     useEffect(() =>{
         if(store.images.uploaded){
@@ -200,7 +110,6 @@ function Upload({startUpload, setStartUpload, initialUrlId}){
                         sucsess={store.db.uploaded}
                         failed={store.db.error}
                         update={update} 
-                        initialUrlId={initialUrlId}
                     />
                 </div>
             </QueryProvider>
@@ -210,9 +119,7 @@ function Upload({startUpload, setStartUpload, initialUrlId}){
         return <>
             <QueryProvider client={queryClient}>
                 <div className={styles['crop-modal']}>
-                    <UploadComplete    
-                    // isr_errors={store.complete.isr_errors} 
-                    />
+                    <UploadComplete isrErrors={store.complete.isr_errors} uniqueId={store.complete.unique_id}/>
                 </div>
             </QueryProvider>
         </>
@@ -367,6 +274,7 @@ function createPayload(values){
         })
     }
     // console.log('PAYLOAD', payload)
+    console.log('URL SENDING ISSSSSSSSSSSS', payload.url)
     return payload
 }
 
@@ -399,7 +307,7 @@ async function postData(payload, setProgress, url, model_path, unique_id, revali
 
 }
 
-function UploadData({sucsess, failed, update, initialUrlId}){
+function UploadData({sucsess, failed, update}){
     
     //close if already tried request and component refreshed
     let close = false
@@ -407,16 +315,16 @@ function UploadData({sucsess, failed, update, initialUrlId}){
     useToggleScroll(!close)
 
     const { values } = useFormikContext()
-    const {dbUrl, model_path, id_path, revalidate} = useContext(ConfigContext)
+    const {dbUrl, model_path, id_path, revalidate, initialValues} = useContext(ConfigContext)
     const [progress, setProgress] = useState([0, 0])
     const url_ids = {
-        initial: initialUrlId,
+        initial: getByPath(initialValues, id_path),
         path: id_path
     }
     const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl, model_path, getByPath(values, id_path), revalidate, url_ids), {enabled: !sucsess && !failed})
 
     useEffect(() =>{
-        if(data && !isError){ update('db_sucsess') }
+        if(data && !isError){ update(['db_sucsess', [data.data.isr_errors, getByPath(data.data.data.data, id_path)]]) }
     }, [data, isError])
 
     useEffect(() =>{
@@ -466,17 +374,17 @@ function UploadData({sucsess, failed, update, initialUrlId}){
 }; UploadData = memo(UploadData)
 
 //upload complete menu 
-function UploadComplete({/*isr_errors*/}){
+function UploadComplete({isrErrors, uniqueId}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, viewUrl, editUrl, id_path} = useContext(ConfigContext)
-    const {data} = useQuery('data')
+    const {cmsTitle, viewUrl, editUrl, id_path, initialValues} = useContext(ConfigContext)
+
     const router = useRouter()
-    const uniqueId = data ? getByPath(data.data.data.data, id_path):false
-    const isrErrors = data ? data.data.isr_errors:[]
+    useEffect(() =>{
+        const href = `/admin/${cmsTitle.toLowerCase()}/edit/${uniqueId}`
+        router.push(href)
+    },[])
     const forceReload = async (e) =>{
         e.preventDefault()
-        const href = `/admin/${cmsTitle.toLowerCase()}/edit/${getByPath(data.data.data.data, id_path)}`
-        await router.push(href)
         router.reload()
     }
     useToggleScroll(true)
