@@ -52,7 +52,7 @@ function Landing({}){
     return <>
         <div className={styles['landing']}>
             <TopBar />
-            {/* <div className={styles['carousel-cont']}>
+            {/* <div className={styles['carousel-cont']}> */}
                 <Carousel>
                     <Slide src={'/black.jpg'} alt={''}>
                         <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
@@ -67,11 +67,11 @@ function Landing({}){
                         <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
                     </Slide>
                 </Carousel>
-            </div> */}
-            <Slide src={'/nani.png'} alt={''}>
+            {/* </div> */}
+            {/* <Slide src={'/nani.png'} alt={''}>
                 <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
                 <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
-            </Slide>
+            </Slide> */}
 
         </div>
     </>
