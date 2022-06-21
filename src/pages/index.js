@@ -27,20 +27,23 @@ export default function Home({services}){
     return [service.name, service.desc, service.img.url, service.img.alt, `http://localhost:3000/services/${service.url}`]
   })
   
-  return <>
-    <TopBar />
-    <Car>{carousel.imgs.map((img, i) =>{return <CarImage img={img} key={i}/>})}</Car>
-    <Counters />
-    <Services services={service_tiles} />
-    <About />
-    <Book services={book.services} />
-    <ScrollNav setReset={setReset} />
-  </>
+    return <>
+        <div className={'page'}>
+            <TopBar />
+            <ScrollNav setReset={setReset} />
+            <Car>{carousel.imgs.map((img, i) =>{return <CarImage img={img} key={i}/>})}</Car>
+            <Counters />
+            <Services services={service_tiles} />
+            <About />
+            <Book services={book.services} />
+        </div>
+    </>
 }
 
 //CONTENT
 const carousel = {
-  imgs: ["/car2.jpg", "/car1.jpg"]
+  // imgs: ["/car2.jpg", "/car1.jpg"]
+  imgs: ["/tree.png", "/nani.png"]
 }
 
 const book = {

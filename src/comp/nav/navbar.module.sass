@@ -1,0 +1,33 @@
+$bottom-line: 3px
+    
+.navbar
+    height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    // border-bottom: $bottom-line solid black
+    color: white
+    height: 100%
+    // outline: 1px solid red
+
+.nav_elem
+    transform: translate(0,$bottom-line)
+    height: 100%
+    padding: 0px 50px 0px 50px
+
+    display: flex
+    justify-content: center
+    align-items: center
+    color: white
+    opacity: 0.7
+
+    border-bottom: $bottom-line solid rgba(0,0,0,0)
+
+    &:hover
+        color: white
+        border-bottom: $bottom-line solid white
+        opacity: 1
+
+.selected
+    border-bottom: $bottom-line solid white
+    color: grey

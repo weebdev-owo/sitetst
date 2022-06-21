@@ -18,35 +18,7 @@ const loreum1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
 const loreum2 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
 const loreum3 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
 
-export default function ServicePage({service}){
-    const intro = {
-        title: service.intro.name,
-        desc: service.intro.desc,
-        img: service.intro.img.url
-    }
-    
-    const summary = {
-        imgs: [service.summary.img1.url, service.summary.img2.url, service.summary.img3.url],
-        statements: [service.summary.s1,  service.summary.s2, service.summary.s3] ,
-        texts: [service.summary.what, service.summary.why]
-    }
-    
-    const process = {
-        intro: service.process.intro,
-        steps: service.process.steps.map((step)=>[step.name, step.desc]),
-        imgs: service.process.steps.map((step)=>step.img.url)
-    }
-    
-    const faq = {
-        intro: service.faq.intro,
-        questions: service.faq.items.map((item)=>item.question),
-        answers: service.faq.items.map((item)=>item.answer),
-    }
-    
-    const book = {
-        services: ['loreum ipsum', 'loreum ipsum' , 'loreum ipsum']
-    }
-    console.log('DOOO DISSSSS:', service, intro)
+export default function ServicePage({service, failed}){
 
     //Reset Nav and url
     const empty_reset = () => () => {}
@@ -57,16 +29,64 @@ export default function ServicePage({service}){
     const elemRef = useRef(null)
     SetBg(elemRef)
 
+    if(service){
+        const intro = {
+            title: service.intro.name,
+            desc: service.intro.desc,
+            img: service.intro.img.url
+        }
+        
+        const summary = {
+            imgs: [service.summary.img1.url, service.summary.img2.url, service.summary.img3.url],
+            statements: [service.summary.s1,  service.summary.s2, service.summary.s3] ,
+            texts: [service.summary.what, service.summary.why]
+        }
+        
+        const process = {
+            intro: service.process.intro,
+            steps: service.process.steps.map((step)=>[step.name, step.desc]),
+            imgs: service.process.steps.map((step)=>step.img.url)
+        }
+        
+        const faq = {
+            intro: service.faq.intro,
+            questions: service.faq.items.map((item)=>item.question),
+            answers: service.faq.items.map((item)=>item.answer),
+        }
+        
+        const book = {
+            services: ['loreum ipsum', 'loreum ipsum' , 'loreum ipsum']
+        }
+        console.log('DOOO DISSSSS:', service, intro)
+
+        return <>
+            <div className='page'>
+                <Intro title={intro.title} desc={intro.desc} img={intro.img}/>
+                <ScrollNav setReset={setReset}/>
+                <Summary imgs={summary.imgs} statements={summary.statements} texts={summary.texts}/>
+                <div ref={elemRef}>
+                    <Process steps={process.steps} imgs={process.imgs} intro={process.intro}/>
+                    <FAQ intro={faq.intro} questions={faq.questions} answers={faq.answers} />
+                    {/* <Book services={book.services}/> */}
+                </div>
+            </div>
+
+        </>
+    }
+    if(failed){
+        return <>
+            <div>DOES NOT EXIST</div>
+        </>
+    }
     return <>
-        <Intro title={intro.title} desc={intro.desc} img={intro.img}/>
-        <ScrollNav setReset={setReset}/>
-        <Summary imgs={summary.imgs} statements={summary.statements} texts={summary.texts}/>
-        <div ref={elemRef}>
-            <Process steps={process.steps} imgs={process.imgs} intro={process.intro}/>
-            <FAQ intro={faq.intro} questions={faq.questions} answers={faq.answers} />
-            <Book services={book.services}/>
-        </div>
+        <div>LOADING</div>
     </>
+    
+}
+
+ServicePage.defaultProps = {
+    service: false,
+    failed: false
 }
 
 export async function getStaticProps(context){
@@ -82,7 +102,8 @@ const id = context.params.id
         // console.log('inside static props', data[0].data.service)
         return {
             props: {
-                service: JSON.parse(JSON.stringify(data[0].data.service))
+                service: JSON.parse(JSON.stringify(data[0].data.service)),
+                failed: true
             }
         }
   } 
@@ -90,7 +111,8 @@ const id = context.params.id
         console.log('inside static props error', error)
         return {
             props: {
-                service: JSON.parse(JSON.stringify({}))
+                service: false,
+                failed: true
             }
         }
   }
@@ -123,54 +145,3 @@ export async function getStaticPaths() {
   }
 }
 
-// function ServicePage2({service}){
-//     const [initial, setInitial] = useState({
-//         intro:{
-//             title: service.initial.intro.name,
-//             desc: service.initial.intro.desc,
-//             img: service.initial.intro.img.url
-//         },
-//         summary: {
-//             imgs: [service.initial.summary.img1.url, service.initial.summary.img2.url, service.initial.summary.img3.url],
-//             statements: [service.initial.summary.s1,  service.initial.summary.s2, service.initial.summary.s3] ,
-//             texts: [service.initial.summary.what, service.initial.summary.why]
-//         },
-//         process: {
-//             intro: service.initial.process.intro,
-//             steps: service.initial.process.steps.map((step)=>[step.name, step.desc]),
-//             imgs: service.initial.process.steps.map((step)=>step.img.url)
-//         },
-//         faq: {
-//             intro: service.initial.faq.intro,
-//             questions: service.initial.faq.items.map((item)=>item.question),
-//             answers: service.initial.faq.items.map((item)=>item.answer),
-//         },
-//         book: {
-//             services: ['loreum ipsum', 'loreum ipsum' , 'loreum ipsum']
-//         }
-//     })
-
-//     //Reset Nav and url
-//     const empty_reset = () => () => {}
-//     const [reset, setReset] = useState(empty_reset)
-//     useEffect(() => {reset()},[])
-
-//     //Change body background and scroll when ref onscreen
-//     const elemRef = useRef(null)
-//     SetBg(elemRef)
-
-//     if(Service){
-//         return <>
-//             <Intro title={initial.intro.title} desc={initial.intro.desc} img={initial.intro.img}/>
-//             <ScrollNav setReset={setReset}/>
-//             <Summary imgs={initial.summary.imgs} statements={initial.summary.statements} texts={initial.summary.texts}/>
-//             <div ref={elemRef}>
-//                 <Process steps={initial.process.steps} imgs={initial.process.imgs} intro={initial.process.intro}/>
-//                 <FAQ intro={initial.faq.intro} questions={initial.faq.questions} answers={initial.faq.answers} />
-//                 <Book services={initial.book.services}/>
-//             </div>
-//         </>
-//     }
-//     return <></>
-
-// }

@@ -1,13 +1,12 @@
 //frontend
 import {useState, useRef} from 'react'
-import styles from '/src/styles/admin/home.module.sass'
+import styles from '/src/cms/lib/menu/menu.module.sass'
 import {SetBgInv} from '/src/lib/utils/setbg'
 import Link from 'next/link'
-//backend
-import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import Service from '/src/cms/data/service/model'
+import Table from '/src/cms/lib/menu/table'
+import {Title, Nav} from '/src/cms/lib/menu/primitives'
 
-function AdminHome({services}){
+function AdminHome({}){
 
     //Change body background and scroll when ref onscreen
     const elemRef = useRef(null)
@@ -16,7 +15,7 @@ function AdminHome({services}){
     return <>
         <div className={styles['home']} ref={elemRef}>
             <Home />
-            <Services services={services}/>
+            <Services />
             <About />
         </div>
     </>
@@ -24,111 +23,44 @@ function AdminHome({services}){
 
 function Home({}){
     return <>
-        <div className={styles['heading']}>Home</div>
-        <div className={styles["create-service-cont"]}>
-            <Link href={'/admin/home'}>
-                <a className={styles["create-service"]}>Edit Intro</a> 
-            </Link>     
-        </div>
+        <Title>Home</Title>
+        <Nav link={'/admin/home'}>Edit Intro</Nav>
     </>
 }
 
 //url, enabled, booking
-function Services({services}){
+function Services({}){
     return <>
-        <div className={styles['heading']}>Services</div>
-        <div className={styles['services-table']}>
-            <div className={styles['services-table-item']}>Url Name</div>
-            <div className={styles['services-table-item']}>Order</div>
-            <div className={styles['services-table-item']}>Enabled</div>
-            <div className={styles['services-table-item']}>Booking</div>
-            <div className={styles['services-table-item']}>Edit</div>
-            <div className={styles['services-table-item']}>View</div>
-
-            {services.map((service, i) => 
-                <>
-                    <div className={styles['services-table-item']} >{`${service.url}`}</div>
-                    <div className={styles['services-table-item']} >{service['services']['tile']['order']}</div>
-                    {service.enabled ? <Tick />:<Cross />}
-                    {service.booking ? <Tick />:<Cross />}
-                    <Link href={`/admin/service/edit/${service.url}`}>
-                        <a className={styles['services-table-item']}>✎</a> 
-                    </Link>  
-                    <Link href={`/services/${service.url}`}>
-                        <a className={styles['services-table-item']}>→</a> 
-                    </Link>     
-
-
-                </>
-            )}
-        </div>
-        <div className={styles["create-service-cont"]}>
-            <Link href={'/admin/service/create'}>
-                <a className={styles["create-service"]}>Create New Service</a> 
-            </Link>     
-        </div>
+        <Title>Services</Title>
+        <Table 
+            layout={[
+                ['Url Name', 'url'],
+                ['Order', 'services.tile.order'],
+                ['Enabled', 'enabled'],
+                ['Booking', 'booking'],
+            ]}
+            options={{
+                'model_path': 'service',
+                'id_path': 'url',
+                'edit': ['/admin', '/service', '/edit/', 'use id'],
+                'view': ['/services/', 'use id'],
+                'order': 'services.tile.order',
+            }}
+        />
+        <Nav link={'/admin/service/create'}>Create New Service</Nav>
         
     </>
 }
 
-function Tick(){
-    return <>
-        <div className={styles['services-table-item']+' '+styles['tick']}>✔</div>
-    </>
-}
 
-function Cross(){
-    return <>
-        <div className={styles['services-table-item']+' '+styles['cross']}>✗</div>
-    </>
-}
 
 function About(){
     return <>
-        <div className={styles['heading']}>About</div>
-        <div className={styles["create-service-cont"]}>
-            <Link href={'/admin/about/edit-intro'}>
-                <a className={styles["create-service"]}>Edit Intro</a> 
-            </Link>     
-        </div>
-        <div className={styles["create-service-cont"]}>
-            <Link href={'/admin/about/edit-locations'}>
-                <a className={styles["create-service"]}>Edit Locations</a> 
-            </Link>     
-        </div>
-        <div className={styles["create-service-cont"]}>
-            <Link href={'/admin/about/edit-team'}>
-                <a className={styles["create-service"]}>Edit Team</a> 
-            </Link>     
-        </div>
+        <Title>About</Title>
+        <Nav link={'/admin/about/edit-intro'}>Edit Intro</Nav>
+        <Nav link={'/admin/about/edit-locations'}>Edit Locations</Nav>
+        <Nav link={'/admin/about/edit-team'}>Edit Team</Nav>
     </>
 }
 
-export async function getStaticProps(context) {
-    let services = []
-    let data = false
-    try {
-        //get services
-        const connection = await dbConnect()
-        data = await Service.find()
-            .select(['data.url', 'data.enabled', 'data.booking', 'data.services.tile.order'])
-            .sort({'data.services.tile.order':1})
-        services = data.map((service, i) => service.data)
-
-        //get staff/team
-
-        //get locations
-
-        return {
-            props: {
-                services: JSON.parse(JSON.stringify(services))
-            }
-        }
-    } 
-    catch (error) {
-        // console.log('inside static props error', error)
-        return {notFound: true}
-    }
-}
-
-  export default AdminHome
+export default AdminHome
