@@ -103,15 +103,14 @@ function Transition({}){
             <div className={styles['text1']}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor</div>
             <div className={styles['services']}>
                 <Service src={'/tree.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                {/* <Img src={'/tree.png'} styleIn={styles['img1']} alt={'alt'}/> */}
-                <Img src={'/nature/desert2.jpg'} styleIn={styles['img1']} alt={'alt'}/>
-                <Img src={'/nani.png'} styleIn={styles['img1']} alt={'alt'}/>
-                <Img src={'/car1.jpg'} styleIn={styles['img1']} alt={'alt'}/>
-                <Img src={'/car2.jpg'} styleIn={styles['img1']} alt={'alt'}/>
-                <Img src={'/nature/cave2.jpg'} styleIn={styles['img1']} alt={'alt'}/>
-                <Img src={'/nature/ice2.jpg'} styleIn={styles['img1']} alt={'alt'}/>
-                <Img src={'/dnt1.jpg'} styleIn={styles['img1']} alt={'alt'}/>
-                <Img src={'/nature/lava1.jpg'} styleIn={styles['img1']} alt={'alt'}/>
+                <Service src={'/nature/desert2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+                <Service src={'/nani.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
+                <Service src={'/car1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+                <Service src={'/car2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+                <Service src={'/nature/cave2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+                <Service src={'/nature/ice2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+                <Service src={'/dnt1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+                <Service src={'/nature/lava1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
             </div>
             <div className={styles['text1']}>Loreum Ipsum Dolor</div>
             <div className={styles['text1']}>OMNOM</div>
