@@ -2,6 +2,7 @@
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
 import ServiceModel from '/src/cms/data/service/model'
 //frontend
+import {useRef, useEffect} from 'react'
 import Img from '/src/comp/image/img'
 import styles from '/src/styles/home.module.sass'
 import Carousel from '/src/comp/carousel/small_car'
@@ -9,18 +10,32 @@ import Thirds from '/src/lib/comps/thirds'
 import MainLogo from '/src/svg/mcfd_logo'
 import NavBar from '/src/comp/nav/navbar'
 import Link from 'next/link'
-// import {setBgCol} from '/src/lib/utils/SetBg'
+import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
+import {setBgCol} from '/src/lib/utils/SetBg'
+
+
 
 
 export default function Home({services}){
-    // setBgCol(false)
+
+
+    useEffect(()=>{setBgCol(false)},[])
     return <>
         {/* <Thirds /> */}
-        <div className={styles['page']}>
-            <Landing />
-            <Transition />
+        <ParallaxProvider>
+            <div className={styles['page']}>
+                <Parallax speed={-1000}>
+                    <Landing />
+                </Parallax>
+                {/* <Parallax speed={0}> */}
 
-        </div>
+                    <Transition />
+                {/* </Parallax> */}
+
+
+            </div>
+        </ParallaxProvider>
+
     </>
 }
 
@@ -57,16 +72,22 @@ function Landing({}){
             <TopBar />
             <Carousel>
                 <Slide src={'/black.jpg'} alt={''}>
-                    <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
-                    <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
+                    {/* <Parallax translateY={[100,-100]}> */}
+                        <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
+                        <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
+                    {/* </Parallax> */}
                 </Slide>
                 <Slide src={'/f1.png'} alt={''}>
-                    {/* <h1 className={styles['intro-text']}>Dentistry Made Easy</h1> */}
-                    {/* <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p> */}
+                    {/* <Parallax translateY={[100,-100]}> */}
+                        <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
+                        <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
+                    {/* </Parallax> */}
                 </Slide>
                 <Slide src={'/nani.png'} alt={''}>
-                    <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
-                    <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
+                    {/* <Parallax translateY={[100,-100]}> */}
+                        <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
+                        <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
+                    {/* </Parallax> */}
                 </Slide>
             </Carousel>
 
@@ -76,10 +97,12 @@ function Landing({}){
 }
 
 function Slide({src, alt, children}){
+    // const { msgRef } = useParallax({ speed: 10 })
     return <>
         <div className={styles['slide']}>
             <Img src={src} styleIn={styles['bg']} alt={alt}/>
-            {children ?  <div className={styles['content']}>{children}</div>: null}
+            {children ?  <Parallax className={styles['content']} translateY={[-90,90]}>{children}</Parallax>: null}
+            
         </div>
     </>
 }
@@ -100,7 +123,8 @@ function TopBar({}){
 function Transition({}){
     return <>
         <div className={styles['transition']}>
-            <div className={styles['text1']}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor</div>
+            
+            <Parallax translateY={[-60,60]} className={styles['text1']}>Services</Parallax>
             <div className={styles['services']}>
                 <Service src={'/tree.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
                 <Service src={'/nature/desert2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>

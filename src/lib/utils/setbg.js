@@ -1,17 +1,20 @@
 import {useEffect} from 'react'
 export const setBgCol = (val) => {
-    if (val){
-        // console.log("vis")
-        document.body.style.background = "#fff"
-        document.body.style.setProperty("--scroll-col", "#0000004b")
-        document.body.style.setProperty("--scroll-hover-col", "black")
-    }
-    else {
-        // console.log("not vis")
-        document.body.style.background = "#000"
-        document.body.style.setProperty("--scroll-col", "#ffffff3d")
-        document.body.style.setProperty("--scroll-hover-col", "#ffffffc1")
-    }
+
+
+        if (val){
+            // console.log("vis")
+            document.body.style.background = "#fff"
+            document.body.style.setProperty("--scroll-col", "#0000004b")
+            document.body.style.setProperty("--scroll-hover-col", "black")
+        }
+        else {
+            // console.log("not vis")
+            document.body.style.background = "#000"
+            document.body.style.setProperty("--scroll-col", "#ffffff3d")
+            document.body.style.setProperty("--scroll-hover-col", "#ffffffc1")
+        }
+
 }
 
 const SetBg = (elemRef) => {
