@@ -71,24 +71,16 @@ function Landing({}){
         <div className={styles['landing']}>
             <TopBar />
             <Carousel>
-                <Slide src={'/black.jpg'} alt={''}>
-                    {/* <Parallax translateY={[100,-100]}> */}
-                        <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
-                        <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
-                    {/* </Parallax> */}
-                </Slide>
-                <Slide src={'/f1.png'} alt={''}>
-                    {/* <Parallax translateY={[100,-100]}> */}
-                        <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
-                        <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
-                    {/* </Parallax> */}
-                </Slide>
-                <Slide src={'/nani.png'} alt={''}>
-                    {/* <Parallax translateY={[100,-100]}> */}
-                        <h1 className={styles['intro-text']}>Dentistry Made Easy</h1>
-                        <p className={styles['intro-desc']}>Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri</p>
-                    {/* </Parallax> */}
-                </Slide>
+                <Slide 
+                    src={'/black.jpg'} alt={''}
+                    title={'Dentistry Made Easy'}
+                    desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri'}
+                />
+                <Slide 
+                    src={'/f1.png'} alt={''}
+                    title={'Dentistry Made Easy'}
+                    desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri'}
+                />
             </Carousel>
 
 
@@ -96,12 +88,19 @@ function Landing({}){
     </>
 }
 
-function Slide({src, alt, children}){
+function Slide({src, alt, title, desc, children}){
     // const { msgRef } = useParallax({ speed: 10 })
     return <>
         <div className={styles['slide']}>
             <Img src={src} styleIn={styles['bg']} alt={alt}/>
-            {children ?  <Parallax className={styles['content']} translateY={[-90,90]}>{children}</Parallax>: null}
+            <div className={styles['content-cont']} >
+                <Parallax translateY={[-90,90]} className={styles['content']}>
+                    <div className={styles['intro-text']} translateY={[-90,90]}>{title}</div>
+                    <div className={styles['intro-desc']} translateY={[-90,90]}>{desc}</div>
+                </Parallax>
+
+            </div>
+
             
         </div>
     </>
@@ -125,21 +124,27 @@ function Transition({}){
         <div className={styles['transition']}>
             
             <Parallax translateY={[-60,60]} className={styles['text1']}>Services</Parallax>
-            <div className={styles['services']}>
-                <Service src={'/tree.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                <Service src={'/nature/desert2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                <Service src={'/nani.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                <Service src={'/car1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                <Service src={'/car2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                <Service src={'/nature/cave2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                <Service src={'/nature/ice2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                <Service src={'/dnt1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-                <Service src={'/nature/lava1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            </div>
-            <div className={styles['text1']}>Loreum Ipsum Dolor</div>
-            <div className={styles['text1']}>OMNOM</div>
-            <div className={styles['text1']}>OMNOM</div>
+            <Services />
+            <div className={styles['text2']}>Loreum Ipsum Dolor</div>
+            <div className={styles['text2']}>OMNOM</div>
+            <div className={styles['text2']}>OMNOM</div>
         </div>
+    </>
+}
+
+function Services({}){
+    return <>
+        <Parallax translateY={[0,0]} className={styles['services']}>
+            <Service src={'/tree.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/nature/desert2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/nani.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/car1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/car2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/nature/cave2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/nature/ice2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/dnt1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/nature/lava1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+        </Parallax>
     </>
 }
 

@@ -76,7 +76,7 @@
     width: 100%
     height: 100%
     
-.content
+.content-cont
     // pointer-events: none
     position: absolute
     height: 100%
@@ -89,6 +89,17 @@
     color: white
     opacity: 1
     background: radial-gradient(rgba(0,0,0,0.7), transparent)
+.content
+    position: absolute
+    height: 100%
+    width: 100%
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    z-index: 10
+    color: white
+    opacity: 1
 
 
 .intro-text
@@ -141,6 +152,10 @@
     // background: rgba(0,0,0,0.9)
     color: white
 
+.text2
+    @extend .text1
+    z-index: 2000
+    background: black
 
 
 .img2
