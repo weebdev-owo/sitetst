@@ -74,14 +74,14 @@ function Landing({}){
 
             <Carousel>
                 <Slide 
-                    src={'/black.jpg'} alt={''}
+                    src={'/toothv2.png'} alt={''}
                     title={'Dental Made Simple'}
-                    desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri'}
+                    desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri.'}
                 />
                 <Slide 
                     src={'/f1.png'} alt={''}
                     title={'Dentistry Made Easy'}
-                    desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri'}
+                    desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri.'}
                 />
             </Carousel>
 
@@ -150,15 +150,15 @@ function ServicesFull({}){
 function Services({}){
     return <>
         <Parallax translateY={[0,0]} className={styles['services']}>
-            <Service src={'/tree.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            <Service src={'/nature/desert2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            <Service src={'/nani.png'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            <Service src={'/car1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            <Service src={'/car2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            <Service src={'/nature/cave2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            <Service src={'/nature/ice2.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            <Service src={'/dnt1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
-            <Service src={'/nature/lava1.jpg'} alt={'alt'}>{['omnom', 'ree']}</Service>
+            <Service src={'/tree.png'} alt={'alt'}>{['Service 1', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nature/desert2.jpg'} alt={'alt'}>{['Service 2', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nani.png'} alt={'alt'}>{['Service 3', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/car1.jpg'} alt={'alt'}>{['Service 4', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/car2.jpg'} alt={'alt'}>{['Service 5', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nature/cave2.jpg'} alt={'alt'}>{['Service 6', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nature/ice2.jpg'} alt={'alt'}>{['Service 7', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/dnt1.jpg'} alt={'alt'}>{['Service 8', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nature/lava1.jpg'} alt={'alt'}>{['Service 9', 'Dolor en feit en nuim veri']}</Service>
         </Parallax>
     </>
 }
