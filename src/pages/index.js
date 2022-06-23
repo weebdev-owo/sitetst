@@ -11,7 +11,7 @@ import MainLogo from '/src/svg/mcfd_logo'
 import NavBar from '/src/comp/nav/navbar'
 import Link from 'next/link'
 import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
-import {setBgCol} from '/src/lib/utils/SetBg'
+import {setBgCol} from '/src/lib/utils/setbg'
 
 
 
@@ -23,13 +23,15 @@ export default function Home({services}){
     return <>
         {/* <Thirds /> */}
         <ParallaxProvider>
+            <TopBar />
             <div className={styles['page']}>
                 <Parallax speed={-1000}>
                     <Landing />
                 </Parallax>
                 {/* <Parallax speed={0}> */}
 
-                    <Transition />
+                <ReasonsFull />
+                <ServicesFull />
                 {/* </Parallax> */}
 
 
@@ -69,11 +71,11 @@ export async function getStaticProps(){
 function Landing({}){
     return <>
         <div className={styles['landing']}>
-            <TopBar />
+
             <Carousel>
                 <Slide 
                     src={'/black.jpg'} alt={''}
-                    title={'Dentistry Made Easy'}
+                    title={'Dental Made Simple'}
                     desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri Dolor en feit en nuim veri'}
                 />
                 <Slide 
@@ -91,18 +93,31 @@ function Landing({}){
 function Slide({src, alt, title, desc, children}){
     // const { msgRef } = useParallax({ speed: 10 })
     return <>
-        <div className={styles['slide']}>
-            <Img src={src} styleIn={styles['bg']} alt={alt}/>
-            <div className={styles['content-cont']} >
+        <div className={styles['slide-cont']}>
+        {/* <div className={styles['slide']}> */}
+            <Parallax translateY={[300,-300]} className={styles['bg2']}><Img src={src} styleIn={styles['bg3']} alt={alt}/></Parallax>
+            {/* <div className={styles['content-cont']} > */}
                 <Parallax translateY={[-90,90]} className={styles['content']}>
                     <div className={styles['intro-text']} translateY={[-90,90]}>{title}</div>
                     <div className={styles['intro-desc']} translateY={[-90,90]}>{desc}</div>
                 </Parallax>
 
-            </div>
-
-            
+            {/* </div> */}
+        {/* </div> */}
         </div>
+    </>
+}
+
+function TopBar2({}){
+    return <>
+        <Parallax translateY={[-2700,300]} className={styles['topbar-cont']}><div className={styles['topbar']}>
+            <div className={styles['logo']}>
+                <a><MainLogo className={styles['logo-item']} /></a>
+            </div>
+            <div className={styles['nav']}>
+                <NavBar />
+            </div>
+        </div></Parallax>
     </>
 }
 
@@ -119,15 +134,15 @@ function TopBar({}){
     </>
 }
 
-function Transition({}){
+function ServicesFull({}){
     return <>
         <div className={styles['transition']}>
             
-            <Parallax translateY={[-60,60]} className={styles['text1']}>Services</Parallax>
+            <Parallax translateY={[-100,60]} className={styles['text1']}>What we do Best</Parallax>
             <Services />
-            <div className={styles['text2']}>Loreum Ipsum Dolor</div>
+            {/* <div className={styles['text2']}>Loreum Ipsum Dolor</div>
             <div className={styles['text2']}>OMNOM</div>
-            <div className={styles['text2']}>OMNOM</div>
+            <div className={styles['text2']}>OMNOM</div> */}
         </div>
     </>
 }
@@ -152,7 +167,7 @@ function Service({src, alt, title, desc, children}){
     return <>
         <Link href={'/index3'}>
             <div className={styles['service']}>
-                <Img src={src} styleIn={styles['img2']} alt={alt}/>
+                <Img src={src} styleIn={styles['img2']} alt={alt}/>   
                 <div className={styles['service-content']}>
                     <div className={styles['service-title']}>{children[0]}</div>
                     <div className={styles['service-desc']}>{children[1]}</div>
@@ -161,5 +176,17 @@ function Service({src, alt, title, desc, children}){
         </Link>
 
     </>
+}
 
+function ReasonsFull({}){
+    return <>
+        <div className={styles['transition']}>
+            
+            <Parallax translateY={[-60,60]} className={styles['text1']}>Why people love Us</Parallax>
+            <Services />
+            {/* <div className={styles['text2']}>Loreum Ipsum Dolor</div>
+            <div className={styles['text2']}>OMNOM</div>
+            <div className={styles['text2']}>OMNOM</div> */}
+        </div>
+    </>
 }
