@@ -6,12 +6,14 @@ import {useRef, useEffect} from 'react'
 import Img from '/src/comp/image/img'
 import styles from '/src/styles/home.module.sass'
 import Carousel from '/src/comp/carousel/small_car'
+import TabCarousel from '/src/comp/tabCarousel/small_car'
 import Thirds from '/src/lib/comps/thirds'
 import MainLogo from '/src/svg/mcfd_logo'
 import NavBar from '/src/comp/nav/navbar'
 import Link from 'next/link'
 import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
 import {setBgCol} from '/src/lib/utils/setbg'
+
 
 
 
@@ -25,9 +27,12 @@ export default function Home({services}){
         <ParallaxProvider>
             <TopBar />
             <div className={styles['page']}>
-                <Parallax speed={-1000}>
+                
+                <Parallax opacity={[4,-2]}>
                     <Landing />
                 </Parallax>
+
+
                 {/* <Parallax speed={0}> */}
 
                 <ReasonsFull />
@@ -36,8 +41,8 @@ export default function Home({services}){
 
 
             </div>
-        </ParallaxProvider>
 
+            </ParallaxProvider>
     </>
 }
 
@@ -72,6 +77,7 @@ function Landing({}){
     return <>
         <div className={styles['landing']}>
 
+
             <Carousel>
                 <Slide 
                     src={'/toothv2.png'} alt={''}
@@ -86,31 +92,39 @@ function Landing({}){
             </Carousel>
 
 
+
+
+
         </div>
     </>
 }
 
+const dwn = (dwn) => [-dwn, dwn*1.5]
+const op = (op) => [op, op-2]
 function Slide({src, alt, title, desc, children}){
     // const { msgRef } = useParallax({ speed: 10 })
     return <>
         <div className={styles['slide-cont']}>
         {/* <div className={styles['slide']}> */}
-            <Parallax translateY={[300,-300]} className={styles['bg2']}><Img src={src} styleIn={styles['bg3']} alt={alt}/></Parallax>
+
+            <Parallax speed={400} className={styles['bg2']}><Img src={src} styleIn={styles['bg3']} alt={alt}/></Parallax>
             {/* <div className={styles['content-cont']} > */}
-                <Parallax translateY={[-90,90]} className={styles['content']}>
-                    <div className={styles['intro-text']} translateY={[-90,90]}>{title}</div>
-                    <div className={styles['intro-desc']} translateY={[-90,90]}>{desc}</div>
+                <Parallax translateY={dwn(1000)} scale={[1,1]} className={styles['content']}>
+                    <div className={styles['intro-text']} >{title}</div>
+                    <div className={styles['intro-desc']} >{desc}</div>
                 </Parallax>
 
             {/* </div> */}
         {/* </div> */}
+
         </div>
     </>
 }
 
 function TopBar2({}){
     return <>
-        <Parallax translateY={[-2700,300]} className={styles['topbar-cont']}><div className={styles['topbar']}>
+        {/* <ParallaxProvider> */}
+        <Parallax translateY={[1000,0]} className={styles['topbar-cont']}><div className={styles['topbar']}>
             <div className={styles['logo']}>
                 <a><MainLogo className={styles['logo-item']} /></a>
             </div>
@@ -118,6 +132,7 @@ function TopBar2({}){
                 <NavBar />
             </div>
         </div></Parallax>
+        {/* </ParallaxProvider> */}
     </>
 }
 
@@ -181,12 +196,56 @@ function Service({src, alt, title, desc, children}){
 function ReasonsFull({}){
     return <>
         <div className={styles['transition']}>
-            
+        {/* <ParallaxProvider> */}
             <Parallax translateY={[-60,60]} className={styles['text1']}>Why people love Us</Parallax>
-            <Services />
+            {/* <Services /> */}
+            <Reasons /> 
             {/* <div className={styles['text2']}>Loreum Ipsum Dolor</div>
             <div className={styles['text2']}>OMNOM</div>
             <div className={styles['text2']}>OMNOM</div> */}
+                    {/* </ParallaxProvider> */}
+        </div>
+        
+    </>
+}
+
+function Reasons({}){
+    return <>
+        <div className={styles['reasons']}>
+
+
+            <TabCarousel>
+                <Tab 
+                    src={'/toothv2.png'} alt={''}
+                    title={'Dental Made Simple'}
+                    desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri.'}
+                    label={'omnom'}
+                />
+                <Tab
+                    src={'/f1.png'} alt={''}
+                    title={'Dentistry Made Easy'}
+                    desc={'Dolor en feit en nuim veri, Dolor en feit en nuim veri.'}
+                    label={'ree'}
+                />
+            </TabCarousel>
+
+
+
+
+
+        </div>
+    </>
+}
+
+function Tab({src, alt, title, desc, children}){
+    // const { msgRef } = useParallax({ speed: 10 })
+    return <>
+        <div className={styles['slide-cont']}>
+            <div speed={400} className={styles['bg4']}><Img src={src} styleIn={styles['bg5']} alt={alt}/></div>
+            {/* <div translateY={dwn(1000)} scale={[1,1]} className={styles['content']}>
+                <div className={styles['intro-text']} >{title}</div>
+                <div className={styles['intro-desc']} >{desc}</div>
+            </div> */}
         </div>
     </>
 }

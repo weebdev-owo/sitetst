@@ -5,7 +5,7 @@ import Link from 'next/link'
 import noHash from '/src/lib/utils/nohash'
 
 const elems = ['Services', 'About', 'Book']
-const links = ['/#Services', '/#About', '#Book']
+const links = ['/services', '/about', '/book']
 
 const reset_tst = () => {
     setTimeout(() => {noHash()}, 100)

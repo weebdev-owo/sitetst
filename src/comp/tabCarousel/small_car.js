@@ -35,18 +35,23 @@ function SmallCar({children}){
     return () => {clearInterval(shifter)}
   }, [])
 
-  return <div className={styles.carousel}>
-    <div className={styles.slides}>
-      {children.length ? 
-        children.map((child, i) => {return <Slide active={active} ord={i} key={i}>{child}</Slide>})
-      :
-        children
-      }
-      <div className={styles.next} ><div className={styles['arrow']} onClick={() => setActive('next')}>{'\u203A'}</div> </div>
-      <div className={styles.prev} ><div className={styles['arrow']} onClick={() => setActive('prev')}>{'\u2039'}</div></div>
+  const labels = children.map(elem => elem?.props?.label)
+    return <>
+    <DotNav active={active} num_dots={children.length} jump={setActive} labels={labels}/>
+    <div className={styles.carousel}>
+        <div className={styles.slides}>
+            {children.length ? 
+                children.map((child, i) => {return <Slide active={active} ord={i} key={i}>{child}</Slide>})
+            :   
+                children
+            }
+            {/* <div className={styles.next} ><div className={styles['arrow']} onClick={() => setActive('next')}>{'\u203A'}</div> </div>
+            <div className={styles.prev} ><div className={styles['arrow']} onClick={() => setActive('prev')}>{'\u2039'}</div></div> */}
+        </div>
+
     </div>
-    <DotNav active={active} num_dots={children.length} jump={setActive}/>
-  </div>
+    </>
+
 }
 
 function Slide({children, active, ord}){
