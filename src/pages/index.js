@@ -2,7 +2,7 @@
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
 import ServiceModel from '/src/cms/data/service/model'
 //frontend
-import {useRef, useEffect, useState} from 'react'
+import {useRef, useEffect, useState, createContext, useContext} from 'react'
 import Img from '/src/comp/image/img'
 import styles from '/src/styles/home.module.sass'
 import Carousel from '/src/comp/carousel/small_car'
@@ -15,38 +15,28 @@ import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
 import {setBgCol} from '/src/lib/utils/setbg'
 import getMobile from '/src/lib/utils/useIsMobile'
 
-let isMobile = false
 
+const ConfigContext = createContext(true)
 
 export default function Home({services}){
-
-    // const [isMobile, setIsMobile] = useState({true})
+    const [isMobile, setIsMobile] = useState(false)
     useEffect(()=>{setBgCol(false)},[])
-    useEffect(() =>{
-        isMobile = getMobile(window)
-        console.log(isMobile)
-    })
+    useEffect(() =>{setIsMobile(getMobile(window))}, [])
+
     return <>
         {/* <Thirds /> */}
+        <ConfigContext.Provider value={isMobile} >
         <ParallaxProvider>
             <TopBar />
             <div className={styles['page']}>
-                
                 <Parallax opacity={[4,-2]}>
                     <Landing />
                 </Parallax>
-
-
-                {/* <Parallax speed={0}> */}
-
                 <ReasonsFull />
                 <ServicesFull />
-                {/* </Parallax> */}
-
-
             </div>
-
-            </ParallaxProvider>
+        </ParallaxProvider>
+        </ConfigContext.Provider>
     </>
 }
 
@@ -107,6 +97,8 @@ const dwn = (dwn) => [-dwn, dwn*1.5]
 const op = (op) => [op, 2-op]
 function Slide({src, alt, title, desc, children}){
     // const { msgRef } = useParallax({ speed: 10 })
+    const isMobile = useContext(ConfigContext)
+    console.log(isMobile)
     return <>
         <div className={styles['slide-cont']}>
         {/* <div className={styles['slide']}> */}
@@ -126,6 +118,7 @@ function Slide({src, alt, title, desc, children}){
 }
 
 function TopBar2({}){
+    const isMobile = useContext(ConfigContext)
     return <>
         {/* <ParallaxProvider> */}
         <Parallax translateY={[1000,0]} disabled={isMobile} className={styles['topbar-cont']}><div className={styles['topbar']}>
@@ -154,6 +147,7 @@ function TopBar({}){
 }
 
 function ServicesFull({}){
+    const isMobile = useContext(ConfigContext)
     return <>
         <div className={styles['transition']}>
             
@@ -167,6 +161,7 @@ function ServicesFull({}){
 }
 
 function Services({}){
+    const isMobile = useContext(ConfigContext)
     return <>
         <Parallax translateY={[0,0]} className={styles['services']}>
             <Service src={'/tree.png'} alt={'alt'}>{['Service 1', 'Dolor en feit en nuim veri']}</Service>
@@ -183,6 +178,7 @@ function Services({}){
 }
 
 function Service({src, alt, title, desc, children}){
+    const isMobile = useContext(ConfigContext)
     return <>
         <Link href={'/index3'}>
             <div className={styles['service']}>
@@ -198,10 +194,11 @@ function Service({src, alt, title, desc, children}){
 }
 
 function ReasonsFull({}){
+    const isMobile = useContext(ConfigContext)
     return <>
         <div className={styles['transition']}>
         {/* <ParallaxProvider> */}
-            <Parallax translateY={[-100,100]} disabled={isMobile} opacity={op(5)} className={styles['text3']}>Why people love Us</Parallax>
+            <Parallax translateY={[-100,100]} disabled={isMobile} opacity={op(5)} className={styles['text3']}>Why people love Us {isMobile} ree</Parallax>
             {/* <Services /> */}
             <Reasons /> 
             {/* <div className={styles['text2']}>Loreum Ipsum Dolor</div>

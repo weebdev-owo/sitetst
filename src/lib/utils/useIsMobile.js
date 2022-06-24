@@ -14,6 +14,7 @@ const getMobileDetect = (userAgent) => {
 
 const getMobile = (window) => {
     const userAgent = window?.navigator?.userAgent
+    console.log('ree', getMobileDetect(userAgent))
     return userAgent ? getMobileDetect(userAgent): true
 };
 
