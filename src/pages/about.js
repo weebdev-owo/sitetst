@@ -1,7 +1,9 @@
 
 
-function About({}){
+function Page({}){
     return <>
     
     </>
 }
+
+export default Page
