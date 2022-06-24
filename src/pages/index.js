@@ -100,7 +100,7 @@ function Landing({}){
 }
 
 const dwn = (dwn) => [-dwn, dwn*1.5]
-const op = (op) => [op, op-2]
+const op = (op) => [op, 2-op]
 function Slide({src, alt, title, desc, children}){
     // const { msgRef } = useParallax({ speed: 10 })
     return <>
@@ -197,7 +197,7 @@ function ReasonsFull({}){
     return <>
         <div className={styles['transition']}>
         {/* <ParallaxProvider> */}
-            <Parallax translateY={[-60,60]} className={styles['text1']}>Why people love Us</Parallax>
+            <Parallax translateY={[-100,100]} opacity={op(5)} className={styles['text3']}>Why people love Us</Parallax>
             {/* <Services /> */}
             <Reasons /> 
             {/* <div className={styles['text2']}>Loreum Ipsum Dolor</div>
