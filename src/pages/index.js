@@ -2,7 +2,7 @@
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
 import ServiceModel from '/src/cms/data/service/model'
 //frontend
-import {useRef, useEffect} from 'react'
+import {useRef, useEffect, useState} from 'react'
 import Img from '/src/comp/image/img'
 import styles from '/src/styles/home.module.sass'
 import Carousel from '/src/comp/carousel/small_car'
@@ -13,15 +13,19 @@ import NavBar from '/src/comp/nav/navbar'
 import Link from 'next/link'
 import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
 import {setBgCol} from '/src/lib/utils/setbg'
+import getMobile from '/src/lib/utils/useIsMobile'
 
-
-
+let isMobile = false
 
 
 export default function Home({services}){
 
-
+    // const [isMobile, setIsMobile] = useState({true})
     useEffect(()=>{setBgCol(false)},[])
+    useEffect(() =>{
+        isMobile = getMobile(window)
+        console.log(isMobile)
+    })
     return <>
         {/* <Thirds /> */}
         <ParallaxProvider>
@@ -107,9 +111,9 @@ function Slide({src, alt, title, desc, children}){
         <div className={styles['slide-cont']}>
         {/* <div className={styles['slide']}> */}
 
-            <Parallax speed={400} className={styles['bg2']}><Img src={src} styleIn={styles['bg3']} alt={alt}/></Parallax>
+            <Parallax speed={400} disabled={isMobile} className={styles['bg2']}><Img src={src} styleIn={styles['bg3']} alt={alt}/></Parallax>
             {/* <div className={styles['content-cont']} > */}
-                <Parallax translateY={dwn(1000)} scale={[1,1]} className={styles['content']}>
+                <Parallax translateY={dwn(1000)} scale={[1,1]} disabled={isMobile} className={styles['content']}>
                     <div className={styles['intro-text']} >{title}</div>
                     <div className={styles['intro-desc']} >{desc}</div>
                 </Parallax>
@@ -124,7 +128,7 @@ function Slide({src, alt, title, desc, children}){
 function TopBar2({}){
     return <>
         {/* <ParallaxProvider> */}
-        <Parallax translateY={[1000,0]} className={styles['topbar-cont']}><div className={styles['topbar']}>
+        <Parallax translateY={[1000,0]} disabled={isMobile} className={styles['topbar-cont']}><div className={styles['topbar']}>
             <div className={styles['logo']}>
                 <a><MainLogo className={styles['logo-item']} /></a>
             </div>
@@ -153,7 +157,7 @@ function ServicesFull({}){
     return <>
         <div className={styles['transition']}>
             
-            <Parallax translateY={[-100,60]} className={styles['text1']}>What we do Best</Parallax>
+            <Parallax translateY={[-100,60]} disabled={isMobile} className={styles['text1']}>What we do Best</Parallax>
             <Services />
             {/* <div className={styles['text2']}>Loreum Ipsum Dolor</div>
             <div className={styles['text2']}>OMNOM</div>
@@ -197,7 +201,7 @@ function ReasonsFull({}){
     return <>
         <div className={styles['transition']}>
         {/* <ParallaxProvider> */}
-            <Parallax translateY={[-100,100]} opacity={op(5)} className={styles['text3']}>Why people love Us</Parallax>
+            <Parallax translateY={[-100,100]} disabled={isMobile} opacity={op(5)} className={styles['text3']}>Why people love Us</Parallax>
             {/* <Services /> */}
             <Reasons /> 
             {/* <div className={styles['text2']}>Loreum Ipsum Dolor</div>
