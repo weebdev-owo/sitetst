@@ -180,7 +180,7 @@ function Reasons({}){
 
 function Tab({src, alt, title, desc, children}){
     return <>
-        <div className={styles['slide-cont']}>
+        <div className={styles['reason-cont']}>
             <div className={styles['reason-desc-cont']}>
                 <div className={styles['reason-desc']}>
                     {desc}
@@ -203,25 +203,24 @@ function ServicesFull({}){
 }
 
 function Services({}){
-    const isMobile = useContext(ConfigContext)
+    const isMobileWidth = useContext(MobileWidthContext)
 
     return <>
-        <Parallax translateY={[0,0]} className={styles['services']}>
-            <FadeUp dist={10}><Service src={'/tree.png'} alt={'alt'}>{['Service 1', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={4}><Service src={'/nature/desert2.jpg'} alt={'alt'}>{['Service 2', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={6}><Service src={'/nani.png'} alt={'alt'}>{['Service 3', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={12}><Service src={'/car1.jpg'} alt={'alt'}>{['Service 4', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={8}><Service src={'/car2.jpg'} alt={'alt'}>{['Service 5', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={15}><Service src={'/nature/cave2.jpg'} alt={'alt'}>{['Service 6', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={16}><Service src={'/nature/ice2.jpg'} alt={'alt'}>{['Service 7', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={6}><Service src={'/dnt1.jpg'} alt={'alt'}>{['Service 8', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={12}><Service src={'/nature/lava1.jpg'} alt={'alt'}>{['Service 9', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-        </Parallax>
+        <div className={styles['services']}>
+            <FadeUp dist={10} disabled={isMobileWidth}><Service src={'/tree.png'} alt={'alt'}>{['Service 1', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+            <FadeUp dist={4} disabled={isMobileWidth}><Service src={'/nature/desert2.jpg'} alt={'alt'}>{['Service 2', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+            <FadeUp dist={6} disabled={isMobileWidth}><Service src={'/nani.png'} alt={'alt'}>{['Service 3', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+            <FadeUp dist={12} disabled={isMobileWidth}><Service src={'/car1.jpg'} alt={'alt'}>{['Service 4', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+            <FadeUp dist={8} disabled={isMobileWidth}><Service src={'/car2.jpg'} alt={'alt'}>{['Service 5', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+            <FadeUp dist={15} disabled={isMobileWidth}><Service src={'/nature/cave2.jpg'} alt={'alt'}>{['Service 6', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+            <FadeUp dist={16} disabled={isMobileWidth}><Service src={'/nature/ice2.jpg'} alt={'alt'}>{['Service 7', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+            <FadeUp dist={6} disabled={isMobileWidth}><Service src={'/dnt1.jpg'} alt={'alt'}>{['Service 8', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+            <FadeUp dist={12} disabled={isMobileWidth}><Service src={'/nature/lava1.jpg'} alt={'alt'}>{['Service 9', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+        </div>
     </>
 }
 
 function Service({src, alt, title, desc, children}){
-    const isMobile = useContext(ConfigContext)
 
     return <>
         <Link href={'/index3'}>
@@ -292,12 +291,13 @@ function Member({src, alt, order, name, role, desc}){
         </div>
     </>}
     return <>
+        <Img src={src} styleIn={styles['img3']} alt={alt}/>  
         <div className={styles['member-text']} >
             <div className={styles['member-name']}>{name}</div>
             <div className={styles['member-role']}>{role}</div>
             <div className={styles['member-desc']}>{desc}</div>
         </div>
-        <Img src={src} styleIn={styles['img3']} alt={alt}/>  
+
     </>
 
 }

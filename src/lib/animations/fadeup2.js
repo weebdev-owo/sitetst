@@ -3,7 +3,7 @@ import styles from './fadeup.module.sass'
 
 
 
-function FadeUp({children, idd, dist}) {
+function FadeUp({children, id, dist, disabled}) {
     const [isVisible, setVisible] = useState(false);
     const domRef = useRef();
     const monitor = (setVis, vis, observer) => {
@@ -26,12 +26,17 @@ function FadeUp({children, idd, dist}) {
         if(!isVisible && obsElemRef){observer.unobserve(obsElemRef)}
       }
     }, []);
+    console.log(disabled)
+    let style = isVisible ? {transform: `none`}:{transform: `translateY(${-dist*4}vh)`}
+    style = disabled ? {}:style
+    let cls = `${styles['fade-up-section2']} ${isVisible ? styles['is-visible2'] : ''}`
+    cls = disabled ? '':cls
 
     return (
-      <div id={idd}
-        className={`${styles['fade-up-section2']} ${isVisible ? styles['is-visible2'] : ''}`}
+      <div id={id}
+        className={cls}
         ref={domRef}
-        style={isVisible ? {transform: `none`}:{transform: `translateY(${-dist*4}vh)`} }
+        style={style}
       >
         {children}
       </div>
@@ -40,7 +45,8 @@ function FadeUp({children, idd, dist}) {
 
 FadeUp = memo(FadeUp)
 FadeUp.defaultProps = {
-  idd: null,
-  dist: 20
+  id: null,
+  dist: 20,
+  disabled: false
 }
 export default FadeUp
