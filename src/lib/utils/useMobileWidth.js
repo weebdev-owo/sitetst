@@ -1,0 +1,13 @@
+import {useState, useEffect} from 'react'
+
+function useMobileWidth(mw){
+    const [isMobileWidth, setIsMobileWidth] = useState(false)
+    const checkWidth = () => {console.log('resizeu',window.innerWidth, window.innerWidth <= mw); setIsMobileWidth(window.innerWidth <= mw)}
+    useEffect(() => {
+        window.addEventListener('resize', checkWidth)
+        return () => {window.removeEventListener('resize', checkWidth)}
+    })
+    return isMobileWidth
+}
+
+export default useMobileWidth

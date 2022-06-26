@@ -1,0 +1,14 @@
+.topbar {
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-transition: 200ms;
+  transition: 200ms;
+  position: relative;
+  z-index: 400;
+}
+
+.topbar:hover {
+  background: white;
+  -webkit-transition: 200ms;
+  transition: 200ms;
+}
+/*# sourceMappingURL=topbar_overlay.module.css.map */
