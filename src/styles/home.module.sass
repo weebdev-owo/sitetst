@@ -1,9 +1,63 @@
+@import '/src/styles/vars.sass'
 .page
     display: grid
     width: 100vw
     // color: white
-    
-//landingPage////////////////////////////////////////////////////////
+    font-weight: 1
+
+//TOPBAR///////////////////////////////////////////////////////////////////////////////
+.topbar-cont
+    position: fixed
+    top: 0
+    left: 0
+    width: 100%
+    height: 100px
+    background: rgba(0,0,0, 1)
+    z-index: 1000
+    // margin-top: 50px
+    opacity: 1
+    z-index: 10000
+    &:hover
+        background: rgba(0,0,0, 1)
+
+
+.topbar
+    position: relative
+    width: 100%
+    height: 100%
+    border: 1px solid 
+
+.logo
+    position: absolute
+    top: 0
+    left: 0
+    height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    padding-left: calc(max(5vw, 40px))
+    opacity: 0.7
+    &:hover
+        opacity: 1
+
+.logo-item
+    filter: invert(100%) 
+    padding: 30px 0px 20px 0px
+    height: 100px
+    transition: 300ms
+
+.nav
+    position: absolute
+    top: 0
+    right: 0
+    padding-right: calc(max(6vw, 10px))
+    height: 100%
+
+// @media (max-width: $mobile-width) 
+//     .nav
+//         padding-right: calc(min(6vw, 10px))
+
+//LANDING PAGE////////////////////////////////////////////////////////
 .landing
     position: relative
     width: 100%
@@ -32,63 +86,9 @@
     height: 100%
     filter: brightness(90%)
     z-index: 0
-.bg4
-    width: 100%
-    height: 100%
-
-.bg5
-    position: absolute
-    bottom: 0
-    width: 100%
-    height: 50%
-    filter: brightness(90%)
-    z-index: 0
-.topbar-cont
-    position: fixed
-    top: 0
-    left: 0
-    width: 100%
-    height: 100px
-    background: rgba(0,0,0, 1)
-    z-index: 1000
-    // margin-top: 50px
-    opacity: 1
-    z-index: 10000
-    &:hover
-        background: rgba(0,0,0, 1)
+    overflow: hidden
 
 
-.topbar
-    position: relative
-    width: 100%
-    height: 100%
-    border: 1px solid 
-
-.logo
-    position: absolute
-    top: 0
-    left: 0
-    height: 100%
-    display: flexpadding 40px
-    justify-content: center
-    align-items: center
-    padding-left: calc(max(5vw, 80px))
-    opacity: 0.7
-    &:hover
-        opacity: 1
-
-.logo-item
-    filter: invert(100%) 
-    padding: 25px 40px 25px 40px
-    height: 100%
-    transition: 300ms
-
-.nav
-    position: absolute
-    top: 0
-    right: 0
-    padding-right: calc(max(10vw, 80px))
-    height: 100%
 
 .carousel-cont
     position: absolute
@@ -111,6 +111,7 @@
     // pointer-events: none
     position: absolute
     left:0
+    top: 0
     height: 100%
     width: 50%
     display: flex
@@ -123,10 +124,10 @@
     // background: radial-gradient(rgba(0,0,0,0.7), transparent)
 .content
     position: absolute
-    top: 20%
+    bottom: 20%
     left: 0
-    height: 100%
-    width: 50%
+    // height: 100%
+    // width: 100%
     padding: 3vw
     padding-left: 5vw
     display: flex
@@ -136,32 +137,71 @@
     z-index: 10
     color: white
     opacity: 1
+    width: 100%
 
 
 .intro-text
     // margin: 0px 0px 30px 0px
-    border-bottom: 1px solid white
     padding: 0px 20px 0px 20px
-    font-size: 70px
-    font-weight: 40
+    font-size: min(70px, 7vw)
+    width: fit-content
+    line-height: 100%
+    border-bottom: 1px solid white
     // text-align: center
     // width: fit-content
     // margin: 0px 30px 0px 30px
 .intro-desc
+    border-top: 1px solid white
     display: flex
     // justify-content: center
     align-items: center
     line-height: 150%
     // padding: 20px 10vw 0px 10vw
-    font-size: 36px
-    max-width: 90%
+    font-size: min(40px, 4vw)
+    width: fit-content
+    max-width: 80%
     // text-align: center
-    font-weight: 40
-    padding: 4px 10px 0px 30px
+    padding: 4px 30px 0px 30px
     filter: brightness(60%)
 .intro-cta
 
-//Transition///////////////////////////////////////////////////////////////////////////////////////////////////
+@media (max-width: $mobile-width) 
+    .bg3
+        width: 100%
+        height: 60%
+    .bg2
+        width: 100%
+        height: 100%
+    .content-cont
+        // pointer-events: none
+        position: absolute
+        left:0
+        top: 0
+        height: 100%
+        width: 100%
+        display: flex
+        justify-content: center
+        align-items: center
+    .content
+        position: absolute
+        top: 60%
+        left: 0
+        height: 30%
+        width: 100%
+        padding: 3vw
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+
+    .intro-text
+        text-align: center
+
+    .intro-desc
+        text-align: center
+
+
+//SERVICES///////////////////////////////////////////////////////////////////////////////////////////////////
 
 .transition
     z-index: 20
@@ -186,7 +226,6 @@
     line-height: 150%
     font-size: 78px
     text-align: center
-    font-weight: 40
     // max-width: 100%
     // background: rgba(0,0,0,0.9)
     color: white
@@ -199,7 +238,6 @@
     line-height: 150%
     font-size: 78px
     text-align: center
-    font-weight: 40
     // max-width: 100%
     // background: rgba(0,0,0,0.9)
     color: white
@@ -227,18 +265,28 @@
 .services
     display: grid
     width: 100%
+    height: fit-content
     max-width: 2000px
-    min-height: 100vh
-    grid-template-columns: repeat(auto-fit, minmax(570px, 1fr))
+    justify-content: center
+    align-items: center
     // min-height: 100vh
+    // grid-template-columns: repeat(auto-fit, max(570px, 33vw))
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))
+
+    // min-height: 100vh
+@media (min-width: 1200px) 
+    .services 
+        grid-template-columns: repeat(auto-fit, minmax(570px, 1fr))
 
 
 .service
     position: relative
     width: 100%
     z-index: 100
-    height: 100%
-    min-height: max(33vh, 400px)
+    // height: fit-content
+    height: min(33vh, 400px)
+
+    // min-height: 
     display: flex
     justify-content: center
     align-items: center
@@ -272,17 +320,15 @@
     // border-bottom: 1px solid white
     padding: 0px 20px 0px 20px
     font-size: 70px
-    font-weight: 40
     text-align: center
     text-shadow: 0px 0px  20px black
     // background: radial-gradient(rgba(0,0,0,0.1), transparent)
 .service-desc
     line-height: 150%
-    padding: 10px 30px 0px 30px
+    // padding: 10px 30px 0px 30px
     font-size: 24px
     max-width: 70%
     text-align: center
-    font-weight: 40
     opacity: 0
     display: none
     transition:  600ms
@@ -293,9 +339,110 @@
 .reasons
     position: relative
     width: 100%
-    height: 80vh
+    height: fit-content
+    min-height: 70vh
     max-width: 2000px
-    min-height: 800px
     z-index: 1
     overflow: hidden
     // scroll-snap-align: start
+.reason-desc-cont
+    width: 100%
+    min-height: 40%
+    height: fit-content
+    display: flex
+    justify-content: center
+    align-items: center
+
+.reason-desc
+    color: grey
+    padding: 40px
+    text-align: center
+    font-size: 40px
+    width: 70%
+    height: fit-content
+    max-width: 1400px
+    transition: color 1000ms
+    &:hover
+        color: white
+        transition: color 1000ms
+
+.bg5
+    width: 100%
+    height: 30vh
+    min-height: 30vh
+    z-index: 0
+
+
+//TEAM///////////////////////////////////////////////////////////
+.team
+    z-index: 20
+    color: white
+    background: rgba(0,0,0,1)
+    display: flex
+    flex-direction: column
+    width: 100%
+    // height: 200vh
+    justify-content: center
+    // justify-items: center
+    align-items: center
+    // scroll-snap-align: start
+    overflow: hidden
+
+.members
+    display: grid
+    width: 100%
+    max-width: 2000px
+    // grid-template-columns: repeat(auto-fit, minmax(570px, 1fr))
+    grid-template-columns: 1fr 1fr
+    color: white
+    background: black
+    z-index: 1000
+    
+.member-text
+
+    background: black
+    width: 100%
+    height: 100%
+    display: flex
+    flex-direction: column
+    justify-content: center
+.member-text-left
+    @extend .member-text
+    justify-content: flex-start
+    align-items: flex-end
+    text-align: right
+    padding: max(40px, 4vh) max(60px, 3vw) 100px 0px
+.member-text-right
+    @extend .member-text
+    justify-content: flex-start
+    align-items: flex-start
+    text-align: left
+    padding: max(20px, 4vh) 0px 100px max(60px, 3vw)
+
+
+.member-name
+    line-height: 100%
+    width: fit-content
+    font-size: min(6vw, 70px)
+.member-role
+    // line-height: 100%
+    width: fit-content
+    font-size: min(6vw, 70px)
+.member-desc
+    width: fit-content
+    max-width: 80%
+    font-size: min(3vw, 40px)
+    color: grey
+
+.img3
+    width: 100%
+    height: 100%
+    min-height: max(400px, 50vh)
+
+
+// .member-text div:nth-of-type(1)
+//     border: 1px solid red
+
+
+
+  

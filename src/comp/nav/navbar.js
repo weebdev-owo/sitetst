@@ -4,8 +4,8 @@ import classnames from 'classnames'
 import Link from 'next/link'
 import noHash from '/src/lib/utils/nohash'
 
-const elems = ['Services', 'About', 'Book']
-const links = ['/services', '/about', '/book']
+const elems = ['Services', 'About', 'News', 'Book']
+const links = ['/services', '/about', '/news', '/book']
 
 const reset_tst = () => {
     setTimeout(() => {noHash()}, 100)

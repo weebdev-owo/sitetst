@@ -1,5 +1,5 @@
 $bottom-line: 3px
-    
+@import '/src/styles/vars.sass'
 .navbar
     height: 100%
     display: flex
@@ -13,7 +13,7 @@ $bottom-line: 3px
 .nav_elem
     transform: translate(0,$bottom-line)
     height: 100%
-    padding: 0px 50px 0px 50px
+    padding: 0px min(50px, max(4vw, 20px)) 0px min(50px, max(4vw, 20px))
 
     display: flex
     justify-content: center
@@ -31,3 +31,7 @@ $bottom-line: 3px
 .selected
     border-bottom: $bottom-line solid white
     color: grey
+
+@media (max-width: $mobile-width) 
+    .nav
+        padding-right: calc(min(6vw, 10px))
