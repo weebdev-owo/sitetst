@@ -354,7 +354,7 @@
     display: flex
     justify-content: center
     align-items: center
-    z-index: 1000
+
 
 .reason-desc
     color: grey
@@ -363,6 +363,7 @@
     font-size: min(40px, 6vw)
     width: 100%
     height: fit-content
+    min-height: max(200px, 30%)
     max-width: 1600px
     transition: color 1000ms
     z-index: 1000
@@ -378,7 +379,7 @@
     width: 100%
     height: 60%
     min-height: 30vh
-    z-index: 0
+    z-index: 100
 
 @media (max-width: $mobile-width) 
     .reasons
