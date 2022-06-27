@@ -7,7 +7,11 @@ function Modal({open, setOpen, children}){
     useToggleScroll(open)
     return createPortal(<>
         <div className={`${styles['modal-cont']} ${open && styles['open']}`}>
-            <button type="button" className={styles["modal-close"]} onClick={()=>{setOpen(false)}}>{'\u2715'}</button>
+            <div className={styles['topbar']}>
+                <div></div>
+                <button type="button" className={styles["modal-close"]} onClick={()=>{setOpen(false)}}>{'\u2715'}</button>
+            </div>
+
             {children}
         </div> 
     </>, document.getElementById('modal'))

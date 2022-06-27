@@ -7,33 +7,44 @@
     width: 100vw
     height: 100vh
     opacity: 0
-    z-index: -1000
+    z-index: 10001
     // transform: translateY(-100vh)
-    transition: opacity 500ms ease-out
+    transition: opacity 500ms ease-in
     will-change: opacity
     background: black
+    pointer-events: none
 
 .open
     opacity: 1
     z-index: 10001
     transition: opacity 500ms ease-out
+    pointer-events: auto
+
     // transform: none
+
+.topbar
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100px
+    display: grid
+    grid-template-columns: 6fr 1fr
 
 .modal-close
     z-index: 10001
     color: white
-    position: absolute
-    top: 0
-    right: 0
+
     font-size: 40px
     font-weight: 1
     background: transparent
-    margin: 40px 30px
+    margin: 0px 0.55vw 0px 0px
     border: 2px solid white
     border-radius: 200px
     padding: 16px 30px 20px 30px
-    transform: scale(0.8)
+    transform: scale(0.6)
     opacity: 0.6
+
 
     &:hover
         opacity: 1

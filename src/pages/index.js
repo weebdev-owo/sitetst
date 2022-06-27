@@ -220,7 +220,7 @@ function ServicesFull({}){
 
     return <>
         <div className={styles['transition']}>
-            <Parallax translateY={[-100,60]} disabled={isMobile} className={styles['text3']}>What we do Best</Parallax>
+            <Parallax translateY={[-100,60]} disabled={isMobile} className={styles['text1']}>What we do Best</Parallax>
             <Services />
         </div>
     </>
@@ -264,7 +264,7 @@ function TeamFull({}){
     const isMobile = useContext(ConfigContext)
     return <>
         <div className={styles['team']}>
-            <Parallax translateY={[-100,100]} opacity={op(6)} disabled={isMobile} className={styles['text1']}>Meet your Team</Parallax>
+            <Parallax translateY={[-100,100]} opacity={op(6)} disabled={isMobile} className={styles['text4']}>Meet your Team</Parallax>
             <Members />
         </div>
     </>
