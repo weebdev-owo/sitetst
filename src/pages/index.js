@@ -107,7 +107,7 @@ function TopBar({}){
     const [bookOpen, setBookOpen] = useState(false)
     useEffect(() => {setMobileOpen(false)}, [isMobileWidth])
     const book_modal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen}/>),[bookOpen])
-
+    if(typeof isMobileWidth === 'undefined'){return <></>}
     if (!isMobileWidth) { return <>
         <div className={styles['topbar-cont']}><div className={styles['topbar']}>
             <div className={styles['logo']}>
