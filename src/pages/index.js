@@ -94,14 +94,16 @@ function TopBar({}){
     </>}
 
     return <>
-        <div className={styles['topbar-cont']}><div className={styles['topbar']} onClick={()=>{setMobileOpen(true)}}>
+        <div className={styles['topbar-cont']} onClick={()=>{setMobileOpen(true)}}>
+            <div className={styles['topbar']} >
             <div className={styles['logo']}>
                 <MainLogo className={styles['logo-item']} />
             </div>
             <div className={styles['nav-burger']}>
                 <NavBurger />
             </div>
-        </div></div>
+        </div>
+        </div>
         <Modal open={mobileOpen && isMobileWidth} setOpen={setMobileOpen}>
 
         </Modal>
