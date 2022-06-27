@@ -26,8 +26,8 @@ function FadeUp({children, id, dist, disabled}) {
         if(!isVisible && obsElemRef){observer.unobserve(obsElemRef)}
       }
     }, []);
-    console.log(disabled)
-    let style = isVisible ? {transform: `none`}:{transform: `translateY(${-dist*4}vh)`}
+    // console.log(disabled)
+    let style = isVisible ? {transform: `none`}:{transform: `translateY(${-dist*2}vh)`}
     style = disabled ? {}:style
     let cls = `${styles['fade-up-section2']} ${isVisible ? styles['is-visible2'] : ''}`
     cls = disabled ? '':cls

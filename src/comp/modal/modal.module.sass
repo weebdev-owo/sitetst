@@ -1,0 +1,40 @@
+.modal-cont
+    position: fixed
+    top: 0
+    left:0
+    // right: 0
+    // bottom: 0
+    width: 100vw
+    height: 100vh
+    opacity: 0
+    z-index: -1000
+    // transform: translateY(-100vh)
+    transition: opacity 500ms ease-out
+    will-change: opacity
+    background: black
+
+.open
+    opacity: 1
+    z-index: 10001
+    transition: opacity 500ms ease-out
+    // transform: none
+
+.modal-close
+    z-index: 10001
+    color: white
+    position: absolute
+    top: 0
+    right: 0
+    font-size: 40px
+    font-weight: 1
+    background: transparent
+    margin: 40px 30px
+    border: 2px solid white
+    border-radius: 200px
+    padding: 16px 30px 20px 30px
+    transform: scale(0.8)
+    opacity: 0.6
+
+    &:hover
+        opacity: 1
+        cursor: pointer

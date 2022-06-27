@@ -16,6 +16,9 @@ import {setBgCol} from '/src/lib/utils/setbg'
 import getMobile from '/src/lib/utils/useIsMobile'
 import FadeUp from '/src/lib/animations/fadeup2'
 import useMobileWidth from '/src/lib/utils/useMobileWidth'
+import NavBurger from '/src/svg/nav_burger'
+import Modal from '/src/comp/modal/modal'
+
 
 const ConfigContext = createContext(true)
 const MobileWidthContext = createContext(false)
@@ -72,8 +75,14 @@ export async function getStaticProps(){
 const dwn = (dwn) => [-dwn, dwn*1.5]
 const op = (op) => [op, 2-op]
 
+
 function TopBar({}){
-    return <>
+    const isMobileWidth = useContext(MobileWidthContext)
+    const toggleNav = () => {}
+    const [mobileOpen, setMobileOpen] = useState(false)
+    useEffect(() => {setMobileOpen(false)}, [isMobileWidth])
+
+    if (!isMobileWidth) { return <>
         <div className={styles['topbar-cont']}><div className={styles['topbar']}>
             <div className={styles['logo']}>
                 <a><MainLogo className={styles['logo-item']} /></a>
@@ -82,7 +91,22 @@ function TopBar({}){
                 <NavBar />
             </div>
         </div></div>
+    </>}
+
+    return <>
+        <div className={styles['topbar-cont']}><div className={styles['topbar']} onClick={()=>{setMobileOpen(true)}}>
+            <div className={styles['logo']}>
+                <MainLogo className={styles['logo-item']} />
+            </div>
+            <div className={styles['nav-burger']}>
+                <NavBurger />
+            </div>
+        </div></div>
+        <Modal open={mobileOpen && isMobileWidth} setOpen={setMobileOpen}>
+
+        </Modal>
     </>
+
 }
 
 function Landing({}){
@@ -156,22 +180,22 @@ function Reasons({}){
         <div className={styles['reasons']}>
             <TabCarousel>
                 <Tab 
-                    src={'/toothv2.png'} alt={''}
+                    src={'/nani3.png'} alt={''}
                     title={'Dental Made Simple'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.'}
-                    label={'reason'}
+                    label={'Reason 1'}
                 />
                 <Tab
                     src={'/f1.png'} alt={''}
                     title={'Dentistry Made Easy'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}
-                    label={'reason'}
+                    label={'Reason 2'}
                 />
                 <Tab
-                    src={'/nani.png'} alt={''}
+                    src={'/nani4.png'} alt={''}
                     title={'Dentistry Made Easy'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco'}
-                    label={'reason'}
+                    label={'Reason 3'}
                 />
             </TabCarousel>
         </div>
@@ -262,7 +286,7 @@ function Members({}){
                 desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'}
             />
             <Member 
-                src={'/c3.png'} alt={'ree'} order={3}
+                src={'/c6.png'} alt={'ree'} order={3}
                 name={'Dr. Habib'}
                 role={'Lead Technician'}
                 desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'}

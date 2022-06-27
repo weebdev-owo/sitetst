@@ -164,7 +164,7 @@ function UploadImages({files, paths, error, uploaded, update}){
         return <>
             <div className={styles['heading']}>{'Error Uploading Images'}</div>
             <div className={styles['sub-heading']}>{`check server status and configuration`}</div>
-            <button type="button" className={styles["upload-close"]} onClick={()=>{update('close')}}>x</button>
+            <button type="button" className={styles["upload-close"]} onClick={()=>{update('close')}}>{'\u2715'}</button>
             <div className={styles['upload-images-display']}>{images}</div>
         </>
     }
@@ -335,7 +335,7 @@ function UploadData({sucsess, failed, update}){
             <div className={styles['upload-data-errors']}>{messages.map((message, i) => 
                 <span className={styles['upload-data-error']} key={i}>{`${message}`}</span>
             )}</div>
-            <button type="button" className={styles["upload-close"]} onClick={()=>{update('close')}}>x</button>
+            <button type="button" className={styles["upload-close"]} onClick={()=>{update('close')}}>{'\u2715'}</button>
         </>
     }
 

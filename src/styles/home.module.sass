@@ -37,8 +37,10 @@
     align-items: center
     padding-left: calc(max(5vw, 40px))
     opacity: 0.7
+    tranisition: opacity 500ms
     &:hover
         opacity: 1
+        tranisition: opacity 500ms
 
 .logo-item
     filter: invert(100%) 
@@ -53,9 +55,42 @@
     padding-right: calc(max(6vw, 10px))
     height: 100%
 
-// @media (max-width: $mobile-width) 
-//     .nav
-//         padding-right: calc(min(6vw, 10px))
+.nav-burger
+    width: 100px
+    height: 100px
+    display: flex
+    justify-content: center
+    align-items: center
+    fill: white
+    opacity: 0.7
+    tranisition: opacity 500ms
+    overflow: hidden
+
+
+@media (max-width: $mobile-width) 
+    .nav
+        padding-right: calc(min(6vw, 10px))
+    .topbar
+        display: grid
+        justify-content: center
+        align-items: center
+        grid-template-columns: 6fr 1fr
+        &:hover
+            .nav-burger
+                opacity: 1
+                tranisition: opacity 500ms
+                cursor: pointer
+            .logo
+                opacity: 1
+                tranisition: opacity 500ms
+                cursor: pointer
+    .logo
+        position: relative
+        padding-left: 20%
+
+    .logo-item
+        padding: 25px 0px 25px 0px
+
 
 //LANDING PAGE////////////////////////////////////////////////////////
 .landing
