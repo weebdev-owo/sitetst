@@ -2,14 +2,14 @@
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
 import ServiceModel from '/src/cms/data/service/model'
 //frontend
-import {useRef, useEffect, useState, createContext, useContext} from 'react'
+import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
 import Img from '/src/comp/image/img'
 import styles from '/src/styles/home.module.sass'
 import Carousel from '/src/comp/carousel/small_car'
 import TabCarousel from '/src/comp/tabCarousel/small_car'
 import Thirds from '/src/lib/comps/thirds'
 import MainLogo from '/src/svg/mcfd_logo'
-import NavBar from '/src/comp/nav/navbar'
+// import NavBar from '/src/comp/nav/navbar'
 import Link from 'next/link'
 import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
 import {setBgCol} from '/src/lib/utils/setbg'
@@ -18,6 +18,8 @@ import FadeUp from '/src/lib/animations/fadeup2'
 import useMobileWidth from '/src/lib/utils/useMobileWidth'
 import NavBurger from '/src/svg/nav_burger'
 import Modal from '/src/comp/modal/modal'
+import cn from 'classnames'
+
 
 
 const ConfigContext = createContext(true)
@@ -76,11 +78,35 @@ const dwn = (dwn) => [-dwn, dwn*1.5]
 const op = (op) => [op, 2-op]
 
 
+function Book({open, setOpen}){
+    return <>
+        <Modal open={open} setOpen={setOpen}>
+            <div className={styles['text1']}>REEEE</div>
+        </Modal>
+    </>
+}
+
+function NavBar({selected, elems, links, cta}){
+    return <section className={styles.navbar}>
+        {elems.map((elem,i) => {
+            return <Link href={links[i]} key={i}>
+                    <a 
+                        key={i} 
+                        className={cn(styles['nav-elem'], {[styles['nav-selected']]: selected==i})}
+                    >{elem}</a>
+            </Link>
+        })}
+        <button className={styles['nav-cta']} onClick={()=>{cta[2](true)}}>{cta[0]}</button>
+    </section>
+}
+
 function TopBar({}){
     const isMobileWidth = useContext(MobileWidthContext)
     const toggleNav = () => {}
     const [mobileOpen, setMobileOpen] = useState(false)
+    const [bookOpen, setBookOpen] = useState(false)
     useEffect(() => {setMobileOpen(false)}, [isMobileWidth])
+    const book_modal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen}/>),[bookOpen])
 
     if (!isMobileWidth) { return <>
         <div className={styles['topbar-cont']}><div className={styles['topbar']}>
@@ -88,9 +114,10 @@ function TopBar({}){
                 <a><MainLogo className={styles['logo-item']} /></a>
             </div>
             <div className={styles['nav']}>
-                <NavBar />
+                <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
             </div>
         </div></div>
+        {book_modal}
     </>}
 
     return <>
@@ -105,8 +132,11 @@ function TopBar({}){
         </div>
         </div>
         <Modal open={mobileOpen && isMobileWidth} setOpen={setMobileOpen}>
-
+            <div className={styles['nav-modal-cont']}>
+                <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
+            </div>  
         </Modal>
+        {book_modal}
     </>
 
 }

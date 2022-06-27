@@ -1,3 +1,4 @@
+@import '/src/styles/vars.sass'
 .modal-cont
     position: fixed
     top: 0
@@ -32,14 +33,14 @@
     grid-template-columns: 6fr 1fr
 
 .modal-close
+    width: 100px
+    height: 100px
     z-index: 10001
     color: white
-
     font-size: 40px
     font-weight: 1
     background: transparent
-    margin: 0px 0.55vw 0px 0px
-    border: 2px solid white
+    border: 3px solid white
     border-radius: 200px
     padding: 16px 30px 20px 30px
     transform: scale(0.6)
@@ -49,3 +50,6 @@
     &:hover
         opacity: 1
         cursor: pointer
+
+
+

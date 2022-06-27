@@ -10,14 +10,14 @@ const links = ['/services', '/about', '/news', '/book']
 const reset_tst = () => {
     setTimeout(() => {noHash()}, 100)
 }
-function NavBar({selected, setSelected}){
+function NavBar({selected, setSelected, elems, links}){
 
     return <section className={styles.navbar}>
         {elems.map((elem,i) => {
             return <Link href={links[i]} key={i}>
                     <a 
                         key={i} 
-                        className={classnames(styles.nav_elem, {[styles.selected]: selected==i})}
+                        className={classnames(styles['nav-elem'], {[styles['nav-selected']]: selected==i})}
                         onClick={() => {reset_tst()}}
                     >{elem}</a>
             </Link>

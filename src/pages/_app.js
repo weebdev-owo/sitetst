@@ -21,7 +21,6 @@ function App({ Component, pageProps }) {
     <meta name="google-site-verification" content="EDlFiBWAIBFCZ-93UMxhZVr0V7GqOCsGfk1BDCQZCNk" />
   </Head>
   <Component {...pageProps} />
-  <div id="modal"></div>
   </>
 }
 

@@ -1,5 +1,6 @@
-$bottom-line: 3px
+
 @import '/src/styles/vars.sass'
+$bottom-line: 3px
 .navbar
     height: 100%
     display: flex
@@ -10,7 +11,7 @@ $bottom-line: 3px
     height: 100%
     // outline: 1px solid red
 
-.nav_elem
+.nav-elem
     transform: translate(0,$bottom-line)
     height: 100%
     padding: 0px min(50px, max(4vw, 20px)) 0px min(50px, max(4vw, 20px))
@@ -28,7 +29,7 @@ $bottom-line: 3px
         border-bottom: $bottom-line solid white
         opacity: 1
 
-.selected
+.nav-selected
     border-bottom: $bottom-line solid white
     color: grey
 

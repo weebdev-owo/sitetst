@@ -36,6 +36,7 @@ function Services({}){
             layout={[
                 ['Url Name', 'url'],
                 ['Order', 'services.tile.order'],
+                ['Name', 'services.tile.name'],
                 ['Enabled', 'enabled'],
                 ['Booking', 'booking'],
             ]}

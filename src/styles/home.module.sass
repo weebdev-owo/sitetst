@@ -6,6 +6,75 @@
     font-weight: 1
 
 //TOPBAR///////////////////////////////////////////////////////////////////////////////
+$bottom-line: 3px
+.navbar
+    height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    // border-bottom: $bottom-line solid black
+    color: white
+    height: 100%
+    // outline: 1px solid red
+
+.nav-elem
+    transform: translate(0,$bottom-line)
+    height: 100%
+    padding: 0px min(50px, max(4vw, 20px)) 0px min(50px, max(4vw, 20px))
+
+    display: flex
+    justify-content: center
+    align-items: center
+    color: white
+    opacity: 0.7
+    border-bottom: $bottom-line solid rgba(0,0,0,0)
+
+    &:hover
+        color: white
+        border-bottom: $bottom-line solid white
+        opacity: 1
+
+.nav-selected
+    border-bottom: $bottom-line solid white
+    color: grey
+.nav-modal-cont
+    width: 100%
+    height: 100%
+    position: absolute
+    top: 0
+    left: 0
+    display: flex
+    justify-content: center
+    align-items: center
+
+.nav-cta
+    @extend .nav-elem
+    height: 70%
+    margin-left: 20px
+    color: #B29146
+    border: 2px solid #B29146
+    opacity: 1
+    background: black
+    font-size: 18px
+    &:hover
+        border: 2px solid #B29146
+        color: #B29146
+        filter: brightness(150%)
+        cursor: pointer
+@media (max-width: $mobile-width) 
+    .navbar
+        display: grid
+        height: fit-content
+        justify-content: center
+        justify-items: center
+    .nav-elem
+        height: 100px
+        width: 100%
+        padding: 0px min(50px, max(4vw, 40px)) 0px min(50px, max(4vw, 40px))
+        font-size: min(8vw, 8vh)
+    .nav-cta
+        margin: 20px 0px 0px 0px
+        // height: 70px
 .topbar-cont
     position: fixed
     top: 0
@@ -23,7 +92,7 @@
 
 
 .topbar
-    // position: relative
+    position: relative
     width: 100%
     height: 100%
 
@@ -163,8 +232,7 @@
     // width: 100%
     padding: 3vw
     padding-left: 5vw
-    display: flex
-    flex-direction: column
+    display: grid
     justify-content: center
     // align-items: center
     z-index: 10
@@ -176,23 +244,23 @@
 .intro-text
     // margin: 0px 0px 30px 0px
     padding: 0px 20px 0px 20px
-    font-size: min(70px, 7vw)
-    width: fit-content
+    font-size: min(70px, 7vw, 7vh)
+    width: 100%
     line-height: 100%
     border-bottom: 1px solid white
     // text-align: center
     // width: fit-content
     // margin: 0px 30px 0px 30px
 .intro-desc
-    border-top: 1px solid white
+    // border-top: 1px solid white
     display: flex
     // justify-content: center
     align-items: center
     line-height: 150%
     // padding: 20px 10vw 0px 10vw
-    font-size: min(40px, 4vw)
+    font-size: min(40px, 4vw, 4vh)
     width: fit-content
-    max-width: 80%
+    max-width: 100%
     // text-align: center
     padding: 4px 30px 0px 30px
     filter: brightness(60%)
@@ -218,9 +286,9 @@
     .content
         position: absolute
         top: 60%
-        left: 0
+        left: 10%
         height: 30%
-        width: 100%
+        width: 80%
         padding: 3vw
         display: flex
         flex-direction: column
@@ -485,15 +553,15 @@
 .member-name
     line-height: 100%
     width: fit-content
-    font-size: min(6vw, 70px)
+    font-size: min(6vw, 70px, 6vh)
 .member-role
     // line-height: 100%
     width: fit-content
-    font-size: min(6vw, 70px)
+    font-size: min(6vw, 70px, 6vh)
 .member-desc
     width: fit-content
     max-width: 80%
-    font-size: min(4vw, 40px)
+    font-size: min(4vw, 40px, 4vh)
     color: grey
 
 .img3
