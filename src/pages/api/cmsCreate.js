@@ -7,10 +7,9 @@ export default async function handler (req, res) {
     const data = req.body.data
     const model_path = req.body.model_path
     const revalidate_paths = req.body.revalidate
-
     //get model and validation schema
-    const model = (await import(`/src/cms/data/${model_path}/model`)).default
-    const modelValidationSchema = (await import(`/src/cms/data/${model_path}/create`)).validationSchema
+    const model = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/${model_path}/model`)).default
+    const modelValidationSchema = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/${model_path}/create`)).validationSchema
 
     //validate request data
     let valid = false
@@ -32,11 +31,12 @@ export default async function handler (req, res) {
     if(valid){
         try {
             const connection = await dbConnectCms()
-            const service = await model.create({data: data})
+            const item = await model.create({data: data})
             const revalidation_errors = await revalidate(res, revalidate_paths)
+            console.log(item)
             res.status(200).json({ 
                 success: true, 
-                data: service,
+                data: item,
                 isr_errors: revalidation_errors
             })
         } 

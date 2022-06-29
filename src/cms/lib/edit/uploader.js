@@ -278,18 +278,19 @@ function createPayload(values){
     return payload
 }
 
-async function postData(payload, setProgress, url, model_path, unique_id, revalidate, url_ids){
+async function postData(payload, setProgress, url, cmsPath, unique_id, revalidate, url_ids){
     const revalidate_paths = revalidate.map((revalidate_path) => {
         if (typeof revalidate_path === 'string'){ return revalidate_path}
         const new_revalidate_path = revalidate_path.map(entry => (entry === 'use id' ? unique_id:entry))
         return '/'+new_revalidate_path.join('/')
     })
     // console.log('UPLOADING DATA', revalidate_paths)
+    console.log('hmhmhmhmhmhmhmh', url_ids)
     return axios.post(
         url, 
         {
             data: payload,
-            model_path: model_path,
+            model_path: cmsPath,
             revalidate: revalidate_paths,
             url_ids: url_ids
         }, 
@@ -315,13 +316,13 @@ function UploadData({sucsess, failed, update}){
     useToggleScroll(!close)
 
     const { values } = useFormikContext()
-    const {dbUrl, model_path, id_path, revalidate, initialValues} = useContext(ConfigContext)
+    const {dbUrl, cmsPath, id_path, revalidate, initialValues} = useContext(ConfigContext)
     const [progress, setProgress] = useState([0, 0])
     const url_ids = {
         initial: getByPath(initialValues, id_path),
         path: id_path
     }
-    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl, model_path, getByPath(values, id_path), revalidate, url_ids), {enabled: !sucsess && !failed})
+    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl, cmsPath, getByPath(values, id_path), revalidate, url_ids), {enabled: !sucsess && !failed})
 
     useEffect(() =>{
         if(data && !isError){ update(['db_sucsess', [data.data.isr_errors, getByPath(data.data.data.data, id_path)]]) }
@@ -376,11 +377,11 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({isrErrors, uniqueId}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, viewUrl, editUrl, id_path, initialValues} = useContext(ConfigContext)
+    const {cmsTitle, cmsPath, viewUrl, editUrl, id_path, initialValues} = useContext(ConfigContext)
 
     const router = useRouter()
     useEffect(() =>{
-        const href = `/admin/${cmsTitle.toLowerCase()}/edit/${uniqueId}`
+        const href = `/admin/${cmsPath}/edit/${uniqueId}`
         router.push(href)
     },[])
     const forceReload = async (e) =>{
@@ -403,19 +404,19 @@ function UploadComplete({isrErrors, uniqueId}){
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={viewUrl || `/services/${uniqueId}`}>
+                <Link href={viewUrl(values) || `/${cmsPath}/${uniqueId}`}>
                     <a className={styles["sucsess-link"]}>View {`${uniqueId}`}</a> 
                 </Link>  
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={editUrl || `/admin/${cmsTitle.toLowerCase()}/edit/${uniqueId}`}>
+                <Link href={editUrl(values) || `/admin/${cmsPath}/edit/${uniqueId}`}>
                     <a className={styles["sucsess-link"]} onClick={forceReload}>Edit {`${uniqueId}`}</a> 
                 </Link>     
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={`/admin/${cmsTitle.toLowerCase()}/create`}>
+                <Link href={`/admin/${cmsPath}/create`}>
                     <a className={styles["sucsess-link"]}>{`Create New ${cmsTitle}`}</a> 
                 </Link>     
             </div>

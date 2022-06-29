@@ -56,8 +56,11 @@ async function check_url_ids(res, model, model_path, initialId, newId, path){
 async function update_initial_doc(res, new_data, model, model_path, initialId, path){
     const data_path = `data.${path}`
     const find_initial = new mongoose.Query().find().where(data_path).eq(initialId)
-    const updated_doc = await model.findOneAndUpdate(find_initial, {data: new_data}, {new: true})
-    if (!updated_doc){
+    const doc = await model.findOne(find_initial)
+    doc.data = new_data
+    const new_doc = await doc.save()
+    console.log('DOCCCCC', doc)
+    if (new_doc !== doc){
         const formated_error = {
             errors: [
                 {properties: 
@@ -71,7 +74,7 @@ async function update_initial_doc(res, new_data, model, model_path, initialId, p
         res.status(400).json(process_errors(formated_error))
         return false
     }
-    return updated_doc
+    return new_doc
 }
 
 export default async function handler (req, res) {
@@ -82,14 +85,14 @@ export default async function handler (req, res) {
     const url_id_path = req.body.url_ids.path
     const initial_url_id = req.body.url_ids.initial
     const new_url_id = getByPath(data, url_id_path)
-    console.log('urls')
-    console.log('intiial: ', initial_url_id)
-    console.log('new: ', new_url_id)
+    // console.log('urls')
+    // console.log('intiial: ', initial_url_id)
+    // console.log('new: ', new_url_id)
 
 
     //get model and validation schema
-    const model = (await import(`/src/cms/data/${model_path}/model`)).default
-    const modelValidationSchema = (await import(`/src/cms/data/${model_path}/edit`)).validationSchema
+    const model = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/${model_path}/model`)).default
+    const modelValidationSchema = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/${model_path}/edit`)).validationSchema
 
     //validate request data
     let valid = false
@@ -111,8 +114,12 @@ export default async function handler (req, res) {
     if(valid){
         try {
             const connection = await dbConnectCms()
-            const valid_url_id = await check_url_ids(res, model, model_path, initial_url_id, new_url_id, url_id_path)
-            if(!valid_url_id){ return }
+            const isOrder = url_id_path.split('.')
+
+            if(isOrder[isOrder.length - 1] !== 'order'){
+                const valid_url_id = await check_url_ids(res, model, model_path, initial_url_id, new_url_id, url_id_path)
+                if(!valid_url_id){ return }
+            }
             const updated_doc = await update_initial_doc(res, data, model, model_path, initial_url_id, url_id_path)
             if(!updated_doc){ return }
             const revalidation_errors = await revalidate(res, revalidate_paths)
@@ -123,7 +130,7 @@ export default async function handler (req, res) {
             })
         } 
         catch (error) {
-            console.log(error)
+            console.log('hmhmhmhmhm', error)
             res.status(400).json(process_errors(error))
         }
     }

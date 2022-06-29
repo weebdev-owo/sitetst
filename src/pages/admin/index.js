@@ -1,7 +1,7 @@
 //frontend
-import {useState, useRef} from 'react'
+import {useState, useRef, useEffect} from 'react'
 import styles from '/src/cms/lib/menu/menu.module.sass'
-import {SetBgInv} from '/src/lib/utils/setbg'
+import {setBgCol} from '/src/lib/utils/setbg'
 import Link from 'next/link'
 import Table from '/src/cms/lib/menu/table'
 import {Title, Nav} from '/src/cms/lib/menu/primitives'
@@ -9,11 +9,10 @@ import {Title, Nav} from '/src/cms/lib/menu/primitives'
 function AdminHome({}){
 
     //Change body background and scroll when ref onscreen
-    const elemRef = useRef(null)
-    SetBgInv(elemRef)
+    useEffect(() =>{setBgCol(false)}, [])
 
     return <>
-        <div className={styles['home']} ref={elemRef}>
+        <div className={styles['home']} >
             <Home />
             <Services />
             <About />
@@ -24,7 +23,22 @@ function AdminHome({}){
 function Home({}){
     return <>
         <Title>Home</Title>
-        <Nav link={'/admin/home'}>Edit Intro</Nav>
+        <Table 
+            layout={[
+                ['title', 'title'],
+                ['Order', 'order'],
+                ['Enabled', 'enabled'],
+            ]}
+            options={{
+                'title': 'Landing Slides',
+                'model_path': 'home/landing',
+                'id_path': 'order',
+                'edit': ['/admin/home/landing/edit/', 'use id'],
+                'view': ['/'],
+                'order': 'order',
+            }}
+        />
+        <Nav link={'/admin/home/landing/create'}>Create Slide</Nav>
     </>
 }
 
@@ -41,14 +55,14 @@ function Services({}){
                 ['Booking', 'booking'],
             ]}
             options={{
-                'model_path': 'service',
+                'model_path': 'services',
                 'id_path': 'url',
-                'edit': ['/admin', '/service', '/edit/', 'use id'],
+                'edit': ['/admin', '/services', '/edit/', 'use id'],
                 'view': ['/services/', 'use id'],
                 'order': 'services.tile.order',
             }}
         />
-        <Nav link={'/admin/service/create'}>Create New Service</Nav>
+        <Nav link={'/admin/services/create'}>Create New Service</Nav>
         
     </>
 }

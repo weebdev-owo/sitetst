@@ -5,10 +5,10 @@ import {Text, TextArea, CheckBox, List, FormImage, Space} from '/src/cms/lib/edi
 import image_styles from '/src/styles/images.module.sass'
 import {useMemo, useEffect, useState, useReducer} from 'react'
 import {QueryClient, QueryClientProvider as QueryProvider, useQuery, useQueries} from 'react-query'
-import {formElements, validationSchema} from '/src/cms/data/service/edit'
+import {formElements, validationSchema} from '/src/cms/data/services/edit'
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import Service from '/src/cms/data/service/model'
+import Service from '/src/cms/data/services/model'
 
 
 export default function Page({data}){
@@ -17,7 +17,7 @@ export default function Page({data}){
             data={data}
             validationSchema={validationSchema}
             cmsTitle={'Service'}
-            model_path={'service'} // the folder in cms/data which corresponds to the data in this page
+            cmsPath={'services'} // the folder in cms/data which corresponds to the data in this page
             id_path={'url'} //the path in values to the unique id of this data
             revalidate={['/', ['services','use id']]} //pages to perform on demand isr
         >

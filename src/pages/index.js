@@ -1,6 +1,6 @@
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import ServiceModel from '/src/cms/data/service/model'
+import ServiceModel from '/src/cms/data/services/model'
 //frontend
 import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
 import Img from '/src/comp/image/img'
@@ -24,20 +24,25 @@ import cn from 'classnames'
 
 const ConfigContext = createContext(true)
 const MobileWidthContext = createContext(false)
+const BookContext = createContext({'setBookOpen':()=>{}, 'bookModal':<></>, 'bookOpen': false})
 
 export default function Page({services}){
     const [isMobile, setIsMobile] = useState(true)
     const isMobileWidth = useMobileWidth(800)
     useEffect(()=>{setBgCol(false)},[])
     useEffect(() =>{setIsMobile(getMobile(window))}, [])
+    const [bookOpen, setBookOpen] = useState(false)
+    const bookModal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen}/>),[bookOpen])
 
 
     return <>
         {/* <Thirds /> */}
         <MobileWidthContext.Provider value={isMobileWidth} >
         <ConfigContext.Provider value={isMobile} >
+        <BookContext.Provider value={{bookModal, bookOpen, setBookOpen}}>
         <ParallaxProvider>
             <TopBar />
+            {bookModal}
             <div className={styles['page']}>
                 <Parallax disabled={isMobile} opacity={[4,-2]}><Landing /></Parallax>
                 <ReasonsFull />
@@ -45,6 +50,7 @@ export default function Page({services}){
                 <TeamFull />
             </div>
         </ParallaxProvider>
+        </BookContext.Provider>
         </ConfigContext.Provider>
         </MobileWidthContext.Provider>
     </>
@@ -104,9 +110,10 @@ function TopBar({}){
     const isMobileWidth = useContext(MobileWidthContext)
     const toggleNav = () => {}
     const [mobileOpen, setMobileOpen] = useState(false)
-    const [bookOpen, setBookOpen] = useState(false)
+    const {bookOpen, setBookOpen, bookModal} = useContext(BookContext)
+
     useEffect(() => {setMobileOpen(false)}, [isMobileWidth])
-    const book_modal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen}/>),[bookOpen])
+
     if(typeof isMobileWidth === 'undefined'){return <></>}
     if (!isMobileWidth) { return <>
         <div className={styles['topbar-cont']}><div className={styles['topbar']}>
@@ -117,7 +124,6 @@ function TopBar({}){
                 <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
             </div>
         </div></div>
-        {book_modal}
     </>}
 
     return <>
@@ -136,7 +142,6 @@ function TopBar({}){
                 <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
             </div>  
         </Modal>
-        {book_modal}
     </>
 
 }
@@ -224,7 +229,7 @@ function Reasons({}){
                     label={'Reason 2'}
                 />
                 <Tab
-                    src={'/nani4.png'} alt={''}
+                    src={'/nanid.png'} alt={''}
                     title={'Dentistry Made Easy'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco'}
                     label={'Reason 3'}
@@ -355,5 +360,9 @@ function Member({src, alt, order, name, role, desc}){
         </div>
 
     </>
+}
+
+function Contact({}){
+    const {bookOpen, setBookOpen, bookModal} = useContext(BookContext)
 
 }

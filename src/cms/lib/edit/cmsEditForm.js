@@ -4,11 +4,12 @@ import {Formik} from 'formik'
 import * as Yup from 'yup'
 import  classNames  from 'classnames';
 import 'react-image-crop/dist/ReactCrop.css'
-import {SetBgInv} from '/src/cms/lib/utils/setbg'
+import {setBgCol} from '/src/cms/lib/utils/setbg'
 import Upload from './uploader'
 import { ConfigContext } from './configContext'
 import {QueryClient, QueryClientProvider as QueryProvider, useQuery, useQueries} from 'react-query'
 // import {initialUploadStore,  uploadReducer} from './uploader.js'
+
 
 const getByPath = (obj, path) => {
     if (typeof path==='string'){path = path.split(".")}
@@ -186,14 +187,13 @@ function uploadReducer(state, data){
             }
     }
 }
-function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, model_path, id_path, revalidate, children}){
+function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, children}){
 
 
     const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
 
     //Change body background and scroll when ref onscreen
-    const elemRef = useRef(null)
-    SetBgInv(elemRef)
+    useEffect(() =>{setBgCol(false)}, [])
     
     const sendToAPI = async (values) => {
         console.log('submmiting', values)
@@ -215,8 +215,8 @@ function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cms
     }
 
     return <>
-        <div id={'Create'} className={styles["form-cont"]} ref={elemRef}>
-            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, model_path, id_path, revalidate, initialValues}}>
+        <div id={'Create'} className={styles["form-cont"]} >
+            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, initialValues}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         <div className={styles["heading"]}>{`Edit ${cmsTitle}`}</div>
@@ -237,8 +237,8 @@ CmsEditFormInner.defaultProps = {
     imageUrl: '/api/uploadSingleImage',
     dbUrl: '/api/cmsEdit',
     validationSchema: Yup.object({}),
-    viewUrl: false,
-    editUrl: false,
+    viewUrl: ()=>false,
+    editUrl: ()=>false,
     revalidate: [],
 }
 

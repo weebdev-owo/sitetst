@@ -12,7 +12,7 @@ import ScrollNav from '/src/comp/scrollnav/scrollnav'
 import SetBg from '/src/lib/utils/setbg'
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import Service from '/src/cms/data/service/model'
+import Service from '/src/cms/data/services/model'
 
 const loreum1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
 const loreum2 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit'

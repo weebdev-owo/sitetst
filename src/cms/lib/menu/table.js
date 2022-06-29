@@ -1,7 +1,7 @@
 //frontend
 import {useState, useRef, useMemo, useEffect} from 'react'
 import styles from './menu.module.sass'
-import {SetBgInv} from '/src/lib/utils/setbg'
+// import {SetBgInv} from '/src/lib/utils/setbg'
 import Link from 'next/link'
 import {QueryClient, QueryClientProvider as QueryProvider, useQuery} from 'react-query'
 import axios from 'axios'
@@ -31,8 +31,6 @@ const getByPath = (obj, path) => {
 function Table({layout, options}){
 
     //Change body background and scroll when ref onscreen
-    const elemRef = useRef(null)
-    SetBgInv(elemRef)
     const dataClient = new QueryClient({
         defaultOptions: {
             queries:{
@@ -46,7 +44,7 @@ function Table({layout, options}){
 
     return <>
         <QueryProvider client={dataClient}>
-            <div className={'ree'} ref={elemRef}>
+            <div className={'ree'}>
                 <Inner layout={layout} options={options}/>
             </div>
         </QueryProvider>
@@ -57,22 +55,29 @@ function Table({layout, options}){
 function Inner({layout, options}){
 
     const [contents, setContents] = useState(false)
-    const {data, isLoading, isError, error} = useQuery('table', ()=>getTableData(layout, options), {
+    const {data, refetch, isLoading, isError, error} = useQuery('table', ()=>getTableData(layout, options), {
         onSuccess: (data) => {
             // console.log(data.data.data)
             setContents(formatTableData(data.data.data, layout, options))
         }
     })
-
+    const refresh = useMemo(()=> <>
+        <div className={styles['table-msg']}>
+            {options.title ? <div className={styles['table-title']}>{options.title}</div>:<></>}
+            <div className={styles['refresh']} onClick={refetch}>{`Refresh \u21bb`}</div>
+        </div>
+    </>
+    , [refetch, options.title])
     const titles = useMemo(() => layout.map((item, i) =><div className={styles['table-top-item']} key={i}>{item[0]}</div>), [layout])
 
 
-    if (isError) {console.log('err', error); return <div>ERROR</div>}
-    if (isLoading) return <div>LOADING</div>
-    const cols = 'auto '.repeat(contents[0].length)
-    console.log(cols)
+    if (isError) {console.log('err', error); return <>{refresh}<div className={styles['table-msg']}>ERROR FETCHING DATA</div></>}
+    if (isLoading) return <div className={styles['table-msg']}>LOADING</div>
+    if(!contents) return <>{refresh}<div className={styles['table-msg']}>EMPTY</div></>
+    const style = data.data.data.length ? {'grid-template-columns': `${'auto '.repeat(contents[0].length)}`}:{}
     return <>
-        <div className={styles['table']} style={{'grid-template-columns': `${cols}`}}>
+        {refresh}
+        <div className={styles['table']} style={style}>
             {titles}
             <div className={styles['table-top-item']}>Edit</div>
             <div className={styles['table-top-item']}>View</div>
@@ -104,7 +109,7 @@ function getTableData(layout, options){
 function formatTableData(data, layout, options){
     const id_path = `data.${options.id_path}`
     try{
-        console.log(data)
+        // console.log(data)
         const new_data =  data.map((item) =>{
             const row = layout.map(([title, path], i)=>{
                 return createTableItem(getByPath(item, `data.${path}`))
@@ -116,7 +121,7 @@ function formatTableData(data, layout, options){
             console.log(row)
             return row
         })
-        console.log(new_data)
+        // console.log(new_data)
         return new_data
     }
     catch (error){

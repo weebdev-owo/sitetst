@@ -1,7 +1,7 @@
 import '/src/styles/global.sass'
 import Head from 'next/head'
 
-//show console.log source
+// show console.log source
 // ['log', 'warn'].forEach(function(method) {
 //   var old = console[method];
 //   console[method] = function() {

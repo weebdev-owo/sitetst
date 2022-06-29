@@ -1,6 +1,6 @@
 
 import CmsCreateForm from '/src/cms/lib/create/cmsCreateForm'
-import {formElements, initialValues, validationSchema} from '/src/cms/data/service/create'
+import {formElements, initialValues, validationSchema} from '/src/cms/data/services/create'
 
 const initialValuesFilled = {
   "url": "thrh",
@@ -96,9 +96,10 @@ export default function Page(){
             initialValues={initialValuesFilled} 
             validationSchema={validationSchema}
             cmsTitle={'Service'}
-            model_path={'service'} // the folder in cms/data which corresponds to the data in this page
+            cmsPath={'services'} // the folder in cms/data which corresponds to the data in this page
             id_path={'url'} //the path in values to the unique id of this data
-            revalidate={['/', ['services','use id']]} //pages to perform on demand isr
+            // revalidate={['/', ['services','use id']]} //pages to perform on demand isr
+            revalidate={[]} //pages to perform on demand isr
         >
             {formElements}
         </CmsCreateForm>

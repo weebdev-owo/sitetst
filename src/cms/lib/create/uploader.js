@@ -274,7 +274,7 @@ function createPayload(values){
     return payload
 }
 
-async function postData(payload, setProgress, url, model_path, unique_id, revalidate){
+async function postData(payload, setProgress, url, cmsPath, unique_id, revalidate){
     const revalidate_paths = revalidate.map((revalidate_path) => {
         if (typeof revalidate_path === 'string'){ return revalidate_path}
         const new_revalidate_path = revalidate_path.map(entry => (entry === 'use id' ? unique_id:entry))
@@ -285,7 +285,7 @@ async function postData(payload, setProgress, url, model_path, unique_id, revali
         url, 
         {
             data: payload,
-            model_path: model_path,
+            model_path: cmsPath,
             revalidate: revalidate_paths
         }, 
         {headers: 
@@ -310,9 +310,9 @@ function UploadData({sucsess, failed, update}){
     useToggleScroll(!close)
 
     const { values } = useFormikContext()
-    const {dbUrl, model_path, id_path, revalidate} = useContext(ConfigContext)
+    const {dbUrl, cmsPath, id_path, revalidate} = useContext(ConfigContext)
     const [progress, setProgress] = useState([0, 0])
-    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl, model_path, getByPath(values, id_path), revalidate), {enabled: !sucsess && !failed})
+    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl, cmsPath, getByPath(values, id_path), revalidate), {enabled: !sucsess && !failed})
 
     useEffect(() =>{
         if(data && !isError){ update(['db_sucsess', data.data.isr_errors]) }
@@ -367,7 +367,7 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({isr_errors}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, viewUrl, editUrl, id_path} = useContext(ConfigContext)
+    const {cmsTitle, cmsPath, viewUrl, editUrl, id_path} = useContext(ConfigContext)
     const router = useRouter()
     const forceReload = () =>{
         router.reload()
@@ -388,19 +388,19 @@ function UploadComplete({isr_errors}){
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={viewUrl || `/services/${getByPath(values, id_path)}`}>
+                <Link href={viewUrl(values) || `/${cmsPath}/${getByPath(values, id_path)}`}>
                     <a className={styles["sucsess-link"]}>View {`${getByPath(values, id_path)}`}</a> 
                 </Link>  
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={editUrl || `/admin/${cmsTitle.toLowerCase()}/edit/${getByPath(values, id_path)}`}>
+                <Link href={editUrl(values) || `/admin/${cmsPath}/edit/${getByPath(values, id_path)}`}>
                     <a className={styles["sucsess-link"]}>Edit {`${getByPath(values, id_path)}`}</a> 
                 </Link>     
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={`/admin/${cmsTitle.toLowerCase()}/create`}>
+                <Link href={`/admin/${cmsPath}/create`}>
                     <a className={styles["sucsess-link"]} onClick={forceReload}>{`Create New ${cmsTitle}`}</a> 
                 </Link>     
             </div>

@@ -12,7 +12,7 @@ import ScrollNav from '/src/comp/scrollnav/scrollnav'
 import { setBgCol } from '/src/lib/utils/setbg'
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import Service from '/src/cms/data/service/model'
+import Service from '/src/cms/data/services/model'
 
 export default function Home({services}){
   //Reset Nav and url

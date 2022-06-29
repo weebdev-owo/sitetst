@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-console.log('defining service schema')
+// console.log('defining service schema')
 
 const service_layout = {
 	createdAt: {type: Date, immutable: true, default: () => Date.now()},
@@ -124,6 +124,7 @@ ServiceSchema.pre('save', async function(next){
 	}
 
 })
+
 
 //after save
 ServiceSchema.post('save', function(document, next){

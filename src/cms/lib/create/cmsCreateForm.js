@@ -4,9 +4,10 @@ import {Formik} from 'formik'
 import * as Yup from 'yup'
 import  classNames  from 'classnames';
 import 'react-image-crop/dist/ReactCrop.css'
-import {SetBgInv} from '/src/cms/lib/utils/setbg'
+import {setBgCol} from '/src/cms/lib/utils/setbg'
 import Upload from './uploader'
 import { ConfigContext } from './configContext'
+
 
 
 const getByPath = (obj, path) => {
@@ -66,7 +67,7 @@ const initialUploadStore = {
 }
 
 function uploadReducer(state, data){
-    console.log('reducer called', data)
+    // console.log('reducer called', data)
     const assign = typeof data === 'string'
     const action = assign ? data:data[0]
     const value = assign ? null:data[1]
@@ -113,12 +114,11 @@ function uploadReducer(state, data){
     }
 }
 
-function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, model_path, id_path, revalidate, children}){
+function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, children}){
     const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
 
     //Change body background and scroll when ref onscreen
-    const elemRef = useRef(null)
-    SetBgInv(elemRef)
+    useEffect(() =>{setBgCol(false)}, [])
     
     const sendToAPI = async (values) => {
         console.log('submmiting', values)
@@ -138,10 +138,10 @@ function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTit
             setUpload('db')
         }
     }
-
+    // console.log('IV', initialValues, validationSchema)
     return <>
-        <div id={'Create'} className={styles["form-cont"]} ref={elemRef}>
-            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, model_path, id_path, revalidate}}>
+        <div id={'Create'} className={styles["form-cont"]}>
+            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         <div className={styles["heading"]}>{`Create ${cmsTitle}`}</div>
@@ -162,8 +162,8 @@ CmsCreateForm.defaultProps = {
     imageUrl: '/api/uploadSingleImage',
     dbUrl: '/api/cmsCreate',
     validationSchema: Yup.object({}),
-    viewUrl: false,
-    editUrl: false,
+    viewUrl: (v)=>false,
+    editUrl: (v)=>false,
 }
 
 export default CmsCreateForm
