@@ -1,6 +1,3 @@
-//backend
-import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import ServiceModel from '/src/cms/data/services/model'
 //frontend
 import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
 import Img from '/src/comp/image/img'
@@ -27,10 +24,16 @@ const MobileWidthContext = createContext(false)
 const BookContext = createContext({'setBookOpen':()=>{}, 'bookModal':<></>, 'bookOpen': false})
 
 export default function Page({services}){
+    console.log(services)
+    //set body and scroll
+    useEffect(()=>{setBgCol(false)},[])
+
+    //mobile queries
     const [isMobile, setIsMobile] = useState(true)
     const isMobileWidth = useMobileWidth(800)
-    useEffect(()=>{setBgCol(false)},[])
     useEffect(() =>{setIsMobile(getMobile(window))}, [])
+
+    //booking state
     const [bookOpen, setBookOpen] = useState(false)
     const bookModal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen}/>),[bookOpen])
 
@@ -44,10 +47,14 @@ export default function Page({services}){
             <TopBar />
             {bookModal}
             <div className={styles['page']}>
-                <Parallax disabled={isMobile} opacity={[4,-2]}><Landing /></Parallax>
-                <ReasonsFull />
-                <ServicesFull />
-                <TeamFull />
+                <Parallax opacity={[4,-2]}><LandingSection /></Parallax>
+                <ReasonsSection />
+                {/* <ReasonsSection /> */}
+                <ServicesSection />
+                THE MCFD DIFFRENCE
+                WHAT OUR CLIENTS SAY
+                PRICING
+                <TeamSection />
             </div>
         </ParallaxProvider>
         </BookContext.Provider>
@@ -56,30 +63,23 @@ export default function Page({services}){
     </>
 }
 
+
+//backend
+import dbConnect from '/src/cms/lib/api/mongoose_connect'
+import getInitialData from '/src/cms/lib/models/getInitialData'
 export async function getStaticProps(){
-  let services = []
-  let data = false
-  try {
-      const connection = await dbConnect()
-      data = await ServiceModel.find()
-          .select(['data.url', 'data.enabled', 'data.services.tile'])
-          .where('data.enabled').eq(true)
-          .sort({'data.services.tile.order':1})
-      services = data.map((service, i) => {
-          return {...service.data.services.tile, url: service.data.url}
-      })
-      // console.log('inside static props', services, JSON.parse(JSON.stringify(services)))
-      return {
-          props: {
-              services: JSON.parse(JSON.stringify(services))
-          }
-      }
-  } 
-  catch (error) {
-      console.log('inside static props error', error)
-      return {notFound: true}
-  }
+    try {
+        const connection = await dbConnect()
+        return {
+            props: {
+                // services: await getInitialData('services', [['enabled', true]], ['url', 'services.tile'], ['services.tile.order'], 'remap')
+            }
+        }
+    } 
+    catch (error) {console.log('inside static props error', error); return {notFound: true}}
 }
+
+
 const dwn = (dwn) => [-dwn, dwn*1.5]
 const op = (op) => [op, 2-op]
 
@@ -146,7 +146,7 @@ function TopBar({}){
 
 }
 
-function Landing({}){
+function LandingSection({}){
     return <>
         <div className={styles['landing']}>
             <Carousel>
@@ -200,7 +200,7 @@ function Slide({src, alt, title, desc, children}){
 
 }
 
-function ReasonsFull({}){
+function ReasonsSection({}){
     const isMobile = useContext(ConfigContext)
 
     return <>
@@ -214,28 +214,28 @@ function ReasonsFull({}){
 
 function Reasons({}){
     return <>
-        <div className={styles['reasons']}>
+        <Parallax opacity={[4, -2]} className={styles['reasons']}>
             <TabCarousel>
-                <Tab 
+                <Tab2 
                     src={'/nani3.png'} alt={''}
                     title={'Dental Made Simple'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.'}
                     label={'Reason 1'}
                 />
-                <Tab
-                    src={'/f1.png'} alt={''}
+                <Tab2
+                    src={'/b1.png'} alt={''}
                     title={'Dentistry Made Easy'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}
                     label={'Reason 2'}
                 />
-                <Tab
-                    src={'/nanid.png'} alt={''}
+                <Tab2
+                    src={'/b3.png'} alt={''}
                     title={'Dentistry Made Easy'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco'}
                     label={'Reason 3'}
                 />
             </TabCarousel>
-        </div>
+        </Parallax>
     </>
 }
 
@@ -252,7 +252,20 @@ function Tab({src, alt, title, desc, children}){
     </>
 }
 
-function ServicesFull({}){
+function Tab2({src, alt, title, desc, children}){
+    return <>
+        <div className={styles['reason-cont2']}>
+            <Img src={src} styleIn={styles['bg52']} alt={alt}/>
+            <div className={styles['reason-desc-cont2']}>
+                <div className={styles['reason-desc2']}>
+                    {desc}
+                </div>
+            </div>
+        </div>
+    </>
+}
+
+function ServicesSection({}){
     const isMobile = useContext(ConfigContext)
 
     return <>
@@ -265,9 +278,10 @@ function ServicesFull({}){
 
 function Services({}){
     const isMobileWidth = useContext(MobileWidthContext)
+    const isMobile = useContext(ConfigContext)
 
     return <>
-        <div className={styles['services']}>
+        <Parallax opacity={[4, -1]} disabled={isMobile} className={styles['services']}>
             <FadeUp dist={10} disabled={isMobileWidth}><Service src={'/tree.png'} alt={'alt'}>{['Service 1', 'Dolor en feit en nuim veri']}</Service></FadeUp>
             <FadeUp dist={4} disabled={isMobileWidth}><Service src={'/nature/desert2.jpg'} alt={'alt'}>{['Service 2', 'Dolor en feit en nuim veri']}</Service></FadeUp>
             <FadeUp dist={6} disabled={isMobileWidth}><Service src={'/nani.png'} alt={'alt'}>{['Service 3', 'Dolor en feit en nuim veri']}</Service></FadeUp>
@@ -277,7 +291,7 @@ function Services({}){
             <FadeUp dist={16} disabled={isMobileWidth}><Service src={'/nature/ice2.jpg'} alt={'alt'}>{['Service 7', 'Dolor en feit en nuim veri']}</Service></FadeUp>
             <FadeUp dist={6} disabled={isMobileWidth}><Service src={'/dnt1.jpg'} alt={'alt'}>{['Service 8', 'Dolor en feit en nuim veri']}</Service></FadeUp>
             <FadeUp dist={12} disabled={isMobileWidth}><Service src={'/nature/lava1.jpg'} alt={'alt'}>{['Service 9', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-        </div>
+        </Parallax>
     </>
 }
 
@@ -297,7 +311,7 @@ function Service({src, alt, title, desc, children}){
     </>
 }
 
-function TeamFull({}){
+function TeamSection({}){
     const isMobile = useContext(ConfigContext)
     return <>
         <div className={styles['team']}>

@@ -38,7 +38,7 @@ function Home({}){
                 'order': 'order',
             }}
         />
-        <Nav link={'/admin/home/landing/create'}>Create Slide</Nav>
+        <Nav link={'/admin/home/landing/create'}>Create New Slide</Nav>
     </>
 }
 
@@ -50,11 +50,11 @@ function Services({}){
             layout={[
                 ['Url Name', 'url'],
                 ['Order', 'services.tile.order'],
-                ['Name', 'services.tile.name'],
                 ['Enabled', 'enabled'],
                 ['Booking', 'booking'],
             ]}
             options={{
+                'title': 'Services',
                 'model_path': 'services',
                 'id_path': 'url',
                 'edit': ['/admin', '/services', '/edit/', 'use id'],
@@ -63,7 +63,6 @@ function Services({}){
             }}
         />
         <Nav link={'/admin/services/create'}>Create New Service</Nav>
-        
     </>
 }
 

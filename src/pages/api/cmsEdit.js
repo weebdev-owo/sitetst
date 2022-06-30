@@ -26,6 +26,11 @@ function createByPath(obj, path, val){
 }
 
 async function check_url_ids(res, model, model_path, initialId, newId, path){
+    const isOrder = path.split('.')
+    if(isOrder[isOrder.length - 1] === 'order'){return true}
+    if (initialId === newId){return true}
+
+    //check if new_id (unique) already belongs to another document in the collection
     try {
         const data = await model.find()
             .select([`data.${path}`])
@@ -58,8 +63,7 @@ async function update_initial_doc(res, new_data, model, model_path, initialId, p
     const find_initial = new mongoose.Query().find().where(data_path).eq(initialId)
     const doc = await model.findOne(find_initial)
     doc.data = new_data
-    const new_doc = await doc.save()
-    console.log('DOCCCCC', doc)
+    const new_doc = await doc.save({ validateBeforeSave: false })
     if (new_doc !== doc){
         const formated_error = {
             errors: [
@@ -85,9 +89,9 @@ export default async function handler (req, res) {
     const url_id_path = req.body.url_ids.path
     const initial_url_id = req.body.url_ids.initial
     const new_url_id = getByPath(data, url_id_path)
-    // console.log('urls')
-    // console.log('intiial: ', initial_url_id)
-    // console.log('new: ', new_url_id)
+    console.log('urls')
+    console.log('intiial: ', initial_url_id)
+    console.log('new: ', new_url_id)
 
 
     //get model and validation schema
@@ -114,14 +118,11 @@ export default async function handler (req, res) {
     if(valid){
         try {
             const connection = await dbConnectCms()
-            const isOrder = url_id_path.split('.')
-
-            if(isOrder[isOrder.length - 1] !== 'order'){
-                const valid_url_id = await check_url_ids(res, model, model_path, initial_url_id, new_url_id, url_id_path)
-                if(!valid_url_id){ return }
-            }
+            const valid_url_id = await check_url_ids(res, model, model_path, initial_url_id, new_url_id, url_id_path)
+            if(!valid_url_id){ return }
             const updated_doc = await update_initial_doc(res, data, model, model_path, initial_url_id, url_id_path)
             if(!updated_doc){ return }
+
             const revalidation_errors = await revalidate(res, revalidate_paths)
             res.status(200).json({ 
                 success: true, 
@@ -130,7 +131,7 @@ export default async function handler (req, res) {
             })
         } 
         catch (error) {
-            console.log('hmhmhmhmhm', error)
+            console.log('errors', error)
             res.status(400).json(process_errors(error))
         }
     }

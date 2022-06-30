@@ -27,7 +27,7 @@ function FadeUp({children, id, dist, disabled}) {
       }
     }, []);
     // console.log(disabled)
-    let style = isVisible ? {transform: `none`}:{transform: `translateY(${-dist*2}vh)`}
+    let style = isVisible ? {transform: `none`}:{transform: `translateY(${dist}vh)`}
     style = disabled ? {}:style
     let cls = `${styles['fade-up-section2']} ${isVisible ? styles['is-visible2'] : ''}`
     cls = disabled ? '':cls

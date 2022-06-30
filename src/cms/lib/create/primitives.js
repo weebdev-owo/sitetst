@@ -110,7 +110,7 @@ function ImageEditor({name, imageStyle, setOpen}){
     const { values, setFieldValue } = useFormikContext()
 
     //disable body scroll on editor open (reset when leave this page)
-    useToggleScroll(values['isEditorOpen'])
+    // useToggleScroll(values['isEditorOpen'])
 
     const [saveTrigger, triggerSave] = useState(0)
 

@@ -1,10 +1,9 @@
-//frontend
-import CmsEditForm from '/src/cms/lib/edit/cmsEditForm'
-import {formElements, validationSchema} from '/src/cms/data/home/landing/edit'
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
 import Model from '/src/cms/data/home/landing/model'
-
+//frontend
+import CmsEditForm, {getFormData} from '/src/cms/lib/edit/cmsEditForm'
+import {formElements, validationSchema} from '/src/cms/data/home/landing/edit'
 
 export default function Page({data}){
     return <>
@@ -24,25 +23,7 @@ export default function Page({data}){
 
 export async function getServerSideProps(context){
     const id = context.params.id
-    let data = false
-    try {
-        const connection = await dbConnect()
-        data = await Model.find()
-            .select(['data'])
-            .where('data.order').eq(id)
-        if (data.length !== 1){throw 'Invalid number of objects matching this id'}
-        // console.log('inside server side props', data[0].data)
-        const initialValues = data[0].data
-        
-        return {
-            props: {
-                data: JSON.parse(JSON.stringify(initialValues))
-            }
-        }
-    } 
-    catch (error) {
-        console.log('inside static props error', error)
-        return {notFound: true}
-    }
+    const connection = await dbConnect()
+    return await getFormData(id, 'order', Model)
 }
 

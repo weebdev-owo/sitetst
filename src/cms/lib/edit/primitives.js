@@ -3,7 +3,6 @@ import styles from './cms.module.sass'
 import {useField, useFormikContext, getIn} from 'formik'
 import  classNames  from 'classnames';
 import { useDropzone } from "react-dropzone"
-// import 'react-image-crop/dist/ReactCrop.css'
 import FileImage from '/src/cms/lib/utils/preview/fileImage'
 import 'react-image-crop/dist/ReactCrop.css'
 import CropImage from '/src/cms/lib/utils/crop/cropImageForm'
@@ -110,7 +109,7 @@ function ImageEditor({name, imageStyle, setOpen}){
     const { values, setFieldValue } = useFormikContext()
 
     //disable body scroll on editor open (reset when leave this page)
-    useToggleScroll(values['isEditorOpen'])
+    // useToggleScroll(values['isEditorOpen'])
 
     const [saveTrigger, triggerSave] = useState(0)
 

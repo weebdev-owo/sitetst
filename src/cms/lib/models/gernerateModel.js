@@ -46,6 +46,6 @@ export default function generateModel(model_name, reorder_paths, data){
         next()
     })
 
-    return mongoose.models[model_name] || mongoose.model(model_name, Schema);
+    return mongoose.models?.[model_name] || mongoose.model(model_name, Schema);
 }
 

@@ -10,7 +10,7 @@ export default function Page(){
             cmsTitle={'Landing Slide'}
             cmsPath={'home/landing'} // the folder in cms/data which corresponds to the data in this page
             id_path={'order'} //the path in values to the unique id of this data
-            revalidate={[]} //pages to perform on demand isr
+            revalidate={['/']} //pages to perform on demand isr
             viewUrl={(v)=>'/'}
         >
             {formElements}
