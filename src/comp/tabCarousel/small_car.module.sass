@@ -25,10 +25,16 @@ $car-height: calc($remaining-height*0.5787)
 .slide
     pointer-events: none
     width: 100%
-    height: 100%
+    // height: 600px
+    // height: 100%
+    // min-height: (70vh)
     position: absolute
+    top:0
+    left:0
+    bottom: 0
+    right:0
     overflow: hidden
-    z-index: 1
+    z-index: 900
 
 .slide_image
     position: absolute
@@ -96,7 +102,7 @@ $car-height: calc($remaining-height*0.5787)
     // bottom: 40px
     // left: 40px
     // margin: 40px
-    padding: 40px
+    padding: 0 0 max(2vh, 10px) 0
     // padding-top: 80px
     z-index: 1000
     // overflow: hidden
@@ -121,3 +127,4 @@ $car-height: calc($remaining-height*0.5787)
     pointer-events: auto
     opacity: 1
     border-bottom: 1px solid white
+    z-index: 999
