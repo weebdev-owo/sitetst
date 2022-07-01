@@ -37,18 +37,18 @@ export default function Page({services}){
     const isMobileWidth = useMobileWidth(800)
     useEffect(() =>{setIsMobile(getMobile(window))}, [])
 
-    //nav state
+    //mobile Nav state
     const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
     //booking state
     const [bookOpen, setBookOpen] = useState(false)
-    const bookModal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen} stopScroll={bookOpen || mobileNavOpen} />),[bookOpen])
 
+    const bookModal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen} />),[bookOpen, mobileNavOpen])
 
 
     return <>
         {/* <Thirds /> */}
-        {/* <ToggleScrollContext.Provider value={{ScrollDisableCount, setScrollDisableCount}}>  */}
+        <ToggleScrollContext.Provider value={{ScrollDisableCount, setScrollDisableCount}}> 
         <MobileNavContext.Provider value={{mobileNavOpen, setMobileNavOpen}}>
         <MobileWidthContext.Provider value={isMobileWidth} >
         <ConfigContext.Provider value={isMobile} >
@@ -71,6 +71,7 @@ export default function Page({services}){
         </ConfigContext.Provider>
         </MobileWidthContext.Provider>
         </MobileNavContext.Provider>
+        </ToggleScrollContext.Provider> 
     </>
 }
 
@@ -125,13 +126,13 @@ function TopBar({}){
     
     useEffect(() => {setMobileNavOpen(false)}, [isMobileWidth])
 
-    const mobileNav = useMemo(()=> (
-    <Modal open={mobileNavOpen && isMobileWidth} setOpen={setMobileNavOpen} stopScroll={bookOpen || mobileNavOpen} z={10001}>
-        <div className={styles['nav-modal-cont']}>
-            <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
-        </div>  
-    </Modal>
-    ), [mobileNavOpen, bookOpen, setMobileNavOpen, isMobileWidth, setBookOpen])
+    const mobileNavModal = useMemo(()=> (
+        <Modal open={mobileNavOpen && isMobileWidth} setOpen={setMobileNavOpen} z={10001}>
+            <div className={styles['nav-modal-cont']}>
+                <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
+            </div>  
+        </Modal>
+    ), [mobileNavOpen, setMobileNavOpen, isMobileWidth, setBookOpen])
 
     if(typeof isMobileWidth === 'undefined'){return <></>}
     if (!isMobileWidth) { return <>
@@ -143,7 +144,7 @@ function TopBar({}){
                 <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
             </div>
         </div></div>
-        {mobileNav}
+        {mobileNavModal}
     </>}
 
     return <>
@@ -152,8 +153,8 @@ function TopBar({}){
                 <div className={styles['logo']}><MainLogo className={styles['logo-item']} /></div>
                 <div className={styles['nav-burger']}><NavBurger /></div>
             </div>
-            {mobileNav}
         </div>
+        {mobileNavModal}
         
     </>
 

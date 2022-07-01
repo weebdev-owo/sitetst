@@ -1,7 +1,7 @@
 import styles from './modal.module.sass'
 import {createPortal} from 'react-dom'
-// import useToggleScroll from '/src/lib/utils/toggleScrollv2'
-import useToggleScroll from '/src/lib/utils/toggleScroll'
+import useToggleScroll from '/src/lib/utils/toggleScrollv2'
+// import useToggleScroll from '/src/lib/utils/toggleScroll'
 import {useState, useEffect} from 'react'
 
 function Modal({open, setOpen, stopScroll, z, children}){
