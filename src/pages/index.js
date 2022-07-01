@@ -16,30 +16,40 @@ import useMobileWidth from '/src/lib/utils/useMobileWidth'
 import NavBurger from '/src/svg/nav_burger'
 import Modal from '/src/comp/modal/modal'
 import cn from 'classnames'
+// import useToggleScroll from '/src/lib/utils/toggleScrollv2'
+import ToggleScrollContext from '/src/lib/utils/toggleScrollContext'
 
 
 
 const ConfigContext = createContext(true)
 const MobileWidthContext = createContext(false)
 const BookContext = createContext({'setBookOpen':()=>{}, 'bookModal':<></>, 'bookOpen': false})
+const MobileNavContext = createContext({})
 
 export default function Page({services}){
-    console.log(services)
+    // console.log(services)
     //set body and scroll
     useEffect(()=>{setBgCol(false)},[])
+    const [ScrollDisableCount, setScrollDisableCount] = useState(0) //useToggleScrollv2
 
     //mobile queries
     const [isMobile, setIsMobile] = useState(true)
     const isMobileWidth = useMobileWidth(800)
     useEffect(() =>{setIsMobile(getMobile(window))}, [])
 
+    //nav state
+    const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
     //booking state
     const [bookOpen, setBookOpen] = useState(false)
-    const bookModal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen}/>),[bookOpen])
+    const bookModal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen} stopScroll={bookOpen || mobileNavOpen} />),[bookOpen])
+
 
 
     return <>
         {/* <Thirds /> */}
+        {/* <ToggleScrollContext.Provider value={{ScrollDisableCount, setScrollDisableCount}}> */}
+        <MobileNavContext.Provider value={{mobileNavOpen, setMobileNavOpen}}>
         <MobileWidthContext.Provider value={isMobileWidth} >
         <ConfigContext.Provider value={isMobile} >
         <BookContext.Provider value={{bookModal, bookOpen, setBookOpen}}>
@@ -60,6 +70,7 @@ export default function Page({services}){
         </BookContext.Provider>
         </ConfigContext.Provider>
         </MobileWidthContext.Provider>
+        </MobileNavContext.Provider>
     </>
 }
 
@@ -86,8 +97,8 @@ const op = (op) => [op, 2-op]
 
 function Book({open, setOpen}){
     return <>
-        <Modal open={open} setOpen={setOpen}>
-            <div className={styles['text1']}>REEEE</div>
+        <Modal open={open} setOpen={setOpen} z={10002}>
+            <div className={styles['book-modal-cont']}>Book</div>
         </Modal>
     </>
 }
@@ -108,11 +119,19 @@ function NavBar({selected, elems, links, cta}){
 
 function TopBar({}){
     const isMobileWidth = useContext(MobileWidthContext)
-    const toggleNav = () => {}
-    const [mobileOpen, setMobileOpen] = useState(false)
+    // const [mobileOpen, setMobileOpen] = useState(false)
+    const {mobileNavOpen, setMobileNavOpen} = useContext(MobileNavContext)
     const {bookOpen, setBookOpen, bookModal} = useContext(BookContext)
+    
+    useEffect(() => {setMobileNavOpen(false)}, [isMobileWidth])
 
-    useEffect(() => {setMobileOpen(false)}, [isMobileWidth])
+    const mobileNav = useMemo(()=> (
+    <Modal open={mobileNavOpen && isMobileWidth} setOpen={setMobileNavOpen} stopScroll={bookOpen || mobileNavOpen} z={10001}>
+        <div className={styles['nav-modal-cont']}>
+            <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
+        </div>  
+    </Modal>
+    ), [mobileNavOpen, bookOpen, setMobileNavOpen, isMobileWidth, setBookOpen])
 
     if(typeof isMobileWidth === 'undefined'){return <></>}
     if (!isMobileWidth) { return <>
@@ -124,24 +143,18 @@ function TopBar({}){
                 <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
             </div>
         </div></div>
+        {mobileNav}
     </>}
 
     return <>
-        <div className={styles['topbar-cont']} onClick={()=>{setMobileOpen(true)}}>
+        <div className={styles['topbar-cont']} onClick={()=>{setMobileNavOpen(true)}}>
             <div className={styles['topbar']} >
-            <div className={styles['logo']}>
-                <MainLogo className={styles['logo-item']} />
+                <div className={styles['logo']}><MainLogo className={styles['logo-item']} /></div>
+                <div className={styles['nav-burger']}><NavBurger /></div>
             </div>
-            <div className={styles['nav-burger']}>
-                <NavBurger />
-            </div>
+            {mobileNav}
         </div>
-        </div>
-        <Modal open={mobileOpen && isMobileWidth} setOpen={setMobileOpen}>
-            <div className={styles['nav-modal-cont']}>
-                <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
-            </div>  
-        </Modal>
+        
     </>
 
 }
@@ -234,19 +247,13 @@ function Reasons({}){
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco'}
                     label={'Reason 3'}
                 />
-                {/* <div className={styles['tst1']} label={'ree'}>
-                    <div>reeee</div> 
-                </div>
-                <div className={styles['tst1']} label={'ree2'}>
-                    <div>reeee</div> 
-                </div> */}
-
             </TabCarousel>
         </Parallax>
     </>
 }
 
 function Tab({src, alt, title, desc, children}){
+
     return <>
         <div className={styles['reason-cont']}>
             <div className={styles['reason-desc-cont']}>
@@ -259,15 +266,17 @@ function Tab({src, alt, title, desc, children}){
     </>
 }
 
-function Tab2({src, alt, title, desc, children}){
+function Tab2({src, alt, desc, children}){
+    const isMobileWidth = useContext(MobileWidthContext)
     return <>
         <div className={styles['reason-cont2']}>
-            <Img src={src} styleIn={styles['bg52']} alt={alt}/>
+            {!isMobileWidth ? <Img src={src} styleIn={styles['bg52']} alt={alt}/>:null}
             <div className={styles['reason-desc-cont2']}>
                 <div className={styles['reason-desc2']}>
                     {desc}
                 </div>
             </div>
+            {isMobileWidth ? <Img src={src} styleIn={styles['bg52']} alt={alt}/>:null}
         </div>
     </>
 }

@@ -46,6 +46,20 @@ $bottom-line: 3px
     display: flex
     justify-content: center
     align-items: center
+    // z-index: 10001
+    background: black
+.book-modal-cont
+    width: 100%
+    height: 100%
+    position: absolute
+    top: 0
+    left: 0
+    display: flex
+    justify-content: center
+    align-items: center
+    // z-index: 10002
+    color: white
+    background: black
 
 .nav-cta
     @extend .nav-elem
@@ -508,7 +522,7 @@ $bottom-line: 3px
     z-index: 1000
 .reason-desc-cont2
     width: 100%
-    min-height: 40%
+    // min-height: 40%
     height: fit-content
     display: flex
     justify-content: center
@@ -521,8 +535,8 @@ $bottom-line: 3px
     padding: min(40px, 4vw)
     font-size: min(40px, 4vw)
     width: 100%
-    height: fit-content
-    min-height: max(200px, 30%)
+    // height: fit-content
+    // min-height: max(200px, 30%)
     max-width: 1600px
     // transition: color 1000ms
     z-index: 1000
@@ -534,14 +548,36 @@ $bottom-line: 3px
 
 .bg52
     width: 100%
-    height: 10
-    min-height: 30vh
+    height: 100%
+    min-height: 100%
     z-index: 1000
     padding: 0px 0px 0px 4vw
 
 @media (max-width: $mobile-width) 
     .reasons
         height: max(70vh, 200px)
+    .reason-cont2
+        text-align: center
+        grid-template-columns: 1fr
+        grid-template-rows: auto-fit auto-fit
+    .bg52
+        width: 100%
+        height: 100%
+        min-height: 70vh
+        z-index: 1000
+        padding: 0px 4vw 0px 4vw
+        // max-height: 60vh
+    .reason-desc-cont2
+        width: 100%
+        // min-height: 40%
+        height: fit-content
+        // min-height: max(20vh, 100px)
+        display: flex
+        // padding-top: 20px
+        justify-content: flex-start
+        align-items: flex-start
+        z-index: 1001
+        background: black
 
 
 //TEAM///////////////////////////////////////////////////////////

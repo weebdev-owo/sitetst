@@ -58,7 +58,7 @@ function Slide({children, active, ord}){
   const anim = useSpring({
     to: {opacity: active==ord ? 1 : 0},
     from: {opacity: 0},
-    config: {duration: 1000},
+    config: {duration: 500},
   });
 
   return <div className={styles.slide + ` ${active==ord ? styles.focused:''}`}>
