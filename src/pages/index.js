@@ -216,7 +216,7 @@ function Reasons({}){
     return <>
         <Parallax opacity={[4, -2]} className={styles['reasons']}>
             <TabCarousel>
-                <Tab2 
+                {/* <Tab2 
                     src={'/nani3.png'} alt={''}
                     title={'Dental Made Simple'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.'}
@@ -233,7 +233,15 @@ function Reasons({}){
                     title={'Dentistry Made Easy'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco'}
                     label={'Reason 3'}
-                />
+                /> */}
+                <div className={styles['tst1']} label={'ree'}>
+                    {/* <Img src={'/nani.png'} styleIn={styles['img2']} alt={'alt'}/>    */}
+                    <div>reeee</div> 
+                </div>
+                <div className={styles['tst1']} label={'ree2'}>
+                    <div>reeee</div> 
+                </div>
+
             </TabCarousel>
         </Parallax>
     </>

@@ -61,7 +61,7 @@ function Slide({children, active, ord}){
     config: {duration: 1000},
   });
 
-  return <div className={styles.slide + ` ${active==ord && styles.focused}`}>
+  return <div className={styles.slide + ` ${active==ord ? styles.focused:''}`}>
     <a.div style={{...anim}}>{children}</a.div>
   </div>
 }
