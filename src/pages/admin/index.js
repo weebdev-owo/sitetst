@@ -5,6 +5,7 @@ import {setBgCol} from '/src/lib/utils/setbg'
 import Link from 'next/link'
 import Table from '/src/cms/lib/menu/table'
 import {Title, Nav} from '/src/cms/lib/menu/primitives'
+import  TabNav  from '/src/comp/tabnav/tabnav';
 
 function AdminHome({}){
 
@@ -13,9 +14,11 @@ function AdminHome({}){
 
     return <>
         <div className={styles['home']} >
-            <Home />
-            <Services />
-            <About />
+            <TabNav>
+                <Home label={'Home'}/>
+                <Services label={'Services'}/>
+                <About label={'About'}/>
+            </TabNav>
         </div>
     </>
 }
@@ -46,6 +49,7 @@ function Home({}){
 function Services({}){
     return <>
         <Title>Services</Title>
+        <Nav link={'/admin/services-page/edit-intro'}>Edit Intro</Nav>
         <Table 
             layout={[
                 ['Url Name', 'url'],

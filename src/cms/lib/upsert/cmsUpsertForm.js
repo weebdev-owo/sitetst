@@ -99,7 +99,7 @@ function EditServiceWithQuery({data, children, ...props}){
     const [initialValues, setInitialValues] = useReducer(intialValuesReducer, JSON.parse(JSON.stringify(data)))
     const [imgLoadComplete, setImgLoadComplete] = useState(false)
     const imgs = useQueries(calc_queries(initialValues, setInitialValues))
-    // useEffect(()=>{setBgCol(false)},[])
+    useEffect(()=>{setBgCol(false)},[])
     useEffect(() =>{ 
         if (imgs.every(img => (img.status === 'success' ||  img.status === 'error'))){setImgLoadComplete(true)}
     }, [initialValues])
@@ -202,7 +202,7 @@ function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cms
     const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
 
     //Change body background and scroll when ref onscreen
-    // useEffect(() =>{setBgCol(false)}, [])
+    useEffect(() =>{setBgCol(false)}, [])
     
     const sendToAPI = async (values) => {
         console.log('submmiting', values)
@@ -244,7 +244,7 @@ function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cms
 CmsEditFormInner = memo(CmsEditFormInner)
 CmsEditFormInner.defaultProps = {
     imageUrl: '/api/uploadSingleImage',
-    dbUrl: '/api/cmsEdit',
+    dbUrl: '/api/cmsUpsert',
     validationSchema: Yup.object({}),
     viewUrl: ()=>false,
     editUrl: ()=>false,

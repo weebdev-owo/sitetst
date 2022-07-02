@@ -1,7 +1,8 @@
 import image_styles from '/src/styles/images.module.sass'
-import  generateForm, {setIV, valid} from '/src/cms/lib/create/generateFormElements'
+import  generateForm, {setIV, valid, dep_valid as dvalid} from '/src/cms/lib/create/generateFormElements'
 import {text, textarea, checkbox, image, list, space} from '/src/cms/lib/create/generateFormPrimitives'
 
+// const [img1, img2] = [valid.img(), dvalid.img('$enabled')]
 const template = [
     ['Home Page',
         ['Landing Slide',

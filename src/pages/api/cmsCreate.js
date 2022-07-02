@@ -7,7 +7,7 @@ export default async function handler (req, res) {
     const data = req.body.data
     const model_path = req.body.model_path
     const revalidate_paths = req.body.revalidate
-    
+    console.log('DATAAA', data)
     //get model and validation schema
     const model = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/${model_path}/model`)).default
     const modelValidationSchema = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/${model_path}/create`)).validationSchema

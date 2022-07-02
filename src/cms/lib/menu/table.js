@@ -73,7 +73,7 @@ function Inner({layout, options}){
 
     if (isError) {console.log('err', error); return <>{refresh}<div className={styles['table-msg']}>ERROR FETCHING DATA</div></>}
     if (isLoading) return <div className={styles['table-msg']}>LOADING</div>
-    if(!contents) return <>{refresh}<div className={styles['table-msg']}>EMPTY</div></>
+    if(!contents?.length) return <>{refresh}<div className={styles['table-msg']}>EMPTY</div></>
     const style = data.data.data.length ? {'grid-template-columns': `${'auto '.repeat(contents[0].length)}`}:{}
     return <>
         {refresh}

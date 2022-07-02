@@ -1,5 +1,5 @@
-import styles from '/src/cms/lib/create/cms.module.sass'
-import {Text, TextArea, CheckBox, List, FormImage, Space} from '/src/cms/lib/create/primitives'
+import styles from '/src/cms/lib/upsert/cms.module.sass'
+import {Text, TextArea, CheckBox, List, FormImage, Space} from '/src/cms/lib/upsert/primitives'
 import * as Yup from 'yup'
 
 function createByPath(obj, path, val){
@@ -70,13 +70,13 @@ function decodeItem(item){
 const img = {
     "original": undefined,
     "cropped": undefined,
-    "url": undefined,
-    "alt": undefined
+    "url": "",
+    "alt": "edit for better seo"
 }
 const primitiveInitialValue = {
-    "text": () => undefined,
-    "textarea": () =>undefined, 
-    "checkbox": () => undefined, 
+    "text": () => '',
+    "textarea": () =>'', 
+    "checkbox": () => false, 
     "image": () => img, 
     "list": () => [], 
 }
@@ -129,73 +129,6 @@ const valid = {
         .required('requred')
 }
 
-const dep_valid = {
-    any: (dep_sibling_name, dep_sibling_val=true) => Yup.object({})        
-        .when(dep_sibling_name, {
-            is: dep_sibling_val,
-            then: (schema) => schema.required('required'),
-            otherwise: (schema) => schema
-        }),
-    bool: (dep_sibling_name, dep_sibling_val=true) => Yup.boolean()        
-        .when(dep_sibling_name, {
-            is: dep_sibling_val,
-            then: (schema) => schema.required('required'),
-            otherwise: (schema) => schema
-        }),
-    int: (min, max, dep_sibling_name, dep_sibling_val=true) => Yup.number()        
-        .typeError('must be a number ree')
-        .integer('must be an integer')
-        .min(min, `must be ${min} or greater`)
-        .max(max, `must be ${max} or smaller`)
-        .when(dep_sibling_name, {
-                is: dep_sibling_val,
-                then: (schema) => schema.required('required'),
-                otherwise: (schema) => schema
-        }),
-    text: (num_chars, dep_sibling_name, dep_sibling_val=true) => Yup.string()
-        .matches(/^[\.a-zA-Z0-9,!? ]*$/, "only letters, numbers, spaces and punctuation allowed")
-        .max(num_chars, `max length ${num_chars} chars`)
-        .when(dep_sibling_name, {
-            is: dep_sibling_val,
-            then: (schema) => schema.required('required'),
-            otherwise: (schema) => schema
-        }),
-    image_file: () => Yup.mixed() 
-        .test('fileSize', `file must be less than ${MAX_FILE_SIZE/mb}mb`, value => value ? value.size<=MAX_FILE_SIZE:true) 
-        .test('fileType', `file must be a ${SUPPORTED_FILE_EXTENSIONS}`, value => value ? SUPPORTED_FORMATS.includes(value.type):true),
-    name: (num_chars, dep_sibling_name, dep_sibling_val=true) => Yup.string()
-        .max(num_chars,`max length ${num_chars} chars`)
-        .matches(/^(?![0-9]*$)[a-zA-Z0-9]+$/, "only letters or numbers allowed")
-        .matches(/^[A-Za-z].*/, "file name should not start with special characters")
-        .matches(/^[^\\/:\*\?"<>\|]+$/,' forbidden characters \ / : * ? " < > |')
-        .matches(/^(?!\.)(?!com[0-9]$)(?!con$)(?!lpt[0-9]$)(?!nul$)(?!aux$)(?!prn$)[^\|\*\?\\:<>/$"]*[^\.\|\*\?\\:<>/$"]+$/, 'forbidden file name')
-        .when(dep_sibling_name, {
-            is: dep_sibling_val,
-            then: (schema) => schema.required('required'),
-            otherwise: (schema) => schema
-        }),
-    img: (dep_sibling_name, dep_sibling_val=true) => Yup.object().shape({
-        alt: dep_valid.text(100, dep_sibling_name, dep_sibling_val),
-        url: Yup.string().url().nullable().when(['cropped', dep_sibling_name], {
-            is: (cropped, dep_sibling_name) => typeof cropped === 'undefined' && dep_sibling_name === dep_sibling_val ,
-            then: Yup.string().url().required('must have a url if no valid cropped image file exists'),
-            otherwise: (schema) => schema
-        }),
-        cropped: dep_valid.image_file().when(['url', dep_sibling_name], {
-            is: (url, dep_sibling_name) => {console.log('REEEEEEEEEEEEEEEEEE', url, dep_sibling_name); return typeof url === 'undefined' && dep_sibling_name === dep_sibling_val},
-            then: (schema) => schema.required('required'),
-            otherwise: (schema) => schema
-        }),
-    }, [['url', 'cropped']]),
-    list: (label, minn, maxx, innerSchema, dep_sibling_name, dep_sibling_val=true) => Yup.array().of(innerSchema)
-        .min(minn, `must have more than ${minn-1} ${label}s`)
-        .max(maxx, `can only have up to ${maxx} ${label}s`)
-        .when(dep_sibling_name, {
-            is: dep_sibling_val,
-            then: (schema) => schema.required('required'),
-            otherwise: (schema) => schema
-        }),
-}
 
 const primitiveYup = {
     "text":() => valid.text(200),
@@ -293,21 +226,21 @@ function generateForm(formTemplate, options={}){
 
         })
     })
-    // if(false){ 
-    //     console.log('INITAL VALUES GENERATED', 
-    //     initialValues.service.process.steps === initialValues.service.faq.items,
-    //     initialValues
-    //     ) 
-    //     console.log(
-    //         'VALIDATION SCHEMA GENERATED', 
-    //         'process', getYupByPath(validationSchema, "service.process.steps").innerType.fields,
-    //         'faq', getYupByPath(validationSchema, "service.faq.items").innerType.fields ,
-    //     )
-    // }
+    if(false){ 
+        console.log('INITAL VALUES GENERATED', 
+        initialValues.service.process.steps === initialValues.service.faq.items,
+        initialValues
+        ) 
+        console.log(
+            'VALIDATION SCHEMA GENERATED', 
+            'process', getYupByPath(validationSchema, "service.process.steps").innerType.fields,
+            'faq', getYupByPath(validationSchema, "service.faq.items").innerType.fields ,
+        )
+    }
     
     return [form, initialValues, validationSchema]
 }
 
 export default generateForm
-export {setIV, valid, dep_valid}
+export {setIV, valid}
 

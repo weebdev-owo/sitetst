@@ -3,7 +3,6 @@ import styles from './cms.module.sass'
 import {useField, useFormikContext, getIn} from 'formik'
 import  classNames  from 'classnames';
 import { useDropzone } from "react-dropzone"
-// import 'react-image-crop/dist/ReactCrop.css'
 import FileImage from '/src/cms/lib/utils/preview/fileImage'
 import 'react-image-crop/dist/ReactCrop.css'
 import CropImage from '/src/cms/lib/utils/crop/cropImageForm'
@@ -209,7 +208,7 @@ function FormImage({name, label, image_style, ...props}){
                     <div className={styles["dropzone-error-cont"]}>
                         {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
                     </div>
-                    <Text name={`${name}.alt`} label={`image description for SEO (alt)`} />
+                    <Text name={`${name}.alt`} label={`text if image will not load (alt)`} />
                 </>
             :        
             <>
