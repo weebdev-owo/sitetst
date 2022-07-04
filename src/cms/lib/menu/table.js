@@ -44,7 +44,7 @@ function Table({layout, options}){
 
     return <>
         <QueryProvider client={dataClient}>
-            <div className={'ree'}>
+            <div className={styles['table-cont']}>
                 <Inner layout={layout} options={options}/>
             </div>
         </QueryProvider>

@@ -2,12 +2,13 @@ import mongoose from "mongoose";
 import reOrder from "/src/cms/lib/utils/reOrder"
 import { getByPath } from '/src/cms/lib/utils/byPath';
 
-export default function generateModel(model_name, reorder_paths, data, collection_name){
+export default function generateModel(model_name, reorder_paths, data, collection_name="pageCMS"){
 
     const layout = {
         createdAt: {type: Date, immutable: true, default: () => Date.now()},
         updatedAt: {type: Date, default: () => Date.now()},
         activeDate: {type: Date, default: () => Date.now()},
+        section: {type: String},
         data: data
     }
     const Schema = new mongoose.Schema(layout);

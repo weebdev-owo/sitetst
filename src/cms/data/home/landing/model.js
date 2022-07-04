@@ -1,4 +1,4 @@
-import generateModel from '/src/cms/lib/models/gernerateModel';
+import generateModel from '/src/cms/lib/models/gernerateModel'
 
 const model_name = 'HomeLandingSlides'
 const reorder_paths = ['order']

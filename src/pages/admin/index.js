@@ -42,6 +42,23 @@ function Home({}){
             }}
         />
         <Nav link={'/admin/home/landing/create'}>Create New Slide</Nav>
+        <Table 
+            layout={[
+                ['Url Name', 'url'],
+                ['Order', 'home.tile.order'],
+                ['Enabled', 'enabled'],
+                ['Home', 'home.tile.enabled'],
+            ]}
+            options={{
+                'title': 'Services',
+                'model_path': 'services',
+                'id_path': 'url',
+                'edit': ['/admin', '/services', '/edit/', 'use id'],
+                'view': ['/services/', 'use id'],
+                'order': 'home.tile.order',
+            }}
+        />
+        <Nav link={'/admin/services/create'}>Create New Service</Nav>
     </>
 }
 
@@ -49,7 +66,7 @@ function Home({}){
 function Services({}){
     return <>
         <Title>Services</Title>
-        <Nav link={'/admin/services-page/edit-intro'}>Edit Intro</Nav>
+        <Nav link={'/admin/services-page/intro-upsert'}>Edit Intro</Nav>
         <Table 
             layout={[
                 ['Url Name', 'url'],

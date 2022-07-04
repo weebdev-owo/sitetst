@@ -21,6 +21,7 @@ const useToggleScroll = (disableScroll) => {
             document.body.style['overflow-y'] = initial_scroll_y
             document.body.style['overflow-x'] = inital_scroll_x
             document.body.style['overflow'] = initial_scroll
+            // if(disableScroll){setScrollDisableCount( cnt => cnt+1 )}
         }
 
     }, []);

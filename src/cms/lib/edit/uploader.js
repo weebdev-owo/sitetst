@@ -273,8 +273,7 @@ function createPayload(values){
             alt: img['alt']
         })
     }
-    // console.log('PAYLOAD', payload)
-    console.log('URL SENDING ISSSSSSSSSSSS', payload.url)
+    console.log('PAYLOAD', payload)
     return payload
 }
 
@@ -377,19 +376,21 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({isrErrors, uniqueId}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, cmsPath, viewUrl, editUrl, id_path, initialValues} = useContext(ConfigContext)
+    const {cmsTitle, cmsPath, viewUrl, editUrl, id_path, initialValues, editText, viewText, createText, pageCms} = useContext(ConfigContext)
 
     const router = useRouter()
     useEffect(() =>{
-        const href = `/admin/${cmsPath}/edit/${uniqueId}`
-        router.push(href)
-    },[])
+        if(!pageCms){
+            const href = `/admin/${cmsPath}/edit/${uniqueId}`
+            router.push(href)
+        }
+    }, [])
     const forceReload = async (e) =>{
         e.preventDefault()
         router.reload()
     }
     useToggleScroll(true)
-
+    
     return <>
         <div className={styles['heading']} style={{"color":'#39C16C'}}>Upload Sucsess</div>
         {isrErrors.length ? <div className={styles['sub-heading']}>{`ISR error, changes will not be reflected immediately`}</div>:null}
@@ -405,21 +406,21 @@ function UploadComplete({isrErrors, uniqueId}){
 
             <div className={styles["sucsess-section"]}>
                 <Link href={viewUrl(values) || `/${cmsPath}/${uniqueId}`}>
-                    <a className={styles["sucsess-link"]}>View {`${uniqueId}`}</a> 
+                    <a className={styles["sucsess-link"]}>{viewText(values) || `View ${uniqueId}`}</a> 
                 </Link>  
             </div>
 
             <div className={styles["sucsess-section"]}>
                 <Link href={editUrl(values) || `/admin/${cmsPath}/edit/${uniqueId}`}>
-                    <a className={styles["sucsess-link"]} onClick={forceReload}>Edit {`${uniqueId}`}</a> 
+                    <a className={styles["sucsess-link"]} onClick={forceReload}>{editText(values) || `Edit ${uniqueId}`}</a> 
                 </Link>     
             </div>
 
-            <div className={styles["sucsess-section"]}>
+            {!pageCms ?<div className={styles["sucsess-section"]}>
                 <Link href={`/admin/${cmsPath}/create`}>
-                    <a className={styles["sucsess-link"]}>{`Create New ${cmsTitle}`}</a> 
+                    <a className={styles["sucsess-link"]}>{createText(values) || `Create New ${cmsTitle}`}</a> 
                 </Link>     
-            </div>
+            </div>:null}
         </div>}
     </>
 } UploadComplete = memo(UploadComplete)

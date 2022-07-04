@@ -304,7 +304,12 @@ function generateForm(formTemplate, options={}){
     //         'faq', getYupByPath(validationSchema, "service.faq.items").innerType.fields ,
     //     )
     // }
-    
+    if (options?.addIv){
+        for (const newIv of options.addIv){
+            createByPath(initialValues, newIv[0], newIv[1])
+        }
+    }
+
     return [form, initialValues, validationSchema]
 }
 

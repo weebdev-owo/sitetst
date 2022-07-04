@@ -1,8 +1,8 @@
 import {getByPath} from '/src/cms/lib/utils/byPath'
-export default async function getInitialData(model_path, conditions=null, selections=null , order=null, reformat=null){
+export default async function getInitialData(section_name, model_path, conditions=null, selections=null , order=null, reformat=null){
     const model = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/${model_path}/model`)).default
     // let data_query = new mongoose.Query().find()
-    let data_query = model.find()
+    let data_query = model.find().where('data.sectionPageCMS').eq(section_name)
     if(selections) data_query = data_query.select(selections.map(selection => `data.${selection}`))
     if(conditions){
         for (const condition of conditions){
@@ -39,6 +39,5 @@ export default async function getInitialData(model_path, conditions=null, select
         new_data = JSON.parse(JSON.stringify(new_data))
 
     }
-    return new_data || JSON.parse(JSON.stringify(raw_data))
-    
+    return new_data || raw_data
 }

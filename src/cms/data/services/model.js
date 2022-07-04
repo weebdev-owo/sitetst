@@ -2,7 +2,7 @@ import generateModel from '/src/cms/lib/models/gernerateModel';
 import mongoose from 'mongoose';
 
 const model_name = 'Service'
-const reorder_paths = ['services.tile.order']
+const reorder_paths = ['services.tile.order', 'home.tile.order']
 const data = {
 	"url": {
 		type: String, 
@@ -16,6 +16,18 @@ const data = {
 	},
 	"enabled":{type: Boolean},
 	"booking": {type: Boolean},
+	"home": {
+		"tile": {
+			"enabled": {type: Boolean},
+			"order": {type: Number, min: 0},
+			"name": {type: String},
+			"desc": {type: String},
+			"img": {
+				"url": {type: String},
+				"alt": {type: String},
+			}
+		}
+	},
 	"services": {
 		"tile": {
 			"order": {type: Number, min: 0},

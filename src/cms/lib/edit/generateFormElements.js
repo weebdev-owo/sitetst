@@ -226,18 +226,22 @@ function generateForm(formTemplate, options={}){
 
         })
     })
-    if(false){ 
-        console.log('INITAL VALUES GENERATED', 
-        initialValues.service.process.steps === initialValues.service.faq.items,
-        initialValues
-        ) 
-        console.log(
-            'VALIDATION SCHEMA GENERATED', 
-            'process', getYupByPath(validationSchema, "service.process.steps").innerType.fields,
-            'faq', getYupByPath(validationSchema, "service.faq.items").innerType.fields ,
-        )
+    // if(false){ 
+    //     console.log('INITAL VALUES GENERATED', 
+    //     initialValues.service.process.steps === initialValues.service.faq.items,
+    //     initialValues
+    //     ) 
+    //     console.log(
+    //         'VALIDATION SCHEMA GENERATED', 
+    //         'process', getYupByPath(validationSchema, "service.process.steps").innerType.fields,
+    //         'faq', getYupByPath(validationSchema, "service.faq.items").innerType.fields ,
+    //     )
+    // }
+    if (options?.addIv){
+        for (const item of options.addIv){
+            createByPath(initialValues, item[0], item[1])
+        }
     }
-    
     return [form, initialValues, validationSchema]
 }
 

@@ -367,7 +367,7 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({isr_errors}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, cmsPath, viewUrl, editUrl, id_path} = useContext(ConfigContext)
+    const {cmsTitle, cmsPath, viewUrl, editUrl, id_path, editText, viewText, createText, pageCms} = useContext(ConfigContext)
     const router = useRouter()
     const forceReload = () =>{
         router.reload()
@@ -389,21 +389,21 @@ function UploadComplete({isr_errors}){
 
             <div className={styles["sucsess-section"]}>
                 <Link href={viewUrl(values) || `/${cmsPath}/${getByPath(values, id_path)}`}>
-                    <a className={styles["sucsess-link"]}>View {`${getByPath(values, id_path)}`}</a> 
+                    <a className={styles["sucsess-link"]}>{viewText(values) || `View ${getByPath(values, id_path)}`}</a> 
                 </Link>  
             </div>
 
             <div className={styles["sucsess-section"]}>
                 <Link href={editUrl(values) || `/admin/${cmsPath}/edit/${getByPath(values, id_path)}`}>
-                    <a className={styles["sucsess-link"]}>Edit {`${getByPath(values, id_path)}`}</a> 
+                    <a className={styles["sucsess-link"]}>{editText(values) || `Edit  ${getByPath(values, id_path)}`}</a> 
                 </Link>     
             </div>
 
-            <div className={styles["sucsess-section"]}>
+            {!pageCms ?<div className={styles["sucsess-section"]}>
                 <Link href={`/admin/${cmsPath}/create`}>
-                    <a className={styles["sucsess-link"]} onClick={forceReload}>{`Create New ${cmsTitle}`}</a> 
+                    <a className={styles["sucsess-link"]} onClick={forceReload}>{createText(values) || `Create New ${cmsTitle}`}</a> 
                 </Link>     
-            </div>
+            </div>:null}
         </div>
     </>
 } UploadComplete = memo(UploadComplete)

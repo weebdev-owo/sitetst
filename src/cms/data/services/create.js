@@ -13,6 +13,16 @@ const create_service_primitive_template = [
         ]
     ],
 
+    ['Home Page',
+        ['What We Do Best',
+            checkbox("home.tile.enabled", "show in 'what we do best' (if the service is enabled)", setIV(true), valid.bool()),
+            text("home.tile.order", "order (where the service is placed on the grid)", valid.int(1, 1000)),
+            text("home.tile.name", "name", valid.text(200)),
+            textarea("home.tile.desc", "description", valid.text(500)),
+            image("home.tile.img", "background image", image_styles['service-tile']),
+        ]
+    ],
+    
     ['Services Page',
         ['Service Tile',
             text("services.tile.order", "order (where the service is placed on services grid)", valid.int(1, 1000)),

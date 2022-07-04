@@ -196,7 +196,7 @@ function uploadReducer(state, data){
             }
     }
 }
-function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, children}){
+function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, children, pageCms}){
 
 
     const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
@@ -225,13 +225,14 @@ function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cms
 
     return <>
         <div id={'Create'} className={styles["form-cont"]} >
-            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, initialValues}}>
+            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, initialValues, editText, viewText, createText, pageCms}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         <div className={styles["heading"]}>{`Edit ${cmsTitle}`}</div>
                         { children }
                         <Upload store={uploadStore} update={setUpload}/>
                         <div className={styles["submit-section"]}>
+                            <button type="submit" disabled style={{display: "none"}} aria-hidden="true"></button>
                             <button type="submit" className={styles["submit"]}>{`Edit ${cmsTitle}`}</button>   
                         </div>
                     </form>
@@ -246,8 +247,8 @@ CmsEditFormInner.defaultProps = {
     imageUrl: '/api/uploadSingleImage',
     dbUrl: '/api/cmsEdit',
     validationSchema: Yup.object({}),
-    viewUrl: ()=>false,
-    editUrl: ()=>false,
+    viewUrl: (v)=>false, editUrl: (v)=>false,
+    editText: (v)=>false, viewText: (v)=>false, createText: (v)=>false,
     revalidate: [],
 }
 
@@ -272,6 +273,8 @@ async function getFormData(id, id_path, Model){
         return {notFound: true}
     }
 }
+
+
 export {getFormData}
 export default CmsEditForm
 

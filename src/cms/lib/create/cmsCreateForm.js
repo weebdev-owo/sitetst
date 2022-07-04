@@ -114,7 +114,7 @@ function uploadReducer(state, data){
     }
 }
 
-function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, children}){
+function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, pageCms, children}){
     const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
 
     //Change body background and scroll when ref onscreen
@@ -141,13 +141,15 @@ function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTit
     // console.log('IV', initialValues, validationSchema)
     return <>
         <div id={'Create'} className={styles["form-cont"]}>
-            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate}}>
+            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, pageCms}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         <div className={styles["heading"]}>{`Create ${cmsTitle}`}</div>
                         { children }
                         <Upload store={uploadStore} update={setUpload} />
+
                         <div className={styles["submit-section"]}>
+                            <button type="submit" disabled style={{display: "none"}} aria-hidden="true"></button>
                             <button type="submit" className={styles["submit"]}>{`Create ${cmsTitle}`}</button>   
                         </div>
                     </form>
@@ -162,8 +164,9 @@ CmsCreateForm.defaultProps = {
     imageUrl: '/api/uploadSingleImage',
     dbUrl: '/api/cmsCreate',
     validationSchema: Yup.object({}),
-    viewUrl: (v)=>false,
-    editUrl: (v)=>false,
+    viewUrl: (v)=>false, editUrl: (v)=>false,
+    editText: (v)=>false, viewText: (v)=>false, createText: (v)=>false,
+    revalidate: [],
 }
 
 export default CmsCreateForm

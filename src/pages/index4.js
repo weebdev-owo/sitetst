@@ -7,7 +7,6 @@ import TabCarousel from '/src/comp/tabCarousel/small_car'
 import Thirds from '/src/lib/comps/thirds'
 import MainLogo from '/src/svg/mcfd_logo'
 // import NavBar from '/src/comp/nav/navbar'
-import Layout, {ConfigContext, MobileWidthContext, BookContext, MobileNavContext} from '/src/lib/layouts/layout1'
 import Link from 'next/link'
 import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
 import {setBgCol} from '/src/lib/utils/setbg'
@@ -21,22 +20,58 @@ import cn from 'classnames'
 import ToggleScrollContext from '/src/lib/utils/toggleScrollContext'
 
 
+
+const ConfigContext = createContext(true)
+const MobileWidthContext = createContext(false)
+const BookContext = createContext({'setBookOpen':()=>{}, 'bookModal':<></>, 'bookOpen': false})
+const MobileNavContext = createContext({})
+
 export default function Page({services}){
-   
+    // console.log(services)
+    //set body and scroll
+    useEffect(()=>{setBgCol(false)},[])
+    const [ScrollDisableCount, setScrollDisableCount] = useState(0) //useToggleScrollv2
+
+    //mobile queries
+    const [isMobile, setIsMobile] = useState(true)
+    const isMobileWidth = useMobileWidth(800)
+    useEffect(() =>{setIsMobile(getMobile(window))}, [])
+
+    //mobile Nav state
+    const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+    //booking state
+    const [bookOpen, setBookOpen] = useState(false)
+
+    const bookModal = useMemo(()=>(<Book open={bookOpen} setOpen={setBookOpen} />),[bookOpen, mobileNavOpen])
 
 
     return <>
         {/* <Thirds /> */}
-        <Layout>
-            <Parallax opacity={[4,-2]}><LandingSection /></Parallax>
-            <ReasonsSection />
-            {/* <ReasonsSection /> */}
-            <ServicesSection />
-            THE MCFD DIFFRENCE (BEFORE AND AFTER)
-            WHAT OUR CLIENTS SAY
-            PRICING
-            <TeamSection />
-        </Layout>
+        <ToggleScrollContext.Provider value={{ScrollDisableCount, setScrollDisableCount}}> 
+        <MobileNavContext.Provider value={{mobileNavOpen, setMobileNavOpen}}>
+        <MobileWidthContext.Provider value={isMobileWidth} >
+        <ConfigContext.Provider value={isMobile} >
+        <BookContext.Provider value={{bookModal, bookOpen, setBookOpen}}>
+        <ParallaxProvider>
+            <TopBar />
+            {bookModal}
+            <div className={styles['page']}>
+                <Parallax opacity={[4,-2]}><LandingSection /></Parallax>
+                <ReasonsSection />
+                {/* <ReasonsSection /> */}
+                <ServicesSection />
+                THE MCFD DIFFRENCE (BEFORE AND AFTER)
+                WHAT OUR CLIENTS SAY
+                PRICING
+                <TeamSection />
+            </div>
+        </ParallaxProvider>
+        </BookContext.Provider>
+        </ConfigContext.Provider>
+        </MobileWidthContext.Provider>
+        </MobileNavContext.Provider>
+        </ToggleScrollContext.Provider> 
     </>
 }
 
@@ -61,6 +96,69 @@ const dwn = (dwn) => [-dwn, dwn*1.5]
 const op = (op) => [op, 2-op]
 
 
+function Book({open, setOpen}){
+    return <>
+        <Modal open={open} setOpen={setOpen} z={10002}>
+            <div className={styles['book-modal-cont']}>Book</div>
+        </Modal>
+    </>
+}
+
+function NavBar({selected, elems, links, cta}){
+    return <section className={styles.navbar}>
+        {elems.map((elem,i) => {
+            return <Link href={links[i]} key={i}>
+                    <a 
+                        key={i} 
+                        className={cn(styles['nav-elem'], {[styles['nav-selected']]: selected==i})}
+                    >{elem}</a>
+            </Link>
+        })}
+        <button className={styles['nav-cta']} onClick={()=>{cta[2](true)}}>{cta[0]}</button>
+    </section>
+}
+
+function TopBar({}){
+    const isMobileWidth = useContext(MobileWidthContext)
+    // const [mobileOpen, setMobileOpen] = useState(false)
+    const {mobileNavOpen, setMobileNavOpen} = useContext(MobileNavContext)
+    const {bookOpen, setBookOpen, bookModal} = useContext(BookContext)
+    
+    useEffect(() => {setMobileNavOpen(false)}, [isMobileWidth])
+
+    const mobileNavModal = useMemo(()=> (
+        <Modal open={mobileNavOpen && isMobileWidth} setOpen={setMobileNavOpen} z={10001}>
+            <div className={styles['nav-modal-cont']}>
+                <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
+            </div>  
+        </Modal>
+    ), [mobileNavOpen, setMobileNavOpen, isMobileWidth, setBookOpen])
+
+    if(typeof isMobileWidth === 'undefined'){return <></>}
+    if (!isMobileWidth) { return <>
+        <div className={styles['topbar-cont']}><div className={styles['topbar']}>
+            <div className={styles['logo']}>
+                <a><MainLogo className={styles['logo-item']} /></a>
+            </div>
+            <div className={styles['nav']}>
+                <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
+            </div>
+        </div></div>
+        {mobileNavModal}
+    </>}
+
+    return <>
+        <div className={styles['topbar-cont']} onClick={()=>{setMobileNavOpen(true)}}>
+            <div className={styles['topbar']} >
+                <div className={styles['logo']}><MainLogo className={styles['logo-item']} /></div>
+                <div className={styles['nav-burger']}><NavBurger /></div>
+            </div>
+        </div>
+        {mobileNavModal}
+        
+    </>
+
+}
 
 function LandingSection({}){
     return <>
@@ -111,15 +209,20 @@ function Slide({src, alt, title, desc, children}){
             </Parallax>         
         </div>
     </>
+
+
+
 }
 
 function ReasonsSection({}){
     const isMobile = useContext(ConfigContext)
+
     return <>
         <div className={styles['transition']}>
             <Parallax translateY={[-100,100]} disabled={isMobile} opacity={op(5)} className={styles['text3']}>Why people love Us</Parallax>
             <Reasons /> 
         </div>
+        
     </>
 }
 
@@ -127,19 +230,19 @@ function Reasons({}){
     return <>
         <Parallax opacity={[4, -2]} className={styles['reasons']}>
             <TabCarousel>
-                <Tab
+                <Tab2 
                     src={'/nani3.png'} alt={''}
                     title={'Dental Made Simple'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.'}
                     label={'Reason 1'}
                 />
-                <Tab
+                <Tab2
                     src={'/b1.png'} alt={''}
                     title={'Dentistry Made Easy'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}
                     label={'Reason 2'}
                 />
-                <Tab
+                <Tab2
                     src={'/b3.png'} alt={''}
                     title={'Dentistry Made Easy'}
                     desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco'}
@@ -150,7 +253,21 @@ function Reasons({}){
     </>
 }
 
-function Tab({src, alt, desc, children}){
+function Tab({src, alt, title, desc, children}){
+
+    return <>
+        <div className={styles['reason-cont']}>
+            <div className={styles['reason-desc-cont']}>
+                <div className={styles['reason-desc']}>
+                    {desc}
+                </div>
+            </div>
+            <Img src={src} styleIn={styles['bg5']} alt={alt}/>
+        </div>
+    </>
+}
+
+function Tab2({src, alt, desc, children}){
     const isMobileWidth = useContext(MobileWidthContext)
     return <>
         <div className={styles['reason-cont2']}>
@@ -179,6 +296,7 @@ function ServicesSection({}){
 function Services({}){
     const isMobileWidth = useContext(MobileWidthContext)
     const isMobile = useContext(ConfigContext)
+
     return <>
         <Parallax opacity={[4, -1]} disabled={isMobile} className={styles['services']}>
             <FadeUp dist={10} disabled={isMobileWidth}><Service src={'/tree.png'} alt={'alt'}>{['Service 1', 'Dolor en feit en nuim veri']}</Service></FadeUp>
@@ -195,6 +313,7 @@ function Services({}){
 }
 
 function Service({src, alt, title, desc, children}){
+
     return <>
         <Link href={'/index3'}>
             <div className={styles['service']}>
@@ -205,6 +324,7 @@ function Service({src, alt, title, desc, children}){
                 </div>
             </div>
         </Link>
+
     </>
 }
 
@@ -273,3 +393,7 @@ function Member({src, alt, order, name, role, desc}){
     </>
 }
 
+function Contact({}){
+    const {bookOpen, setBookOpen, bookModal} = useContext(BookContext)
+
+}

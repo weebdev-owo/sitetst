@@ -8,7 +8,7 @@ function Spinner({loading, h}){
         style = {
             height: h,
             border: `${bar_width}px solid #f3f3f3 `,
-            "border-top": `${bar_width}px solid #383636`,
+            "borderTop": `${bar_width}px solid #383636`,
         }
         // if(spinnerRef.current){spinnerRef.current.style.transform = `translateY(${100}px)`}
     }

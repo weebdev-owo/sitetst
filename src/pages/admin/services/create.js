@@ -6,6 +6,20 @@ const initialValuesFilled = {
   "url": "thrh",
   "enabled": true,
   "booking": true,
+  "home": {
+        "tile": {
+            "enabled": true,
+            "order": "4",
+            "name": "drh",
+            "desc": "drgh",
+            "img": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            }
+        }
+    },
   "services": {
       "tile": {
           "order": "4",
