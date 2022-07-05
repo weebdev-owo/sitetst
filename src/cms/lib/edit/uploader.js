@@ -10,55 +10,17 @@ import Link from 'next/link'
 import {useRouter} from 'next/router'
 import {QueryClient, QueryClientProvider as QueryProvider, useQuery} from 'react-query'
 import { ConfigContext } from './configContext'
+import ProgressBar from '/src/cms/lib/comps/ProgressBar/ProgressBar'
+import get_imgs from '/src/cms/lib/utils/get_imgs'
+import {getByPath, setByPath} from '/src/cms/lib/utils/byPath'
 
 
-const getByPath = (obj, path) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    path.forEach(entry =>{res = res[entry]})
-    return res
-}
-const setByPath = (obj, path, val) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    const final = path.pop()
-    path.forEach((entry) =>{res = res[entry]})
-    res[final] = val
-}
-
-let num_images = 0;
-function unique_query_id(){
-    num_images += 1
-    return `image${num_images}`
-}
-
-const isImg = new RegExp('^img', 'i')
-function get_imgs(data, path, paths){  
-    if (typeof data === 'object' && data != null){
-        if (Array.isArray(data)){   //array
-            for(let i=0; i<data.length; i++){
-                get_imgs(data[i], path.concat([i]), paths)
-            }
-        }
-        else {  
-            const keys = Object.keys(data) //object
-            for (let i=0; i<keys.length; i++){
-                if (isImg.test(keys[i])){paths.push(path.concat([keys[i]]))}
-                else {get_imgs(data[keys[i]], path.concat([keys[i]]), paths)}
-            }
-        }
-    }
-    return paths
-}
 
 //give me a upload store and an update reducer and a formik values object, and ill do some image uploads to cloudinary, then mutate values, and then send the modified values to a database
-function Upload({store, update, initialUrlId}){
+function Upload({store, update}){
     const queryClient = useMemo(() => new QueryClient({
         defaultOptions: {
             queries:{
-                // onSucsess: 
-                // refetchInterval,
-                // refetchIntervalInBackground,
                 refetchOnMount: false,
                 refetchOnReconnect: false,
                 refetchOnWindowFocus: false,
@@ -68,12 +30,7 @@ function Upload({store, update, initialUrlId}){
     }), [])
 
     const { values, errors } = useFormikContext()
-    console.log("CURRENT VALUES", 
-        values, 
-        errors,
-        // values.service.process.steps, 
-        // values.service.faq.items
-    )   
+    console.log("CURRENT VALUES", values, errors)   
 
     useEffect(() =>{
         if(store.images.uploaded){
@@ -197,72 +154,54 @@ function UploadImage({file, path, sucsess, failed, update}) {
     const { values } = useFormikContext()
     const {imageUrl} = useContext(ConfigContext)
     const [progress, setProgress] = useState([0, 0])
-    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('image', () => postImage(file, setProgress, imageUrl), {enabled: !sucsess && !failed})
+    const {data, isLoading, isError, error} = useQuery('image', () => postImage(file, setProgress, imageUrl), {
+        enabled: !sucsess && !failed,
+        onSuccess: (data) => {setByPath(values, path.concat(['url']), data.data.url); update('image_sucsess')},
+        onError: () => {update('image_error')}
+    })
 
-    useEffect(() =>{
-        if(data && !isError){ setByPath(values, path.concat(['url']), data.data.url); update('image_sucsess')}
-    }, [data, isError])
 
-    useEffect(() =>{
-        if(isError){ update('image_error') }
-    }, [isError])
 
     //create image and rember it
     const image = useMemo(() => <ContainFileImage file={file}/>, [file])
 
     //display response error
-    if (isError){
-        console.log('ERROR UPLOADING FILE: ', file.name, error)
-        return <>
-            <div>
+    if (isError){ console.log('ERROR UPLOADING FILE: ', file.name, error);
+        return <><div>
                 {image}
                 <div className={styles['upload-image-error']}>{`${error.response.data.message || error.response.message}`}</div>
-            </div> 
-        </>
+        </div></>
     }
 
     //display request in progress
     if (isLoading){
 
         //optimizing
-        if(progress[0] === progress[1]){
-            return <>
-                <div>
-                    {image}
-                    <div className={styles['upload-image-optimizing']}>
-                        <div className={styles['upload-image-optimizing-text']}>{`Optimizing`}</div>
-                        <Spinner h={20} />
-                    </div>
-                </div>
- 
-            </>             
-        }
+        if(progress[0] === progress[1]){ return <> <div>
+            {image}
+            <div className={styles['upload-image-optimizing']}>
+                <div className={styles['upload-image-optimizing-text']}>{`Optimizing`}</div>
+                <Spinner h={20} />
+            </div>
+        </div></>}
 
         //progress
-        else{
-            return <>
-                <div>
-                    {image}
-                    <ProgressBar progress={progress} />
-                </div>
-            </>
-        }
-        
+        else { return <><div>
+            {image}
+            <ProgressBar progress={progress} />
+        </div></>}
     }
 
     //display response sucsess
-    return <>
-        <div>
-            {image}
-            <div className={styles['upload-image-optimizing']}>
-                <div className={styles['upload-image-optimizing-text']}>{`Uploaded`}</div>
-            </div>
+    return <><div>
+        {image}
+        <div className={styles['upload-image-optimizing']}>
+            <div className={styles['upload-image-optimizing-text']}>{`Uploaded`}</div>
         </div>
-    </>
+    </div></>
 
 }; UploadImage = memo(UploadImage)
 
-//upload data and display
 function createPayload(values){
     const payload = JSON.parse(JSON.stringify(values))
     const paths = get_imgs(payload, [], [])
@@ -273,38 +212,40 @@ function createPayload(values){
             alt: img['alt']
         })
     }
-    console.log('PAYLOAD', payload)
     return payload
 }
 
-async function postData(payload, setProgress, url, cmsPath, unique_id, revalidate, url_ids){
-    const revalidate_paths = revalidate.map((revalidate_path) => {
-        if (typeof revalidate_path === 'string'){ return revalidate_path}
-        const new_revalidate_path = revalidate_path.map(entry => (entry === 'use id' ? unique_id:entry))
+
+
+async function postData(values, config, setProgress){
+    const {dbUrl, initialValues, modelPath, validationPath, revalidate, idPath} = config
+    const payload = createPayload(values)
+    const uniqueId = getByPath(payload, idPath)
+    const revalidatePaths = revalidate.map((revalidatePath) => {
+        if (typeof revalidatePath === 'string'){ return revalidatePath}
+        const new_revalidate_path = revalidatePath.map(entry => (entry === 'use id' ? uniqueId:entry))
         return '/'+new_revalidate_path.join('/')
     })
-    // console.log('UPLOADING DATA', revalidate_paths)
-    console.log('hmhmhmhmhmhmhmh', url_ids)
+
     return axios.post(
-        url, 
+        dbUrl, 
         {
             data: payload,
-            model_path: cmsPath,
-            revalidate: revalidate_paths,
-            url_ids: url_ids
+            initialId: getByPath(initialValues, idPath),
+            newId: uniqueId,
+            idPath: idPath,
+            modelPath: modelPath,
+            validationPath: validationPath,
+            revalidatePaths: revalidatePaths,
         }, 
-        {headers: 
-            {'Content-Type': 'application/json'},
+        {
+            headers: {'Content-Type': 'application/json'},
             onUploadProgress: (e) => {
                 const totalLength = e.lengthComputable ? e.total : e.target.getResponseHeader('content-length') || e.target.getResponseHeader('x-decompressed-content-length');
-                if (totalLength !== null) {
-                    const progressData = [e.loaded, totalLength];
-                    setProgress(progressData)
-                }
+                if (totalLength !== null) setProgress([e.loaded, totalLength])
             }
         }
     )
-
 }
 
 function UploadData({sucsess, failed, update}){
@@ -314,27 +255,21 @@ function UploadData({sucsess, failed, update}){
     useEffect(()=>{if(sucsess || failed){update('close')}; close=true}, [])
     useToggleScroll(!close)
 
-    const { values } = useFormikContext()
-    const {dbUrl, cmsPath, id_path, revalidate, initialValues} = useContext(ConfigContext)
+    const {values} = useFormikContext()
+    const config = useContext(ConfigContext)
+    const {idPath} = config
     const [progress, setProgress] = useState([0, 0])
-    const url_ids = {
-        initial: getByPath(initialValues, id_path),
-        path: id_path
-    }
-    const {data, isLoading, isError, isFetching, isRefetching, status, error} = useQuery('data', () => postData(createPayload(values), setProgress, dbUrl, cmsPath, getByPath(values, id_path), revalidate, url_ids), {enabled: !sucsess && !failed})
 
-    useEffect(() =>{
-        if(data && !isError){ update(['db_sucsess', [data.data.isr_errors, getByPath(data.data.data.data, id_path)]]) }
-    }, [data, isError])
-
-    useEffect(() =>{
-        if(isError){ update('db_error') }
-    }, [isError])
+    const {data, isLoading, isError, error} = useQuery('data', () => postData(values, config, setProgress), {
+        enabled: !sucsess && !failed,
+        onSuccess: (data) => update(['db_sucsess', [data.data.isr_errors, getByPath(data.data.data.data, idPath)]]),
+        onError: () => update('db_error')
+    })
 
     if(close){ return null }
 
     if(isError){
-        // console.log('ERROR UPLOADING DATA', error)
+        console.log('ERROR UPLOADING DATA', error)
         const types = error.response.data.error.types
         const messages = error.response.data.error.messages
         return <>
@@ -363,7 +298,6 @@ function UploadData({sucsess, failed, update}){
         </>
     }
 
-    // console.log("COMPLETED DATA UPLOAD", data)
     return <>
         <div className={styles['heading']}>{'Uploading Data to Server'}</div>
         <div className={styles['upload-data-inprogress']}>
@@ -376,19 +310,13 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({isrErrors, uniqueId}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, cmsPath, viewUrl, editUrl, id_path, initialValues, editText, viewText, createText, pageCms} = useContext(ConfigContext)
-
+    const {cmsTitle, cmsPath, viewUrl, editUrl, editText, viewText, createText, pageCms} = useContext(ConfigContext)
     const router = useRouter()
+    const forceReload = async (e) => {e.preventDefault(); router.reload()}
+
     useEffect(() =>{
-        if(!pageCms){
-            const href = `/admin/${cmsPath}/edit/${uniqueId}`
-            router.push(href)
-        }
+        if(!pageCms){ router.push(`/admin/${cmsPath}/edit/${uniqueId}`) }
     }, [])
-    const forceReload = async (e) =>{
-        e.preventDefault()
-        router.reload()
-    }
     useToggleScroll(true)
     
     return <>
@@ -424,55 +352,5 @@ function UploadComplete({isrErrors, uniqueId}){
         </div>}
     </>
 } UploadComplete = memo(UploadComplete)
-
-//progress bar
-function ProgressBar({progress}){
-    let [loaded, total] = progress
-    let unit = ''
-    if (total>100000){
-        loaded = (loaded/1000000).toFixed(2)
-        total = (total/1000000).toFixed(2)
-        unit='mb'
-    }
-    else if(total>100) {
-        loaded = (loaded/1000).toFixed(2)
-        total = (total/1000).toFixed(2)
-        unit='kb'
-    }
-    else{
-        loaded = (loaded/1).toFixed(2)
-        total = (total/1).toFixed(2)
-        unit='bytes'
-    }
-    return <>
-        <div className={styles['progress-uploading']}>
-            <Bar progress={Math.floor((loaded*100)/total)} />
-            <div>{`${loaded}/${total} ${unit}`}</div>
-        </div>
-    </>
-
-
-}
-
-function Bar({progress}){
-    return <>
-        <div style={{
-            height: '5px', 
-            width: '200px',
-            backgroundColor: 'black',
-            borderRadius: '20px',
-            border: '1px solid white'
-        }}>
-            <div style={{
-                height: '100%', 
-                width: `${progress}%`,
-                backgroundColor: 'white',
-                borderRadius: '20px'
-            }}>
-
-            </div>
-        </div>
-    </>
-}
 
 export default Upload

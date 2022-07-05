@@ -23,8 +23,6 @@ import ToggleScrollContext from '/src/lib/utils/toggleScrollContext'
 
 export default function Page({services}){
    
-
-
     return <>
         {/* <Thirds /> */}
         <Layout>

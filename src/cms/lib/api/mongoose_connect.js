@@ -40,18 +40,18 @@ async function dbConnect () {
     }
 }
 
-async function dbConnectCms(res){
+async function dbConnectCms(){
     try{
         return await dbConnect()
     }
     catch (error){
-        throw {
+        const formated_error = {
             errors: [
                 {properties: {reason: 'ServerConnection', message: error.message}}
             ]
         }
+        throw formated_error
     }
 }
 
 export default dbConnectCms
-export {mongoose}

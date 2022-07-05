@@ -10,42 +10,9 @@ import Upload from './uploader'
 import { ConfigContext } from './configContext'
 import {QueryClient, QueryClientProvider as QueryProvider, useQuery, useQueries} from 'react-query'
 import Spinner from '/src/cms/lib/comps/spinner/spinner'
-// import {initialUploadStore,  uploadReducer} from './uploader.js'
+import get_imgs from '/src/cms/lib/utils/get_imgs'
+import {getByPath, setByPath} from '/src/cms/lib/utils/byPath'
 
-
-
-const getByPath = (obj, path) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    path.forEach(entry =>{res = res[entry]})
-    return res
-}
-const setByPath = (obj, path, val) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    const final = path.pop()
-    path.forEach((entry) =>{res = res[entry]})
-    res[final] = val
-}
-
-const isImg = new RegExp('^img', 'i')
-function get_imgs(data, path, paths){  
-    if (typeof data === 'object' && data != null){
-        if (Array.isArray(data)){   //array
-            for(let i=0; i<data.length; i++){
-                get_imgs(data[i], path.concat([i]), paths)
-            }
-        }
-        else {  
-            const keys = Object.keys(data) //object
-            for (let i=0; i<keys.length; i++){
-                if (isImg.test(keys[i])){paths.push(path.concat([keys[i]]))}
-                else {get_imgs(data[keys[i]], path.concat([keys[i]]), paths)}
-            }
-        }
-    }
-    return paths
-}
 
 //requires 
 function CmsEditForm({children, ...props}){
@@ -89,17 +56,17 @@ function calc_queries(data, updateImg){
         }
     })
 }
-function intialValuesReducer(state, [path, value]){
+function initialValuesReducer(state, [path, value]){
     setByPath(state, path.concat(['original']), value)
     setByPath(state, path.concat(['cropped']), value)
-    // console.log(state, path, value)
     return {...state}
 }
+
 function EditServiceWithQuery({data, children, ...props}){
-    const [initialValues, setInitialValues] = useReducer(intialValuesReducer, JSON.parse(JSON.stringify(data)))
+    const [initialValues, setInitialValues] = useReducer(initialValuesReducer, JSON.parse(JSON.stringify(data)))
     const [imgLoadComplete, setImgLoadComplete] = useState(false)
+
     const imgs = useQueries(calc_queries(initialValues, setInitialValues))
-    // useEffect(()=>{setBgCol(false)},[])
     useEffect(() =>{ 
         if (imgs.every(img => (img.status === 'success' ||  img.status === 'error'))){setImgLoadComplete(true)}
     }, [initialValues])
@@ -108,22 +75,20 @@ function EditServiceWithQuery({data, children, ...props}){
         <CmsEditFormInner initialValues={initialValues} {...props}>
             {children}
         </CmsEditFormInner>
-
     </>}
-    else{ return <>
+
+    return <>
         <div className={styles['loading-initial-data-cont']}>
             <div className={styles['loading-initial-data']}>
                 <p>LOADING DATA</p>    
                 <Spinner h={'8vw'}/>
             </div>
         </div>
-    </>}
+    </>
 }
 
 const initialUploadStore = {
-    
     action: "",
-
     images: {
         // enabled: false, //enables display
         num_uploaded: 0, //complete when num_uploaded === files.length
@@ -132,12 +97,10 @@ const initialUploadStore = {
         uploaded: false,
         error: false
     },
-
     db: { //triggered by image upload completion
         uploaded: false,
         error: false
     },
-
     complete: {
         isr_errors: [],
         unique_id: null
@@ -196,14 +159,11 @@ function uploadReducer(state, data){
             }
     }
 }
-function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, children, pageCms}){
+function CmsEditFormInner({initialValues, validationSchema, children, ...props}){
 
-
+    const { imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, pageCms} = props
     const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
-
-    //Change body background and scroll when ref onscreen
-    // useEffect(() =>{setBgCol(false)}, [])
-    
+   
     const sendToAPI = async (values) => {
         console.log('submmiting', values)
   
@@ -225,7 +185,7 @@ function CmsEditFormInner({initialValues, validationSchema, imageUrl, dbUrl, cms
 
     return <>
         <div id={'Create'} className={styles["form-cont"]} >
-            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, initialValues, editText, viewText, createText, pageCms}}>
+            <ConfigContext.Provider value={{initialValues, ...props}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         <div className={styles["heading"]}>{`Edit ${cmsTitle}`}</div>
@@ -257,7 +217,7 @@ async function getFormData(id, id_path, Model){
     try {
         data = await Model.find()
             .select(['data'])
-            .where(`data.${id_path}`).eq(id)
+            .where(`${id_path}`).eq(id)
         if (data.length !== 1){throw 'Invalid number of objects matching this id'}
         // console.log('inside server side props', data[0].data)
         const initialValues = data[0].data

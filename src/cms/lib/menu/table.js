@@ -109,7 +109,6 @@ function getTableData(layout, options){
 function formatTableData(data, layout, options){
     const id_path = `data.${options.id_path}`
     try{
-        // console.log(data)
         const new_data =  data.map((item) =>{
             const row = layout.map(([title, path], i)=>{
                 return createTableItem(getByPath(item, `data.${path}`))
@@ -118,10 +117,8 @@ function formatTableData(data, layout, options){
             const view = <Link href={createUrl(item, id_path, options.view)}><a className={styles['table-view']}>→</a></Link>    
             row.push(edit)
             row.push(view)
-            console.log(row)
             return row
         })
-        // console.log(new_data)
         return new_data
     }
     catch (error){

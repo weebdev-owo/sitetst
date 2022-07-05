@@ -5,43 +5,11 @@ import * as Yup from 'yup'
 import  classNames  from 'classnames';
 import 'react-image-crop/dist/ReactCrop.css'
 import {setBgCol} from '/src/cms/lib/utils/setbg'
-import Upload from './uploader'
+import Upload from '/src/cms/lib/create/uploader'
 import { ConfigContext } from './configContext'
+import get_imgs from '/src/cms/lib/utils/get_imgs'
+import {getByPath, setByPath} from '/src/cms/lib/utils/byPath'
 
-
-
-const getByPath = (obj, path) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    path.forEach(entry =>{res = res[entry]})
-    return res
-}
-const setByPath = (obj, path, val) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    const final = path.pop()
-    path.forEach((entry) =>{res = res[entry]})
-    res[final] = val
-}
-
-const isImg = new RegExp('^img', 'i')
-function get_imgs(data, path, paths){  
-    if (typeof data === 'object' && data != null){
-        if (Array.isArray(data)){   //array
-            for(let i=0; i<data.length; i++){
-                get_imgs(data[i], path.concat([i]), paths)
-            }
-        }
-        else {  
-            const keys = Object.keys(data) //object
-            for (let i=0; i<keys.length; i++){
-                if (isImg.test(keys[i])){paths.push(path.concat([keys[i]]))}
-                else {get_imgs(data[keys[i]], path.concat([keys[i]]), paths)}
-            }
-        }
-    }
-    return paths
-}
 
 const initialUploadStore = {
     
@@ -114,7 +82,17 @@ function uploadReducer(state, data){
     }
 }
 
-function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, pageCms, children}){
+const CmsCreateForm_defaultProps = {
+    imageUrl: '/api/uploadSingleImage',
+    dbUrl: '/api/cmsCreate',
+    viewUrl: (v)=>false, editUrl: (v)=>false,
+    editText: (v)=>false, viewText: (v)=>false, createText: (v)=>false,
+    revalidate: [],
+}
+
+function CmsCreateForm({initialValues, validationSchema, children, ...props}){
+
+    const { imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, pageCms} = props
     const [uploadStore, setUpload] = useReducer(uploadReducer, initialUploadStore)
 
     //Change body background and scroll when ref onscreen
@@ -141,7 +119,7 @@ function CmsCreateForm({initialValues, validationSchema, imageUrl, dbUrl, cmsTit
     // console.log('IV', initialValues, validationSchema)
     return <>
         <div id={'Create'} className={styles["form-cont"]}>
-            <ConfigContext.Provider value={{imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, pageCms}}>
+            <ConfigContext.Provider value={{initialValues, ...props}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         <div className={styles["heading"]}>{`Create ${cmsTitle}`}</div>

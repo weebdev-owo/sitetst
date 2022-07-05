@@ -34,7 +34,7 @@ function Home({}){
             ]}
             options={{
                 'title': 'Landing Slides',
-                'model_path': 'home/landing',
+                'model_path': 'home_landing',
                 'id_path': 'order',
                 'edit': ['/admin/home/landing/edit/', 'use id'],
                 'view': ['/'],
@@ -51,14 +51,14 @@ function Home({}){
             ]}
             options={{
                 'title': 'Services',
-                'model_path': 'services',
+                'model_path': 'service',
                 'id_path': 'url',
-                'edit': ['/admin', '/services', '/edit/', 'use id'],
-                'view': ['/services/', 'use id'],
+                'edit': ['/admin/service/edit/', 'use id'],
+                'view': ['/service/', 'use id'],
                 'order': 'home.tile.order',
             }}
         />
-        <Nav link={'/admin/services/create'}>Create New Service</Nav>
+        <Nav link={'/admin/service/create'}>Create New Service</Nav>
     </>
 }
 
