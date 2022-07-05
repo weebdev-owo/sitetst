@@ -4,17 +4,18 @@ import image_styles from '/src/styles/images.module.sass'
 
 const model_name = 'Service'
 const reorder_paths = ['services.tile.order', 'home.tile.order']
+
+const configs = {
+    cmsTitle: 'Service', 
+    pagePath: 'service', 
+    idPath: 'url', 
+    modelPath: 'service', 
+    revalidate: ['/', ['service','use id']], 
+    viewUrl: undefined, 
+    editUrl: undefined
+}
 const data = {
-	"url": {
-		type: String, 
-		// minLength: 1,
-		// maxLength: 100,
-		// validate: {
-		// 	validator: async name => {return !(await mongoose.models[model_name].countDocuments({'data.url': name}))},
-		// 	message: err => `A service with the url name [ ${err.value} ] already exists, the url name of a service must be unique. \n Change the url name and try again`,
-		// 	reason: 'Validation'
-		// },
-	},
+	"url": {type: String, },
 	"enabled":{type: Boolean},
 	"booking": {type: Boolean},
 	"home": {
@@ -172,7 +173,7 @@ const generate_template = (primitives, setIV, valid) =>{
 } 
 
 
-export {generate_template}
+export {generate_template, configs}
 export default model
 
 
