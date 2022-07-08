@@ -1,6 +1,10 @@
+//MODEL
 import generateModel from '/src/cms/lib/models/gernerateModel'
+import imgSchema from '/src/cms/lib/models/schemas/img'
+//FORM
+import generateCreateForm from '/src/cms/lib/create/generateCreateForm'
+import generateEditForm from '/src/cms/lib/edit/generateEditForm'
 import image_styles from '/src/styles/images.module.sass'
-// import mongoose from 'mongoose'
 
 //MODEL
 const model_name = 'Service'
@@ -15,10 +19,7 @@ const data = {
 			"order": {type: Number, min: 0},
 			"name": {type: String},
 			"desc": {type: String},
-			"img": {
-				"url": {type: String},
-				"alt": {type: String},
-			}
+			"img": imgSchema
 		}
 	},
 	"services": {
@@ -26,39 +27,24 @@ const data = {
 			"order": {type: Number, min: 0},
 			"name": {type: String},
 			"desc": {type: String},
-			"img": {
-				"url": {type: String},
-				"alt": {type: String},
-			}
+			"img": imgSchema
 		}
 	},
 	"service": {
 		"intro": {
 			"name": {type: String},
 			"desc": {type: String},
-			"img": {
-				"url": {type: String},
-				"alt": {type: String},
-			}
+			"img": imgSchema
 		},
 		"summary": {
 			"s1": {type: String},
 			"s2": {type: String},
 			"s3": {type: String},
-			"img1": {
-				"url": {type: String},
-				"alt": {type: String},
-			},
+			"img1": imgSchema,
 			"what": {type: String},
-			"img2": {
-				"url": {type: String},
-				"alt": {type: String},
-			},
+			"img2": imgSchema,
 			"why": {type: String},
-			"img3": {
-				"url": {type: String},
-				"alt": {type: String},
-			}
+			"img3": imgSchema
 		},
 		"process": {
 			"intro": {type: String},
@@ -66,10 +52,7 @@ const data = {
 				{
 					"name": {type: String},
 					"desc": {type: String},
-					"img": {
-						"url": {type: String},
-						"alt": {type: String},
-					}
+					"img": imgSchema
 				}
 			]
 		},
@@ -84,18 +67,122 @@ const data = {
 		}
 	}
 }
-const model = generateModel(model_name, reorder_paths, data, {uid_type: String})
+const model = generateModel(model_name, reorder_paths, data, {
+	uid_type: String,
+})
 
 //FORM
-const configs = {
-    cmsTitle: 'Service', 
-    pagePath: 'service', 
-    idPath: 'url', 
-    modelPath: 'service', 
-    revalidate: ['/', ['service','use id']], 
-    viewUrl: undefined, 
-    editUrl: undefined
+const initialValuesFilled = {
+    "url": "thrh",
+    "enabled": true,
+    "booking": true,
+    "home": {
+          "tile": {
+              "enabled": true,
+              "order": "4",
+              "name": "drh",
+              "desc": "drgh",
+              "img": {
+                  "original": null,
+                  "cropped": null,
+                  "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                  "alt": "edit for better seo"
+              }
+          }
+      },
+    "services": {
+        "tile": {
+            "order": "4",
+            "name": "drh",
+            "desc": "drgh",
+            "img": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            }
+        }
+    },
+    "service": {
+        "intro": {
+            "name": "drgh",
+            "desc": "drh",
+            "img": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            }
+        },
+        "summary": {
+            "s1": "drh",
+            "s2": "drh",
+            "s3": "drh",
+            "img1": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            },
+            "what": "drh",
+            "img2": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            },
+            "why": "drh",
+            "img3": {
+                "original": null,
+                "cropped": null,
+                "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                "alt": "edit for better seo"
+            }
+        },
+        "process": {
+            "intro": "drh",
+            "steps": [
+                {
+                    "name": "drh",
+                    "desc": "drh",
+                    "img": {
+                        "original": null,
+                        "cropped": null,
+                        "url": "https://res.cloudinary.com/ryuzakithe3rd/image/authenticated/s--PCG5tnyn--/q_auto:eco/v1654226886/mcfdtest/temp/2572ec684773b98cbc2e68500_d3ivtu.jpg",
+                        "alt": "edit for better seo"
+                    }
+                }
+            ]
+        },
+        "faq": {
+            "intro": "drh",
+            "items": [
+                {
+                    "question": "drh",
+                    "answer": "drh"
+                },
+                {
+                    "question": "drg",
+                    "answer": "rg"
+                }
+            ]
+        }
+    },
+    "isEditorOpen": false,
+    "editorFileName": "",
+    "editorPreviewStyle": null,
+    "isSubmitOpen": false
 }
+const page_name = 'service'
+const configs = {
+	initialValuesFilled: initialValuesFilled,
+    title: `Landing Slide`,
+    pagePath: `${page_name}`, 
+    filePath: `collections/${page_name}`, 
+    idPath: 'url', 
+    revalidate: ['/', ['service','use id']], 
+}
+
 const generate_template = (primitives, setIV, valid) =>{
     const {text, textarea, checkbox, image, list, space} = primitives
     return [
@@ -172,9 +259,10 @@ const generate_template = (primitives, setIV, valid) =>{
     ]
 } 
 
-export {generate_template, configs}
-export default model
+const [createValidationSchema, createForm] = generateCreateForm(configs, generate_template)
+const [editValidationSchema, editForm] = generateEditForm(configs, generate_template)
 
+export { createValidationSchema, editValidationSchema, createForm, editForm, model}
 
 
 

@@ -2,7 +2,7 @@ import {getByPath} from '/src/cms/lib/utils/byPath'
 //await getInitialData('service', [['enabled', true]], ['url', 'services.tile'], ['services.tile.order'], 'remap')
 //await getInitialData(model_path, conditions=[['path', value]], selections['selection1', 'selection2'], order=['order.by.this.path'])
 export default async function getInitialData(model_path, conditions=null, selections=null , order=null, reformat=null){
-    const model = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/models/${model_path}`)).default
+    const model = await (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/collections/${model_path}`)).model
     // let data_query = new mongoose.Query().find()
     let data_query = model.find()
     if(selections) data_query = data_query.select(selections.map(selection => selection !== 'uid' ? `data.${selection}`:'uid'))

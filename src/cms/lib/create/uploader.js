@@ -199,7 +199,7 @@ function UploadImage({file, path, sucsess, failed, update}) {
 }; UploadImage = memo(UploadImage)
 
 async function postData(values, config, setProgress){
-    const {dbUrl, modelPath, validationPath, revalidate, idPath, cmsPagePath, cmsFilePath} = config
+    const {dbUrl, revalidate, idPath, cmsPagePath, cmsFilePath} = config
     const payload = createPayload(values)
     const uniqueId = idPath !== '' ? getByPath(payload, idPath):''
     const revalidatePaths = revalidate.map((revalidatePath) => {
@@ -213,8 +213,6 @@ async function postData(values, config, setProgress){
             data: payload,
             newId: uniqueId,
             idPath: idPath,
-            modelPath: modelPath,
-            validationPath: validationPath,
             revalidatePaths: revalidatePaths,
             cmsPagePath: cmsPagePath,
             cmsFilePath: cmsFilePath
@@ -290,7 +288,7 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({isrErrors}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, cmsPath, viewUrl, editUrl, idPath, editText, viewText, createText, pageCms} = useContext(ConfigContext)
+    const {cmsTitle, cmsPagePath, viewUrl, editUrl, idPath, editText, viewText, createText, pageCms} = useContext(ConfigContext)
     const router = useRouter()
     const forceReload = () =>{
         router.reload()
@@ -311,19 +309,19 @@ function UploadComplete({isrErrors}){
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={viewUrl(values) || `/${cmsPath}/${getByPath(values, idPath)}`}>
+                <Link href={viewUrl(values) || `/${cmsPagePath}/${getByPath(values, idPath)}`}>
                     <a className={styles["sucsess-link"]}>{viewText(values) || `View ${getByPath(values, idPath)}`}</a> 
                 </Link>  
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={editUrl(values) || `/admin/${cmsPath}/edit/${getByPath(values, idPath)}`}>
+                <Link href={editUrl(values) || `/admin/${cmsPagePath}/edit/${getByPath(values, idPath)}`}>
                     <a className={styles["sucsess-link"]}>{editText(values) || `Edit  ${getByPath(values, idPath)}`}</a> 
                 </Link>     
             </div>
 
             {!pageCms ?<div className={styles["sucsess-section"]}>
-                <Link href={`/admin/${cmsPath}/create`}>
+                <Link href={`/admin/${cmsPagePath}/create`}>
                     <a className={styles["sucsess-link"]} onClick={forceReload}>{createText(values) || `Create New ${cmsTitle}`}</a> 
                 </Link>     
             </div>:null}

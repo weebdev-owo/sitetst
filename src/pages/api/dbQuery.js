@@ -7,7 +7,7 @@ export default async function handler (req, res) {
     const layout = req.body.layout
     const options = req.body.options
     const model_path = req.body.options.model_path
-    const model = await (await import(`/src/cms/data/item/${model_path}`)).default
+    const model = await (await import(`/src/cms/data/collections/${model_path}`)).model
     // console.log('DATA', layout, options, model)
 
     //get from db

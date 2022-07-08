@@ -1,6 +1,6 @@
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import getInitialData from '/src/cms/lib/models/getInitialData'
+import getItemData from '/src/cms/lib/models/getitemData'
 //frontend
 import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
 import Img from '/src/comp/image/img'
@@ -37,6 +37,7 @@ export default function Page({services}){
             WHAT OUR CLIENTS SAY
             PRICING
             <TeamSection />
+            <ResultsSection />
         </Layout>
     </>
 }
@@ -46,7 +47,7 @@ export async function getStaticProps(){
         const connection = await dbConnect()
         return {
             props: {
-                services: await getInitialData('service', [['enabled', true], ['home.enabled', true]], ['url', 'home.tile'], ['services.home.order'], "remap")
+                // services: await getItemData('service', [['enabled', true], ['home.enabled', true]], ['url', 'home.tile'], ['services.home.order'], "remap")
             }
         }
     } 
@@ -269,4 +270,16 @@ function Member({src, alt, order, name, role, desc}){
 
     </>
 }
+
+function ResultsSection({}){
+    const isMobile = useContext(ConfigContext)
+    return <>
+        <div className={styles['team']}>
+            <Parallax translateY={[-100,100]} opacity={op(6)} disabled={isMobile} className={styles['text4']}>The MCFD Diffrence</Parallax>
+            <Members />
+        </div>
+    </>
+}
+
+
 

@@ -1,7 +1,6 @@
-import generateModel from '/src/cms/lib/models/gernerateModel'
-import image_styles from '/src/styles/images.module.sass'
-
 //MODEL
+import generateModel from '/src/cms/lib/models/gernerateModel'
+
 const model_name = 'HomeLandingSlides'
 const reorder_paths = ['order']
 const data = {
@@ -16,19 +15,30 @@ const data = {
 }
 const model = generateModel(model_name, reorder_paths, data, {
 	uid_type: Number,
-    uid_order_path: reorder_paths[0], //if uid ia an order reorder it according to which path in reorder paths
+    uid_order_path: reorder_paths[0]
 })
 
+
 //FORM
+import generateCreateForm from '/src/cms/lib/create/generateCreateForm'
+import generateEditForm from '/src/cms/lib/edit/generateEditForm'
+import image_styles from '/src/styles/images.module.sass'
+
+const page_name = 'home'
+const section_name = 'landing'
 const configs = {
-    cmsTitle: 'Landing Slide', 
-    pagePath: 'home/landing', 
+    title: `Landing Slide`,
+    pagePath: `/${page_name}/${section_name}`, 
+    filePath: `collections/${page_name}_${section_name}`, 
     idPath: 'order', 
-    modelPath: 'home_landing', 
     revalidate: ['/'], 
     viewUrl: (v)=>'/', 
-    editUrl: undefined
+    editUrl: undefined,
+    viewText: undefined,
+    editText: undefined,
+    isPageData: false,
 }
+
 const generate_template = (primitives, setIV, valid) =>{
     const {text, textarea, checkbox, image, list, space} = primitives
     return [
@@ -44,5 +54,10 @@ const generate_template = (primitives, setIV, valid) =>{
     ]
 } 
 
-export {generate_template, configs, model}
-export default model
+const [createValidationSchema, createForm] = generateCreateForm(configs, generate_template)
+const [editValidationSchema, editForm] = generateEditForm(configs, generate_template)
+
+export { createValidationSchema, editValidationSchema, createForm, editForm, model}
+
+
+

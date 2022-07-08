@@ -52,7 +52,7 @@ function Home({}){
                 ['Home', 'home.tile.enabled'],
             ]}
             options={{
-                'title': 'services (what we do best)',
+                'title': 'Services',
                 'model_path': 'service',
                 'id_path': 'url',
                 'edit': ['/admin/service/edit/', 'use id'],
@@ -80,7 +80,7 @@ function Services({}){
                 'title': 'Services',
                 'model_path': 'service',
                 'id_path': 'url',
-                'edit': ['/admin/service/edit/', 'use id'],
+                'edit': ['/admin', '/service', '/edit/', 'use id'],
                 'view': ['/service/', 'use id'],
                 'order': 'services.tile.order',
             }}

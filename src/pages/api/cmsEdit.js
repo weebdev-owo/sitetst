@@ -7,14 +7,16 @@ import update_document from '/src/cms/lib/api/update_document'
 
 export default async function handler (req, res) {
 
-    const { data, initialId, newId, idPath, modelPath, validationPath, revalidatePaths } = req.body
+    const { data, initialId, newId, idPath, cmsFilePath, revalidatePaths, pageCms } = req.body
 
-    //get model and validation schema
-    const model = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/models/${modelPath}`)).default
-    const modelValidationSchema = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/pages/admin/${validationPath}`)).editValidationSchema
+    const cms = await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ 
+        `/src/cms/data/${cmsFilePath}`
+    )
+    const model = await cms.model
+    const validationSchema = await cms.createValidationSchema
 
     try {
-        await validate_data(data, modelValidationSchema)
+        await validate_data(data, validationSchema)
         await dbConnectCms()
         await does_id_exist(model, initialId, newId, idPath)
         const updatedDocument = await update_document(data, model, initialId, newId)

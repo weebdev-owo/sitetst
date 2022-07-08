@@ -4,17 +4,16 @@ import * as primitives from '/src/cms/lib/create/generateFormPrimitives'
 
 
 const generateCreateForm = (config, generateTemplate) =>{
-    const {cmsTitle, pagePath, idPath, modelPath, revalidate, viewUrl, editUrl, viewText, editText, isPageData} = config
+    const {title, pagePath, filePath, idPath, revalidate, viewUrl, editUrl, viewText, editText, isPageData, initialValuesFilled, customValidationSchema} = config
     const template = generateTemplate(primitives, setIV, valid)
     const [formElements, initialValues, validationSchema] = generateFormComponents(template)
-    const createForm = () => <CmsCreateForm 
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            cmsTitle={cmsTitle}
-            cmsPath={pagePath}
+    const c1 = () => <CmsCreateForm 
+            initialValues={initialValuesFilled || initialValues}
+            validationSchema={customValidationSchema || validationSchema}
+            cmsTitle={title}
+            cmsPagePath={pagePath}
+            cmsFilePath={filePath}
             idPath={idPath}
-            modelPath={modelPath}
-            validationPath={`${pagePath}/create`}
             revalidate={revalidate}
             viewUrl={viewUrl}
             editUrl={editUrl}
@@ -24,6 +23,7 @@ const generateCreateForm = (config, generateTemplate) =>{
         >
             {formElements}
     </CmsCreateForm>
+    const createForm = () => c1
     return [validationSchema, createForm]
 }
 

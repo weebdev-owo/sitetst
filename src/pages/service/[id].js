@@ -1,7 +1,9 @@
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
 import Service from '/src/cms/data/services/model'
-import getInitialData from '/src/cms/lib/models/getInitialData'
+import getPageData from '/src/cms/lib/models/getPageData'
+import getItemData from '/src/cms/lib/models/getItemData'
+
 //frontend
 import Head from 'next/head'
 import Image from 'next/image'
@@ -89,7 +91,7 @@ export async function getStaticProps(context){
     const id = context.params.id
     try {
         const connection = await dbConnect()
-        const service = await getInitialData('service', [['enabled', true], ['uid', id]], ['uid', 'service'], null, 'remap')
+        const service = await getItemData('service', [['enabled', true], ['uid', id]], ['uid', 'service'], null, 'remap')
         // console.log(service)
         return { props: {service:service}}
     } 

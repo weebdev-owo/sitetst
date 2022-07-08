@@ -6,26 +6,29 @@ import does_id_exist from '/src/cms/lib/api/does_id_exist'
 import create_document from '/src/cms/lib/api/create_document'
 
 export default async function handler (req, res) {
-    const { data, newId, idPath, modelPath, validationPath, revalidatePaths } = req.body
 
-    //get model and validation schema
-    const model = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/models/${modelPath}`)).default
-    const modelValidationSchema = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/pages/admin/${validationPath}`)).createValidationSchema
+    const { data, newId, idPath, cmsFilePath, revalidatePaths, pageCms } = req.body
+
+    const cms = await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ 
+        `/src/cms/data/${cmsFilePath}`
+    )
+    const model = await cms.model
+    const validationSchema = await cms.createValidationSchema
 
     try {
-        await validate_data(data, modelValidationSchema)
+        await validate_data(data, validationSchema)
         await dbConnectCms()
         const newDocument = await create_document(model, data, newId, idPath)
         const revalidationErrors = await revalidate(res, revalidatePaths)
-        console.log('REVE', revalidationErrors)
         res.status(200).json({ 
             success: true, 
             data: newDocument,
             isr_errors: revalidationErrors
         })
+
     } 
     catch (error) {
-        console.log('ERERERERE', error)
+        console.log('CMS create error', error)
         res.status(400).json(process_errors(error))
     }
     

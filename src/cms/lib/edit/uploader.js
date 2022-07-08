@@ -216,7 +216,7 @@ function createPayload(values){
 }
 
 async function postData(values, config, setProgress){
-    const {dbUrl, initialValues, modelPath, validationPath, revalidate, idPath} = config
+    const {dbUrl, initialValues, revalidate, idPath, cmsFilePath, cmsPagePath} = config
     const payload = createPayload(values) 
     const initialUniqueId = idPath !== '' ? getByPath(initialValues, idPath):''
     const uniqueId = idPath !== '' ? getByPath(payload, idPath):''
@@ -233,9 +233,9 @@ async function postData(values, config, setProgress){
             initialId: initialUniqueId,
             newId: uniqueId,
             idPath: idPath,
-            modelPath: modelPath,
-            validationPath: validationPath,
             revalidatePaths: revalidatePaths,
+            cmsPagePath: cmsPagePath,
+            cmsFilePath: cmsFilePath
         }, 
         {
             headers: {'Content-Type': 'application/json'},
@@ -309,12 +309,12 @@ function UploadData({sucsess, failed, update}){
 //upload complete menu 
 function UploadComplete({isrErrors, uniqueId}){
     const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
-    const {cmsTitle, cmsPath, viewUrl, editUrl, editText, viewText, createText, pageCms} = useContext(ConfigContext)
+    const {cmsTitle, cmsPagePath, viewUrl, editUrl, editText, viewText, createText, pageCms} = useContext(ConfigContext)
     const router = useRouter()
     const forceReload = async (e) => {e.preventDefault(); router.reload()}
 
     useEffect(() =>{
-        if(!pageCms){ router.push(`/admin/${cmsPath}/edit/${uniqueId}`) }
+        if(!pageCms){ router.push(`/admin/${cmsPagePath}/edit/${uniqueId}`) }
     }, [])
     useToggleScroll(true)
     
@@ -332,19 +332,19 @@ function UploadComplete({isrErrors, uniqueId}){
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={viewUrl(values) || `/${cmsPath}/${uniqueId}`}>
+                <Link href={viewUrl(values) || `/${cmsPagePath}/${uniqueId}`}>
                     <a className={styles["sucsess-link"]}>{viewText(values) || `View ${uniqueId}`}</a> 
                 </Link>  
             </div>
 
             <div className={styles["sucsess-section"]}>
-                <Link href={editUrl(values) || `/admin/${cmsPath}/edit/${uniqueId}`}>
+                <Link href={editUrl(values) || `/admin/${cmsPagePath}/edit/${uniqueId}`}>
                     <a className={styles["sucsess-link"]} onClick={forceReload}>{editText(values) || `Edit ${uniqueId}`}</a> 
                 </Link>     
             </div>
 
             {!pageCms ?<div className={styles["sucsess-section"]}>
-                <Link href={`/admin/${cmsPath}/create`}>
+                <Link href={`/admin/${cmsPagePath}/create`}>
                     <a className={styles["sucsess-link"]}>{createText(values) || `Create New ${cmsTitle}`}</a> 
                 </Link>     
             </div>:null}
