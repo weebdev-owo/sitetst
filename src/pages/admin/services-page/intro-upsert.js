@@ -23,7 +23,7 @@ export default function Page({data, foundCmsPageData}){
             cmsPath={`pageCms/${unique_id}`} // the folder in cms/data which corresponds to the data in this page
             revalidate={[`/${page_name}`]} //pages to perform on demand isr
             viewUrl={(v)=>`/${page_name}`}
-            editUrl={(values) => `/admin/${getByPath(values, unique_id_path)}-upsert`}
+            editUrl={(v) => `/admin/${getByPath(v, unique_id_path)}-upsert`}
             viewText={(v)=>`view ${page_name}`}
             editText={(v)=>`edit ${page_name} ${section_name}`}
             pageCms={true}

@@ -2,20 +2,13 @@ import dbConnectCms from '/src/cms/lib/api/mongoose_connect'
 import process_errors from '/src/cms/lib/api/process_errors'
 import revalidate from '/src/cms/lib/api/revalidate'
 
-const getByPath = (obj, path) => {
-    if (typeof path==='string'){path = path.split(".")}
-    let res = obj
-    path.forEach(entry =>{res = res[entry]})
-    return res
-}
-
 export default async function handler (req, res) {
     //data
     const layout = req.body.layout
     const options = req.body.options
     const model_path = req.body.options.model_path
-    const model = await (await import(`/src/cms/data/models/${model_path}`)).default
-    console.log('DATA', layout, options, model)
+    const model = await (await import(`/src/cms/data/item/${model_path}`)).default
+    // console.log('DATA', layout, options, model)
 
     //get from db
     try {
@@ -31,7 +24,7 @@ export default async function handler (req, res) {
     } 
     catch (error) {
         console.log(error)
-        // res.status(400).json(process_errors(error))
+        res.status(400).json(process_errors(error))
     }
     
 }
@@ -39,7 +32,6 @@ export default async function handler (req, res) {
 async function getTableData(model, layout, order) {
     try {
         const select_fields = layout.map(item => `data.${item[1]}`)
-        console.log('ORDERRRRRR', order)
         if (order){
             const sort_by = {}
             sort_by[`data.${order}`] = 1

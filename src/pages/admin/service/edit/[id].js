@@ -8,12 +8,10 @@ import CmsEditForm from '/src/cms/lib/edit/cmsEditForm'
 import generateForm, {setIV, valid} from '/src/cms/lib/edit/generateFormElements'
 import * as editPrimitives from '/src/cms/lib/edit/generateFormPrimitives'
 
-
+const {cmsTitle, pagePath, idPath, modelPath, revalidate, viewUrl, editUrl} = configs
 const template = generate_template(editPrimitives, setIV, valid)
 const [formElements, initialValues, validationSchema] = generateForm(template)
 export {validationSchema as editValidationSchema}
-
-const {cmsTitle, pagePath, idPath, modelPath, revalidate, viewUrl, editUrl} = configs
 
 export default function Page({data}){
     return <>

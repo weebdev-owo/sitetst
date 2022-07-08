@@ -199,16 +199,14 @@ function UploadImage({file, path, sucsess, failed, update}) {
 }; UploadImage = memo(UploadImage)
 
 async function postData(values, config, setProgress){
-    const {dbUrl, modelPath, validationPath, revalidate, idPath} = config
+    const {dbUrl, modelPath, validationPath, revalidate, idPath, cmsPagePath, cmsFilePath} = config
     const payload = createPayload(values)
-    const uniqueId = getByPath(payload, idPath)
+    const uniqueId = idPath !== '' ? getByPath(payload, idPath):''
     const revalidatePaths = revalidate.map((revalidatePath) => {
         if (typeof revalidatePath === 'string'){ return revalidatePath}
         const new_revalidate_path = revalidatePath.map(entry => (entry === 'use id' ? uniqueId:entry))
         return '/'+new_revalidate_path.join('/')
     })
-    console.log('RERERERE', revalidatePaths)
-
     return axios.post(
         dbUrl, 
         {
@@ -218,6 +216,8 @@ async function postData(values, config, setProgress){
             modelPath: modelPath,
             validationPath: validationPath,
             revalidatePaths: revalidatePaths,
+            cmsPagePath: cmsPagePath,
+            cmsFilePath: cmsFilePath
         }, 
         {
             headers: {'Content-Type': 'application/json'},
@@ -238,7 +238,6 @@ function UploadData({sucsess, failed, update}){
 
     const {values} = useFormikContext()
     const config = useContext(ConfigContext)
-    const {idPath} = config
     const [progress, setProgress] = useState([0, 0])
 
     const {data, isLoading, isError, error} = useQuery('data', () => postData(values, config, setProgress), {

@@ -2,18 +2,9 @@ import generateModel from '/src/cms/lib/models/gernerateModel'
 import image_styles from '/src/styles/images.module.sass'
 // import mongoose from 'mongoose'
 
+//MODEL
 const model_name = 'Service'
 const reorder_paths = ['services.tile.order', 'home.tile.order']
-
-const configs = {
-    cmsTitle: 'Service', 
-    pagePath: 'service', 
-    idPath: 'url', 
-    modelPath: 'service', 
-    revalidate: ['/', ['service','use id']], 
-    viewUrl: undefined, 
-    editUrl: undefined
-}
 const data = {
 	"url": {type: String, },
 	"enabled":{type: Boolean},
@@ -93,9 +84,18 @@ const data = {
 		}
 	}
 }
-
 const model = generateModel(model_name, reorder_paths, data, {uid_type: String})
 
+//FORM
+const configs = {
+    cmsTitle: 'Service', 
+    pagePath: 'service', 
+    idPath: 'url', 
+    modelPath: 'service', 
+    revalidate: ['/', ['service','use id']], 
+    viewUrl: undefined, 
+    editUrl: undefined
+}
 const generate_template = (primitives, setIV, valid) =>{
     const {text, textarea, checkbox, image, list, space} = primitives
     return [
@@ -171,7 +171,6 @@ const generate_template = (primitives, setIV, valid) =>{
         ]
     ]
 } 
-
 
 export {generate_template, configs}
 export default model

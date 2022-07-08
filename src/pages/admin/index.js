@@ -18,6 +18,8 @@ function AdminHome({}){
                 <Home label={'Home'}/>
                 <Services label={'Services'}/>
                 <About label={'About'}/>
+                <News label={'News'}/>
+                <Book label={'Book'}/>
             </TabNav>
         </div>
     </>
@@ -66,7 +68,7 @@ function Home({}){
 function Services({}){
     return <>
         <Title>Services</Title>
-        <Nav link={'/admin/services-page/intro-upsert'}>Edit Intro</Nav>
+        <Nav link={'/admin/PageData/services/intro'}>Edit Intro</Nav>
         <Table 
             layout={[
                 ['Url Name', 'url'],
@@ -76,18 +78,16 @@ function Services({}){
             ]}
             options={{
                 'title': 'Services',
-                'model_path': 'services',
+                'model_path': 'service',
                 'id_path': 'url',
-                'edit': ['/admin', '/services', '/edit/', 'use id'],
-                'view': ['/services/', 'use id'],
+                'edit': ['/admin', '/service', '/edit/', 'use id'],
+                'view': ['/service/', 'use id'],
                 'order': 'services.tile.order',
             }}
         />
-        <Nav link={'/admin/services/create'}>Create New Service</Nav>
+        <Nav link={'/admin/service/create'}>Create New Service</Nav>
     </>
 }
-
-
 
 function About(){
     return <>
@@ -95,6 +95,18 @@ function About(){
         <Nav link={'/admin/about/edit-intro'}>Edit Intro</Nav>
         <Nav link={'/admin/about/edit-locations'}>Edit Locations</Nav>
         <Nav link={'/admin/about/edit-team'}>Edit Team</Nav>
+    </>
+}
+
+function News({}){
+    return <>
+    
+    </>
+}
+
+function Book({}){
+    return <>
+    
     </>
 }
 

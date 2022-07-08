@@ -1,3 +1,6 @@
+//backend
+import dbConnect from '/src/cms/lib/api/mongoose_connect'
+import getInitialData from '/src/cms/lib/models/getInitialData'
 //frontend
 import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
 import Img from '/src/comp/image/img'
@@ -22,7 +25,7 @@ import ToggleScrollContext from '/src/lib/utils/toggleScrollContext'
 
 
 export default function Page({services}){
-   
+   console.log(services)
     return <>
         {/* <Thirds /> */}
         <Layout>
@@ -38,16 +41,12 @@ export default function Page({services}){
     </>
 }
 
-
-//backend
-import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import getInitialData from '/src/cms/lib/models/getInitialData'
 export async function getStaticProps(){
     try {
         const connection = await dbConnect()
         return {
             props: {
-                services: await getInitialData('services', [['enabled', true]], ['url', 'services.tile'], ['services.tile.order'], 'remap')
+                services: await getInitialData('service', [['enabled', true], ['home.enabled', true]], ['url', 'home.tile'], ['services.home.order'], "remap")
             }
         }
     } 
@@ -226,7 +225,7 @@ function Members({}){
                 desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'}
             />
             <Member 
-                src={'/c2.png'} alt={'ree'} order={2}
+                src={'/c10.png'} alt={'ree'} order={2}
                 name={'Dr. Habib'}
                 role={'Lead Technician'}
                 desc={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'}

@@ -215,12 +215,11 @@ function createPayload(values){
     return payload
 }
 
-
-
 async function postData(values, config, setProgress){
     const {dbUrl, initialValues, modelPath, validationPath, revalidate, idPath} = config
-    const payload = createPayload(values)
-    const uniqueId = getByPath(payload, idPath)
+    const payload = createPayload(values) 
+    const initialUniqueId = idPath !== '' ? getByPath(initialValues, idPath):''
+    const uniqueId = idPath !== '' ? getByPath(payload, idPath):''
     const revalidatePaths = revalidate.map((revalidatePath) => {
         if (typeof revalidatePath === 'string'){ return revalidatePath}
         const new_revalidate_path = revalidatePath.map(entry => (entry === 'use id' ? uniqueId:entry))
@@ -231,7 +230,7 @@ async function postData(values, config, setProgress){
         dbUrl, 
         {
             data: payload,
-            initialId: getByPath(initialValues, idPath),
+            initialId: initialUniqueId,
             newId: uniqueId,
             idPath: idPath,
             modelPath: modelPath,
@@ -325,7 +324,7 @@ function UploadComplete({isrErrors, uniqueId}){
         {isrErrors.length ? <div className={styles['upload-data-errors']}>{isrErrors.map((path, i) => 
             <div key={i}><span className={styles['upload-data-error']}>{` on demand isr failed for page: [ ${path} ] hence changes will not be displayed immediately`}</span></div>
         )}</div>:null}  
-        {uniqueId && <div className={styles['sucsess-links']}>
+        {<div className={styles['sucsess-links']}>
             <div className={styles["sucsess-section"]}>
                 <Link href={'/admin'}>
                     <a className={styles["sucsess-link"]}>Admin Home</a> 

@@ -4,8 +4,7 @@ import { getByPath } from '/src/cms/lib/utils/byPath';
 
 export default function generateModel(model_name, reorder_paths, data, options ){
 
-    const {uid_type, uid_is_order, uid_default, collection_name} = options ?? {}
-    console.log(options, options?.uid_type, options?.uid_is_order, options?.uid_default, options?.collection_name)
+    const {uid_type, uid_order_path, uid_default, collection_name} = options ?? {}
     const layout = {
         createdAt: {type: Date, immutable: true, default: () => Date.now()},
         updatedAt: {type: Date, default: () => Date.now()},
@@ -29,7 +28,7 @@ export default function generateModel(model_name, reorder_paths, data, options )
         this.updatedAt = Date.now()
         let reorders = true
         for await (const path of reorder_paths){
-            const reordered = await reOrder(getByPath(this.data, path), model_name, path, {uid_is_order: uid_is_order})
+            const reordered = await reOrder(this._id, getByPath(this.data, path), model_name, path, {uid_order_path: uid_order_path})
             reorders &&= reordered
             if (!reordered){
                 const error = {

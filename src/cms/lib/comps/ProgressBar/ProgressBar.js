@@ -7,8 +7,8 @@ export default function ProgressBar({progress}){
     const kb = 1000
 
     if (total>100*kb){ loaded = (loaded/mb).toFixed(2); total = (total/mb).toFixed(2); unit = 'mb'; }
-    else if(total>0.1*mb) { loaded = (loaded/kb).toFixed(2); total = (total/kb).toFixed(2); unit = 'kb'; }
-    else{ loaded = (loaded).toFixed(2); total = (total).toFixed(2); unit = 'bytes'; }
+    else if(total>kb) { loaded = (loaded/kb).toFixed(2); total = (total/kb).toFixed(2); unit = 'kb'; }
+    else{ loaded = (loaded).toFixed(0); total = (total).toFixed(0); unit = 'bytes'; }
 
     return <>
         <div className={styles['progress-uploading']}>

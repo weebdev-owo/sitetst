@@ -1,7 +1,7 @@
 import generateModel from '/src/cms/lib/models/gernerateModel'
 import image_styles from '/src/styles/images.module.sass'
 
-
+//MODEL
 const model_name = 'HomeLandingSlides'
 const reorder_paths = ['order']
 const data = {
@@ -14,12 +14,21 @@ const data = {
 		"alt": {type: String},
 	}
 }
-
 const model = generateModel(model_name, reorder_paths, data, {
 	uid_type: Number,
-	uid_is_order: true
+    uid_order_path: reorder_paths[0], //if uid ia an order reorder it according to which path in reorder paths
 })
 
+//FORM
+const configs = {
+    cmsTitle: 'Landing Slide', 
+    pagePath: 'home/landing', 
+    idPath: 'order', 
+    modelPath: 'home_landing', 
+    revalidate: ['/'], 
+    viewUrl: (v)=>'/', 
+    editUrl: undefined
+}
 const generate_template = (primitives, setIV, valid) =>{
     const {text, textarea, checkbox, image, list, space} = primitives
     return [
@@ -35,5 +44,5 @@ const generate_template = (primitives, setIV, valid) =>{
     ]
 } 
 
-export {generate_template}
+export {generate_template, configs, model}
 export default model

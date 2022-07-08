@@ -1,13 +1,15 @@
+//both
+import { generate_template, configs } from '/src/cms/data/models/service'
 //frontend
 import CmsCreateForm from '/src/cms/lib/create/cmsCreateForm'
 import generateForm, {setIV, valid} from '/src/cms/lib/create/generateFormElements'
 import * as createPrimitives from '/src/cms/lib/create/generateFormPrimitives'
-//both
-import { generate_template } from '/src/cms/data/models/service'
 
+const {cmsTitle, pagePath, idPath, modelPath, revalidate, viewUrl, editUrl} = configs
 const template = generate_template(createPrimitives, setIV, valid)
 const [formElements, initialValues, validationSchema] = generateForm(template)
 export {validationSchema as createValidationSchema}
+
 const initialValuesFilled = {
     "url": "thrh",
     "enabled": true,
@@ -110,18 +112,19 @@ const initialValuesFilled = {
     "isSubmitOpen": false
 }
 
-const pagePath = 'service'
 export default function Page({}){
     return <>
         <CmsCreateForm 
             initialValues={initialValuesFilled}
             validationSchema={validationSchema}
-            cmsTitle={'Service'}
-            cmsPath={pagePath} 
-            idPath={'url'} 
-            modelPath={'service'}
-            validationPath={`${pagePath}/create`} 
-            revalidate={['/', ['service','use id']]} 
+            cmsTitle={cmsTitle}
+            cmsPath={pagePath}
+            idPath={idPath}
+            modelPath={modelPath}
+            validationPath={`${pagePath}/create`}
+            revalidate={revalidate}
+            viewUrl={viewUrl}
+            editUrl={editUrl}
         >
             {formElements}
         </CmsCreateForm>

@@ -24,7 +24,7 @@ export default function Home({services}){
     },[])
 
   const service_tiles = services.map((service) =>{
-    return [service.name, service.desc, service.img.url, service.img.alt, `http://localhost:3000/services/${service.url}`]
+    return [service.name, service.desc, service.img.url, service.img.alt, `http://localhost:3000/service/${service.url}`]
   })
   
     return <>

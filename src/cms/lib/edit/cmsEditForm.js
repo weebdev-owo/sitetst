@@ -212,7 +212,7 @@ CmsEditFormInner.defaultProps = {
     revalidate: [],
 }
 
-async function getFormData(id, id_path, Model){
+async function getFormProps(id, id_path, Model){
     let data = false
     try {
         data = await Model.find()
@@ -234,8 +234,15 @@ async function getFormData(id, id_path, Model){
     }
 }
 
+async function getFormData(id, Model){
+    const data = await Model.find().select(['data']).where(`uid`).eq(id)
+    if (data.length !== 1){throw 'Invalid number of objects matching this id'}
+    const initialValues = data[0].data
+    return JSON.parse(JSON.stringify(initialValues))
+}
 
-export {getFormData}
+
+export {getFormProps, getFormData}
 export default CmsEditForm
 
 
