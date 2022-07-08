@@ -63,7 +63,7 @@ function initialValuesReducer(state, [path, value]){
 }
 
 function EditServiceWithQuery({data, children, ...props}){
-    const [initialValues, setInitialValues] = useReducer(initialValuesReducer, JSON.parse(JSON.stringify(data)))
+    const [initialValues, setInitialValues] = useReducer(initialValuesReducer, JSON.parse(JSON.stringify(data ? data:{})))
     const [imgLoadComplete, setImgLoadComplete] = useState(false)
 
     const imgs = useQueries(calc_queries(initialValues, setInitialValues))

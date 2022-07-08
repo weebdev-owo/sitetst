@@ -173,14 +173,14 @@ const initialValuesFilled = {
     "editorPreviewStyle": null,
     "isSubmitOpen": false
 }
-const page_name = 'service'
+const item_name = 'service'
 const configs = {
 	initialValuesFilled: initialValuesFilled,
     title: `Landing Slide`,
-    pagePath: `${page_name}`, 
-    filePath: `collections/${page_name}`, 
-    idPath: 'url', 
-    revalidate: ['/', ['service','use id']], 
+	idPath: 'url', 
+    pagePath: `${item_name}`, 
+    filePath: `collections/${item_name}`, 
+    revalidate: [[item_name, 'use id'], '/'], 
 }
 
 const generate_template = (primitives, setIV, valid) =>{

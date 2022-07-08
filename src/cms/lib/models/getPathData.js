@@ -1,6 +1,6 @@
-export default async function getPageData(model_path, conditions=null){
+export default async function getPathData(model_path, conditions=null){
 
-    const model = (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/PageData/${model_path}`)).default
+    const model = await (await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ `/src/cms/data/collections/${model_path}`)).model
     let data_query = model.find().select(['uid'])
     
     if(conditions){
