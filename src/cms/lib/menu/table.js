@@ -12,21 +12,6 @@ const getByPath = (obj, path) => {
     path.forEach(entry =>{res = res[entry]})
     return res
 }
-// const layout = [
-//     // ['title', 'path'],
-//     ['Url Name', 'url'],
-//     ['Order', 'services.tile.order'],
-//     ['Enabled', 'enabled'],
-//     ['Booking', 'booking'],
-// ]
-
-// const options = {
-//     'model_path': 'service',
-//     'id_path': 'url',
-//     'edit': ['/admin', '/service', '/edit/', 'use id'],
-//     'view': ['/services/', 'use id'],
-//     'order': 'services.tile.order',
-// }
 
 function Table({layout, options}){
 
@@ -100,7 +85,7 @@ function Cross(){
 
 function getTableData(layout, options){
     return axios.post(
-        '/api/dbQuery', 
+        '/api/cms/dbQuery', 
         JSON.stringify({layout, options}), 
         {headers: {'Content-Type': 'application/json'}}
     )

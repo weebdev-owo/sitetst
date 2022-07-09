@@ -204,8 +204,8 @@ function CmsEditFormInner({initialValues, validationSchema, children, ...props})
 
 CmsEditFormInner = memo(CmsEditFormInner)
 CmsEditFormInner.defaultProps = {
-    imageUrl: '/api/uploadSingleImage',
-    dbUrl: '/api/cmsEdit',
+    imageUrl: '/api/cms/uploadImage',
+    dbUrl: '/api/cms/edit',
     validationSchema: Yup.object({}),
     viewUrl: (v)=>false, editUrl: (v)=>false,
     editText: (v)=>false, viewText: (v)=>false, createText: (v)=>false,
@@ -241,8 +241,15 @@ async function getFormData(id, Model){
     return JSON.parse(JSON.stringify(initialValues))
 }
 
+async function getFormPageData(Model){
+    const data = await Model.find()
+    if (data.length === 1) return JSON.parse(JSON.stringify(data[0].data))
+    if (data.length === 0) return false
+    else throw 'Invalid number of objects matching this id'
+}
 
-export {getFormProps, getFormData}
+
+export {getFormProps, getFormData, getFormPageData}
 export default CmsEditForm
 
 

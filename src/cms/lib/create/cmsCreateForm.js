@@ -81,14 +81,6 @@ function uploadReducer(state, data){
     }
 }
 
-const CmsCreateForm_defaultProps = {
-    imageUrl: '/api/uploadSingleImage',
-    dbUrl: '/api/cmsCreate',
-    viewUrl: (v)=>false, editUrl: (v)=>false,
-    editText: (v)=>false, viewText: (v)=>false, createText: (v)=>false,
-    revalidate: [],
-}
-
 function CmsCreateForm({initialValues, validationSchema, children, ...props}){
 
     const { imageUrl, dbUrl, cmsTitle, viewUrl, editUrl, cmsPath, id_path, revalidate, editText, viewText, createText, pageCms} = props
@@ -138,8 +130,8 @@ function CmsCreateForm({initialValues, validationSchema, children, ...props}){
 
 CmsCreateForm = memo(CmsCreateForm)
 CmsCreateForm.defaultProps = {
-    imageUrl: '/api/uploadSingleImage',
-    dbUrl: '/api/cmsCreate',
+    imageUrl: '/api/cms/uploadImage',
+    dbUrl: '/api/cms/create',
     validationSchema: Yup.object({}),
     viewUrl: (v)=>false, editUrl: (v)=>false,
     editText: (v)=>false, viewText: (v)=>false, createText: (v)=>false,

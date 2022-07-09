@@ -1,6 +1,6 @@
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import {getFormData} from '/src/cms/lib/edit/cmsEditForm'
+import {getFormPageData} from '/src/cms/lib/edit/cmsEditForm'
 import Error from 'next/error'
 import {useState, useEffect} from 'react'
 import LoadingPage from '/src/cms/lib/comps/LoadingPage/LoadingPage'
@@ -9,7 +9,7 @@ const cmsImportForm = async (path, type, setForm) =>{
     try {
         let form = 'error'
         const cms = await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ 
-            `/src/cms/data/collections/${path}`
+            `/src/cms/data/PageData/${path}`
         )
         if (type === 'create') form = await cms.createForm
         if (type === 'edit') form = await cms.editForm
@@ -18,7 +18,7 @@ const cmsImportForm = async (path, type, setForm) =>{
     catch (error){ console.log(error); setForm('error') }
 }
 
-export default function Page({ctxt, form_path, data}){
+export default function Page({form_path, data}){
 
     const [form, setForm] = useState(null)
 
@@ -40,25 +40,19 @@ export async function getServerSideProps(context){
     let data = false
 
     try{
-        if (url.at(-1) === 'create'){
-            if (url.length === 3) form_path = `${url[0]}_${url[1]}`
-            else if (url.length === 2) form_path = url[0]
-            else throw 'invalid url'
+        if (url.length === 2){
+                form_path = `${url[0]}_${url[1]}`
+                const model = await (await import(`/src/cms/data/PageData/${form_path}`)).model
+                const connection = await dbConnect()
+                data = await getFormPageData(model)
         }
-        else if (url.at(-2) === 'edit'){
-            if (url.length === 4) form_path = `${url[0]}_${url[1]}`
-            else if (url.length === 3) form_path = url[0]
-            else throw 'invalid url'
-            const model = await (await import(`/src/cms/data/collections/${form_path}`)).model
-            const connection = await dbConnect()
-            data = await getFormData(url.at(-1), model)
-        }
+        else throw 'invalid url'
+
     }
     catch (error){console.log(error); form_path = false; data=false;}
 
     return {
         props: {
-            ctxt: JSON.parse(JSON.stringify(context.params)),
             form_path: form_path, 
             data: data,
         }
