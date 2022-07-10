@@ -26,7 +26,6 @@ const pageData = createPageData({
             ]
         ]
     } 
-
 })
 
 const { createValidationSchema, editValidationSchema, createForm, editForm, model} = pageData

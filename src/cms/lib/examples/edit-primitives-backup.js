@@ -1,15 +1,12 @@
-import React, {memo, useRef, useState, useCallback, useEffect, useReducer, useMemo, useContext} from 'react'
+import React, {memo, useRef, useState, useCallback, useEffect, useReducer, useMemo} from 'react'
 import styles from './cms.module.sass'
 import {useField, useFormikContext, getIn} from 'formik'
 import  classNames  from 'classnames';
 import { useDropzone } from "react-dropzone"
-// import 'react-image-crop/dist/ReactCrop.css'
 import FileImage from '/src/cms/lib/utils/preview/fileImage'
 import 'react-image-crop/dist/ReactCrop.css'
 import CropImage from '/src/cms/lib/utils/crop/cropImageForm'
 import useToggleScroll from '/src/cms/lib/utils/toggleScroll'
-import useErrorScroll from '/src/cms/lib/utils/useErrorScroll'
-import { getByPath } from '/src/cms/lib/utils/byPath';
 
 //FORM PRIMITIVES//
 function Text({label, ...props}){
@@ -23,11 +20,7 @@ function Text({label, ...props}){
     else{ isErr = meta.error==='required' ? false:meta.error && (meta.touched || field.value || field.value===0) }
     const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
 
-    //scroll to error on submit
-    const elemRef = useErrorScroll(props.name, meta)
-
-
-    return <div className={styles["section"]} ref={elemRef}>
+    return <div className={styles["section"]}>
         <label className={styles["label"]} htmlFor={props.id || props.name}>
             <p>{`${label}`}</p>
             {isErr ? <pre className={styles['label-err']}>{` - ${meta.error}`}</pre>:null}
@@ -47,10 +40,7 @@ function TextArea({label, ...props}){
     else{ isErr = meta.error==='required' ? false:meta.error && (meta.touched || field.value || field.value===0) }
     const input_css = classNames(styles["textarea-big"], {[styles["textarea-err"]]: isErr})
 
-    //scroll to error on submit
-    const elemRef = useErrorScroll(props.name, meta)
-
-    return <div className={styles["section"]} ref={elemRef}>
+    return <div className={styles["section"]}>
         <label className={styles["label"]} htmlFor={props.id || props.name}>
             <p>{`${label}`}</p>
             {isErr ? <pre className={styles['label-err']}>{` - ${meta.error}`}</pre>:null}
@@ -70,53 +60,46 @@ function CheckBox({label, ...props}){
 }
 
 function List({name, children, item_template, item_label, ...props}){
-    const { values, setFieldValue, submitCount, setFieldTouched, isSubmitting} = useFormikContext()
+    const { values, setFieldValue, submitCount, setFieldTouched} = useFormikContext()
     const [field, meta] = useField(name) //list field
     
     //define array functions
     const editStep = async (i, item) =>{
         await setFieldTouched(name, true)
-        const newSteps = getByPath(values, name)
+        const newSteps = await getIn(values, name)
         if(i=='push'){ newSteps.push(item) }
         else{ item ? newSteps.splice(i, 0, item):newSteps.splice(i, 1) }
         setFieldValue(name, newSteps)
-        console.log('ITEMMMMMM', item)
     }
-    const ins = (i) =>{editStep(i, JSON.parse(JSON.stringify(item_template)))}
+    const ins = (i) =>{editStep(i+1, item_template)}
     const del = (i) =>{editStep(i)}
-    const push = () =>{editStep('push', JSON.parse(JSON.stringify(item_template)))}
+    const push = () =>{editStep('push', item_template)}
 
     //determine errors
     let isErr
     const error = typeof meta.error === 'string' ? meta.error:''
-    if(submitCount || isSubmitting){ isErr = error }
+    if(submitCount){ isErr = error }
     else{ isErr = error==='required' ? false:error && (meta.touched) }
     const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
 
-    //scroll to error on submit
-    const elemRef = useErrorScroll(name, meta)
-
     return <>
-        <label className={styles["section-desc"]} htmlFor={props.id || name} ref={elemRef}>
+        <label className={styles["section-desc"]} htmlFor={props.id || name}>
             <p>{`${item_label}s`}</p>
             {isErr ? <pre className={styles['label-err']}>{` ${meta.error}`}</pre>:null}
         </label>
-        <div className={styles['list-cont']}>
-            {getIn(values, name).map((unneed, i) =>{
-                return <>
-                    <div className={styles['elem-topbar']}>
-                        {`${item_label} ${i+1}.`} 
-                        <div>
-                            <button type="button" className={styles["elem-button-add"]} onClick={() =>{ins(i)}}>Add</button>
-                            <button type="button" className={styles["elem-button-del"]} onClick={() =>{del(i)}}>Delete</button>
-                        </div>
+        {getIn(values, name).map((unneed, i) =>{
+            return <>
+                <div className={styles['elem-topbar']}>
+                    {`${item_label} ${i+1}.`} 
+                    <div>
+                        <button type="button" className={styles["elem-button-add"]} onClick={() =>{ins(i)}}>Add</button>
+                        <button type="button" className={styles["elem-button-del"]} onClick={() =>{del(i)}}>Delete</button>
                     </div>
-                    {children(i, name)}
-                    {/* <Space />    */}
-                </>
-            })}
-        </div>
-        
+                </div>
+                {children(i, name)}
+                <Space />
+            </>
+        })}
         <button type="button" className={styles["list-add"]} onClick={() => {push()}}>{`+ Add ${item_label}`}</button> 
     </>
  
@@ -155,7 +138,7 @@ function FormImage({name, label, image_style, ...props}){
     const mb = 1000*1000
     const MAX_FILE_SIZE = props.max_size || 10*mb
     const SUPPORTED_FILE_EXTENSIONS = props.sf || ['.jpg', '.jpeg', '.png', '.gif']
-    const { values, setFieldValue, submitCount, setFieldTouched,isSubmitting } = useFormikContext()
+    const { values, setFieldValue, submitCount, setFieldTouched } = useFormikContext()
     const [file, setFile] = useState(null)
     const [dropzoneErr, setDropzoneErr] = useState(false)
     const [field, meta, helpers] = useField(`${name}`)
@@ -202,16 +185,13 @@ function FormImage({name, label, image_style, ...props}){
     let isErr
     let error = typeof crop_meta.error === 'string' ? crop_meta.error:''
     error = dropzoneErr && !cropped_file ? dropzoneErr:error
-    if(submitCount || isSubmitting){ isErr = error }
+    if(submitCount){ isErr = error }
     else{ isErr = error==='required' ? false : error }
     const input_css = classNames(styles["textarea-smol"], {[styles["textarea-err"]]: isErr})
 
-    //scroll to error on submit
-    const elemRef = useErrorScroll(name, meta, isErr)
-
     return <>
         {editorOpen ? <ImageEditor name={name} imageStyle={image_style} setOpen={setEditorOpen} />:null}
-        <label className={styles["label"]} htmlFor={props.id || name} ref={elemRef}>
+        <label className={styles["label"]} htmlFor={props.id || name}>
             <p>{`${label}`}</p>
             {isErr ? <pre className={styles['label-err']}>{` - ${error}`}</pre>:null}
         </label>
@@ -228,7 +208,7 @@ function FormImage({name, label, image_style, ...props}){
                     <div className={styles["dropzone-error-cont"]}>
                         {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
                     </div>
-                    <Text name={`${name}.alt`} label={`image description for SEO (alt)`} />
+                    <Text name={`${name}.alt`} label={`text if image will not load (alt)`} />
                 </>
             :        
             <>
@@ -240,6 +220,7 @@ function FormImage({name, label, image_style, ...props}){
                     {dropzoneErr && cropped_file && <p className={styles["dropzone-error"]}>{dropzoneErr}</p>}
                 </div>
             </>
+
             }
         </div>
 

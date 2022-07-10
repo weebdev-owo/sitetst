@@ -8,7 +8,7 @@ import create_document from '/src/cms/lib/api/create_document'
 export default async function handler (req, res) {
 
     const { data, newId, idPath, cmsFilePath, revalidatePaths, pageCms } = req.body
-
+    console.log('DATATAAA', data)
     const cms = await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ 
         `/src/cms/data/${cmsFilePath}`
     )
@@ -16,9 +16,10 @@ export default async function handler (req, res) {
     const validationSchema = await cms.createValidationSchema
 
     try {
-        await validate_data(data, validationSchema)
+        const parsed_data = await validate_data(data, validationSchema)
+        console.log(parsed_data)
         await dbConnectCms()
-        const newDocument = await create_document(model, data, newId, idPath)
+        const newDocument = await create_document(model, parsed_data, newId, idPath)
         const revalidationErrors = await revalidate(res, revalidatePaths)
         res.status(200).json({ 
             success: true, 

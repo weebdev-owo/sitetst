@@ -1,44 +1,22 @@
 //MODEL
 import generateModel from '/src/cms/lib/models/gernerateModel'
-
-const model_name = 'HomeLandingSlides'
-const reorder_paths = ['order']
-const data = {
-	"enabled": {type: Boolean},
-	"order": {type: Number, min: 0, max: 1000000},
-	"title": {type: String},
-	"desc": {type: String},
-	"img": {
-		"url": {type: String},
-		"alt": {type: String},
-	}
-}
-const model = generateModel(model_name, reorder_paths, data, {
-	uid_type: Number,
-    uid_order_path: reorder_paths[0]
-})
-
-
+import imgSchema from '/src/cms/lib/models/schemas/img'
 //FORM
 import generateCreateForm from '/src/cms/lib/create/generateCreateForm'
 import generateEditForm from '/src/cms/lib/edit/generateEditForm'
 import image_styles from '/src/styles/images.module.sass'
 
+
 const page_name = 'home'
 const section_name = 'landing'
-const configs = {
-    title: `Landing Slide`,
-    pagePath: `/${page_name}/${section_name}`, 
-    filePath: `collections/${page_name}_${section_name}`, 
-    idPath: 'order', 
-    revalidate: ['/'], 
-    viewUrl: (v)=>'/', 
-    editUrl: undefined,
-    viewText: undefined,
-    editText: undefined,
-    isPageData: false,
+const model_name = `${page_name}_${section_name}-slides`
+const data = {
+	"enabled": {type: Boolean},
+	"order": {type: Number, min: 0, max: 1000000},
+	"title": {type: String},
+	"desc": {type: String},
+	"img": imgSchema
 }
-
 const generate_template = (primitives, setIV, valid) =>{
     const {text, textarea, checkbox, image, list, space} = primitives
     return [
@@ -54,6 +32,27 @@ const generate_template = (primitives, setIV, valid) =>{
     ]
 } 
 
+//MODEL
+const reorder_paths = ['order']
+const model = generateModel(model_name, reorder_paths, data, {
+	uid_type: Number,
+    uid_order_path: reorder_paths[0]
+})
+
+
+//FORM
+const configs = {
+    title: `Landing Slide`,
+    pagePath: `/${page_name}/${section_name}`, 
+    filePath: `collections/${page_name}_${section_name}`, 
+    idPath: 'order', 
+    revalidate: ['/'], 
+    viewUrl: (v)=>'/', 
+    editUrl: undefined,
+    viewText: undefined,
+    editText: undefined,
+    isPageData: false,
+}
 const [createValidationSchema, createForm] = generateCreateForm(configs, generate_template)
 const [editValidationSchema, editForm] = generateEditForm(configs, generate_template)
 

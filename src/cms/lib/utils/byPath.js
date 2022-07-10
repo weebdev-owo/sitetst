@@ -1,7 +1,7 @@
 export const getByPath = (obj, path) => {
     if (typeof path==='string'){path = path.split(".")}
     let res = obj
-    path.forEach(entry =>{res = res[entry]})
+    path.forEach(entry =>{res = res?.[entry]})
     return res
 }
 

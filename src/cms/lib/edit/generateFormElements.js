@@ -68,15 +68,15 @@ function decodeItem(item){
 
 //INITIAL VALUES
 const img = {
-    "original": undefined,
-    "cropped": undefined,
-    "url": "",
-    "alt": "edit for better seo"
+    "original": null,
+    "cropped": null,
+    "url": '',
+    "alt": ''
 }
 const primitiveInitialValue = {
     "text": () => '',
-    "textarea": () =>'', 
-    "checkbox": () => false, 
+    "textarea": () => '', 
+    "checkbox": () => null, 
     "image": () => img, 
     "list": () => [], 
 }

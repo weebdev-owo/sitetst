@@ -1,14 +1,17 @@
 import React, {memo, useRef, useState, useCallback, useEffect, useReducer, useMemo, createContext, useContext} from 'react'
 import styles from './cms.module.sass'
-import {Formik} from 'formik'
+import {Formik, useFormikContext} from 'formik'
 import * as Yup from 'yup'
 import  classNames  from 'classnames';
 import 'react-image-crop/dist/ReactCrop.css'
 import {setBgCol} from '/src/cms/lib/utils/setbg'
 import Upload from '/src/cms/lib/create/uploader'
 import { ConfigContext } from './configContext'
+// import { FormContext } from './formContext'
 import get_imgs from '/src/cms/lib/utils/get_imgs'
 import {getByPath, setByPath} from '/src/cms/lib/utils/byPath'
+
+import {FormContextProvider, useFormContext} from '/src/cms/lib/utils/FormContext'
 
 const initialUploadStore = {
     
@@ -32,7 +35,6 @@ const initialUploadStore = {
         isr_errors: []
     }
 }
-
 function uploadReducer(state, data){
     // console.log('reducer called', data)
     const assign = typeof data === 'string'
@@ -88,6 +90,8 @@ function CmsCreateForm({initialValues, validationSchema, children, ...props}){
 
     //Change body background and scroll when ref onscreen
     useEffect(() =>{setBgCol(false)}, [])
+
+
     
     const sendToAPI = async (values) => {
         console.log('submmiting', values)
@@ -112,6 +116,8 @@ function CmsCreateForm({initialValues, validationSchema, children, ...props}){
         <div id={'Create'} className={styles["form-cont"]}>
             <ConfigContext.Provider value={{initialValues, ...props}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
+                    {/* <ResetErrorScroll /> */}
+                    <FormContextProvider >
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         <div className={styles["heading"]}>{`Create ${cmsTitle}`}</div>
                         { children }
@@ -122,11 +128,14 @@ function CmsCreateForm({initialValues, validationSchema, children, ...props}){
                             <button type="submit" className={styles["submit"]}>{`Create ${cmsTitle}`}</button>   
                         </div>
                     </form>
+                    </FormContextProvider>
                 </>}}</Formik>
             </ConfigContext.Provider>
         </div>
     </>
 }
+
+
 
 CmsCreateForm = memo(CmsCreateForm)
 CmsCreateForm.defaultProps = {

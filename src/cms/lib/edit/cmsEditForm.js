@@ -12,6 +12,7 @@ import {QueryClient, QueryClientProvider as QueryProvider, useQuery, useQueries}
 import Spinner from '/src/cms/lib/comps/spinner/spinner'
 import get_imgs from '/src/cms/lib/utils/get_imgs'
 import {getByPath, setByPath} from '/src/cms/lib/utils/byPath'
+import {FormContextProvider, useFormContext} from '/src/cms/lib/utils/FormContext'
 
 
 //requires 
@@ -187,6 +188,7 @@ function CmsEditFormInner({initialValues, validationSchema, children, ...props})
         <div id={'Create'} className={styles["form-cont"]} >
             <ConfigContext.Provider value={{initialValues, ...props}}>
                 <Formik initialValues={initialValues} onSubmit={sendToAPI} validationSchema={validationSchema}>{(formik) =>{console.log();return <>
+                    <FormContextProvider>
                     <form className={styles["form"]} onSubmit={formik.handleSubmit} autoComplete="off">
                         <div className={styles["heading"]}>{`Edit ${cmsTitle}`}</div>
                         { children }
@@ -196,6 +198,7 @@ function CmsEditFormInner({initialValues, validationSchema, children, ...props})
                             <button type="submit" className={styles["submit"]}>{`Edit ${cmsTitle}`}</button>   
                         </div>
                     </form>
+                    </FormContextProvider>
                 </>}}</Formik>
             </ConfigContext.Provider>
         </div>

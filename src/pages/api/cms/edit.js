@@ -8,7 +8,7 @@ import update_document from '/src/cms/lib/api/update_document'
 export default async function handler (req, res) {
 
     const { data, initialId, newId, idPath, cmsFilePath, revalidatePaths, pageCms } = req.body
-
+    console.log('DATATAAA', data)
     const cms = await import(/* webpackIgnore: false */ /* webpackPreload: true */ /* webpackMode: "eager" */ 
         `/src/cms/data/${cmsFilePath}`
     )
@@ -16,10 +16,11 @@ export default async function handler (req, res) {
     const validationSchema = await cms.createValidationSchema
 
     try {
-        await validate_data(data, validationSchema)
+        const parsed_data = await validate_data(data, validationSchema)
+        console.log(parsed_data)
         await dbConnectCms()
         await does_id_exist(model, initialId, newId, idPath)
-        const updatedDocument = await update_document(data, model, initialId, newId)
+        const updatedDocument = await update_document(parsed_data, model, initialId, newId)
         const revalidationErrors = await revalidate(res, revalidatePaths)
         res.status(200).json({ 
             success: true, 
