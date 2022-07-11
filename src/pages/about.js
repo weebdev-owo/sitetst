@@ -1,6 +1,6 @@
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import getItemData from '/src/cms/lib/models/getitemData'
+import getItemData from '/src/cms/lib/models/getItemData'
 //frontend
 import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
 import Img from '/src/comp/image/img'
