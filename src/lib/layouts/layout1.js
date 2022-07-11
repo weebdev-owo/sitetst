@@ -25,8 +25,8 @@ const MobileNavContext = createContext({})
 
 export {ConfigContext, MobileWidthContext, BookContext, MobileNavContext}
 
-export default function Layout1({children}){
-    useEffect(()=>{setBgCol(false)},[])
+export default function Layout1({bgCol, startOffset, thirds, children}){
+    useEffect(()=>{setBgCol(bgCol || false)},[])
     const [ScrollDisableCount, setScrollDisableCount] = useState(0) //useToggleScrollv2
 
     //mobile queries
@@ -45,6 +45,7 @@ export default function Layout1({children}){
 
     return <>
         {/* <Thirds /> */}
+        {thirds ? <Thirds />:null}
         <ToggleScrollContext.Provider value={{ScrollDisableCount, setScrollDisableCount}}> 
         <MobileNavContext.Provider value={{mobileNavOpen, setMobileNavOpen}}>
         <MobileWidthContext.Provider value={isMobileWidth} >
@@ -52,6 +53,7 @@ export default function Layout1({children}){
         <BookContext.Provider value={{bookModal, bookOpen, setBookOpen}}>
         <ParallaxProvider>
             <TopBar />
+            {startOffset ? <div className={styles['topbar-offset']} />:null}
             {bookModal}
             <div className={styles['page']}>
                 {children}
@@ -113,7 +115,7 @@ function TopBar({}){
     if (!isMobileWidth) { return <>
         <div className={styles['topbar-cont']}><div className={styles['topbar']}>
             <div className={styles['logo']}>
-                <a><MainLogo className={styles['logo-item']} /></a>
+                <Link href={'/'}><a><MainLogo className={styles['logo-item']} /></a></Link>
             </div>
             <div className={styles['nav']}>
                 <NavBar elems={['Services', 'About', 'News',]} links = {['/services', '/about', '/news']} cta={['Book', '/book', setBookOpen]}/>
@@ -130,7 +132,6 @@ function TopBar({}){
             </div>
         </div>
         {mobileNavModal}
-        
     </>
 
 }

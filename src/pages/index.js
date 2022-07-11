@@ -86,6 +86,7 @@ function LandingSection({}){
 
 function Slide({src, alt, title, desc, children}){
     const isMobile = useContext(ConfigContext)
+    console.log(isMobile, 'RERERERERERER')
     const isMobileWidth = useContext(MobileWidthContext)
     if(!isMobileWidth) { return <>
         <div className={styles['slide-cont']}>
