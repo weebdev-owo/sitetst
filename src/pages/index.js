@@ -141,15 +141,16 @@ function Reasons({}){
 
 function Tab({src, alt, desc, children}){
     const isMobileWidth = useContext(MobileWidthContext)
+    const isMobile = useContext(ConfigContext)
     return <>
         <div className={styles['reason-cont2']}>
-            {!isMobileWidth ? <ParallaxImg src={src} styleIn={styles['bg52']} alt={alt}/>:null}
+            {!isMobileWidth ? <ParallaxImg src={src} disabled={isMobile} styleIn={styles['bg52']} alt={alt}/>:null}
             <div className={styles['reason-desc-cont2']}>
                 <div className={styles['reason-desc2']}>
                     {desc}
                 </div>
             </div>
-            {isMobileWidth ? <ParallaxImg src={src} styleIn={styles['bg52']} alt={alt}/>:null}
+            {isMobileWidth ? <ParallaxImg src={src} disabled={isMobile} styleIn={styles['bg52']} alt={alt}/>:null}
         </div>
     </>
 }
@@ -275,11 +276,12 @@ function ResultsSection({}){
 
 
 
-const ParallaxImg = ({src,img_order, alt, styleIn, speed}) => {
+const ParallaxImg = ({src,img_order, alt, styleIn, speed, disabled}) => {
     const ord_style = img_order ? {order: img_order}:{}
     return <>
         <ParallaxBanner className={styleIn} style={ord_style} layers={[{
             speed: speed || -20,
+            disabled: disabled,
             children: (<Img src={src} styleIn={styles['parallax-img']} alt={alt}/>),
         }]}/>
     </>
