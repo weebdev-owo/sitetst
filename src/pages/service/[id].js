@@ -1,6 +1,6 @@
 //backend
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
-import getPageData from '/src/cms/lib/models/getPageData'
+// import getPageData from '/src/cms/lib/models/getPageData'
 import getItemData from '/src/cms/lib/models/getItemData'
 
 //frontend
