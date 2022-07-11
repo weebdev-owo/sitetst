@@ -2,26 +2,16 @@
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
 import getItemData from '/src/cms/lib/models/getItemData'
 //frontend
-import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
+import {useContext} from 'react'
 import Img from '/src/comp/image/img'
 import styles from '/src/styles/home.module.sass'
 import Carousel from '/src/comp/carousel/small_car'
 import TabCarousel from '/src/comp/tabCarousel/small_car'
-import Thirds from '/src/lib/comps/thirds'
-import MainLogo from '/src/svg/mcfd_logo'
 // import NavBar from '/src/comp/nav/navbar'
 import Layout, {ConfigContext, MobileWidthContext, BookContext, MobileNavContext} from '/src/lib/layouts/layout1'
 import Link from 'next/link'
-import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
-import {setBgCol} from '/src/lib/utils/setbg'
-import getMobile from '/src/lib/utils/useIsMobile'
-import FadeUp from '/src/lib/animations/fadeup2'
-import useMobileWidth from '/src/lib/utils/useMobileWidth'
-import NavBurger from '/src/svg/nav_burger'
-import Modal from '/src/comp/modal/modal'
-import cn from 'classnames'
-// import useToggleScroll from '/src/lib/utils/toggleScrollv2'
-import ToggleScrollContext from '/src/lib/utils/toggleScrollContext'
+import {Parallax, ParallaxBanner} from 'react-scroll-parallax'
+
 
 
 export default function Page({services}){
@@ -153,13 +143,13 @@ function Tab({src, alt, desc, children}){
     const isMobileWidth = useContext(MobileWidthContext)
     return <>
         <div className={styles['reason-cont2']}>
-            {!isMobileWidth ? <Img src={src} styleIn={styles['bg52']} alt={alt}/>:null}
+            {!isMobileWidth ? <ParallaxImg src={src} styleIn={styles['bg52']} alt={alt}/>:null}
             <div className={styles['reason-desc-cont2']}>
                 <div className={styles['reason-desc2']}>
                     {desc}
                 </div>
             </div>
-            {isMobileWidth ? <Img src={src} styleIn={styles['bg52']} alt={alt}/>:null}
+            {isMobileWidth ? <ParallaxImg src={src} styleIn={styles['bg52']} alt={alt}/>:null}
         </div>
     </>
 }
@@ -180,15 +170,16 @@ function Services({}){
     const isMobile = useContext(ConfigContext)
     return <>
         <Parallax opacity={[4, -1]} disabled={isMobile} className={styles['services']}>
-            <FadeUp dist={10} disabled={isMobileWidth}><Service src={'/tree.png'} alt={'alt'}>{['Service 1', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={4} disabled={isMobileWidth}><Service src={'/nature/desert2.jpg'} alt={'alt'}>{['Service 2', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={6} disabled={isMobileWidth}><Service src={'/nani.png'} alt={'alt'}>{['Service 3', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={12} disabled={isMobileWidth}><Service src={'/car1.jpg'} alt={'alt'}>{['Service 4', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={8} disabled={isMobileWidth}><Service src={'/car2.jpg'} alt={'alt'}>{['Service 5', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={15} disabled={isMobileWidth}><Service src={'/nature/cave2.jpg'} alt={'alt'}>{['Service 6', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={16} disabled={isMobileWidth}><Service src={'/nature/ice2.jpg'} alt={'alt'}>{['Service 7', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={6} disabled={isMobileWidth}><Service src={'/dnt1.jpg'} alt={'alt'}>{['Service 8', 'Dolor en feit en nuim veri']}</Service></FadeUp>
-            <FadeUp dist={12} disabled={isMobileWidth}><Service src={'/nature/lava1.jpg'} alt={'alt'}>{['Service 9', 'Dolor en feit en nuim veri']}</Service></FadeUp>
+           <Service src={'/tree.png'} alt={'alt'}>{['Service 1', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nature/desert2.jpg'} alt={'alt'}>{['Service 2', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nani.png'} alt={'alt'}>{['Service 3', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/car1.jpg'} alt={'alt'}>{['Service 4', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/car2.jpg'} alt={'alt'}>{['Service 5', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nature/cave2.jpg'} alt={'alt'}>{['Service 6', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nature/ice2.jpg'} alt={'alt'}>{['Service 7', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/dnt1.jpg'} alt={'alt'}>{['Service 8', 'Dolor en feit en nuim veri']}</Service>
+            <Service src={'/nature/lava1.jpg'} alt={'alt'}>{['Service 9', 'Dolor en feit en nuim veri']}</Service>
+            {/* <FadeUp dist={12} disabled={isMobileWidth}><Service src={'/nature/lava1.jpg'} alt={'alt'}>{['Service 9', 'Dolor en feit en nuim veri']}</Service></FadeUp> */}
         </Parallax>
     </>
 }
@@ -254,7 +245,7 @@ function Member({src, alt, order, name, role, desc}){
     const member_text_class = order%2 ? styles['member-text-right']:styles['member-text-left']
     const isMobileWidth = useContext(MobileWidthContext)
     if(!isMobileWidth) { return <>
-        <Img src={src} styleIn={styles['img3']} cStyle={{order: img_order}} alt={alt}/>   
+        <ParallaxImg src={src} styleIn={styles['img3']} img_order={img_order} cStyle={{order: img_order}} alt={alt}/>   
         <div className={member_text_class} style={{order: text_order}}>
             <div className={styles['member-name']}>{name}</div>
             <div className={styles['member-role']}>{role}</div>
@@ -284,3 +275,12 @@ function ResultsSection({}){
 
 
 
+const ParallaxImg = ({src,img_order, alt, styleIn, speed}) => {
+    const ord_style = img_order ? {order: img_order}:{}
+    return <>
+        <ParallaxBanner className={styleIn} style={ord_style} layers={[{
+            speed: speed || -20,
+            children: (<Img src={src} styleIn={styles['parallax-img']} alt={alt}/>),
+        }]}/>
+    </>
+}

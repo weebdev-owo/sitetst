@@ -1,3 +1,4 @@
+@import '/src/styles/vars.sass'
 /*///////////////////////////////////////////////RESET///////////////////////////////////////////////*/
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -62,6 +63,14 @@ body
   transition: 500ms background ease-in
   scroll-snap-type: y proximity
   scroll-behavior: smooth
+  font-weight: 300
+
+@media (max-width: $mobile-width) 
+  body
+    font-family: Lucida Sans,Lucida 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+    font-weight: 400
+    font-family: Georgia
+    // font-family: Sen , sans-serif
 
 html
   scroll-snap-type: y proximity

@@ -3,7 +3,12 @@
     display: grid
     width: 100vw
     // color: white
-    font-weight: 1
+//     font-weight: 1
+// @media (max-width: $mobile-width) 
+//     .page
+//         font-weight: 400
+//         font-family: Georgia
+
 
 //TOPBAR///////////////////////////////////////////////////////////////////////////////
 $bottom-line: 3px
@@ -382,7 +387,7 @@ $bottom-line: 3px
 .img2
     width: 100%
     height: 100%
-    filter: brightness(90%)
+    filter: brightness(60%)
     // position: absolute
     // top:0
     // left:0
@@ -467,7 +472,8 @@ $bottom-line: 3px
 .reasons
     position: relative
     width: 100%
-    height: max(70vh, 600px)
+    height: 70vh
+    min-height: 400px
     max-width: 2000px
     z-index: 1
     overflow: hidden
@@ -534,9 +540,9 @@ $bottom-line: 3px
 
 
 .reason-desc2
-    color: white
+    color: grey
     padding: min(40px, 4vw)
-    font-size: min(40px, 4vw)
+    font-size: min(40px, 4vw, 4vh)
     width: 100%
     // height: fit-content
     // min-height: max(200px, 30%)
@@ -548,6 +554,7 @@ $bottom-line: 3px
     //     color: white
     //     transition: color 1000ms
     z-index: 1000
+    filter: brightness(120%)
 
 .bg52
     width: 100%
@@ -660,8 +667,12 @@ $bottom-line: 3px
     .member-text
         padding: 20px
         padding-bottom: 4vh
+    .member-desc
+        padding-bottom: 40px
 
-
+.parallax-img
+    height: 90%
+    width: 100%
   
 .tst1
     width: 100%

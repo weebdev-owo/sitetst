@@ -1,12 +1,12 @@
 //frontend
-import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
+import {useEffect, useState, createContext, useContext, useMemo} from 'react'
 import styles from '/src/styles/home.module.sass'
 
 import Thirds from '/src/lib/comps/thirds'
 import MainLogo from '/src/svg/mcfd_logo'
 // import NavBar from '/src/comp/nav/navbar'
 import Link from 'next/link'
-import {useParallax, Parallax, ParallaxProvider} from 'react-scroll-parallax'
+import {ParallaxProvider} from 'react-scroll-parallax'
 import {setBgCol} from '/src/lib/utils/setbg'
 import getMobile from '/src/lib/utils/useIsMobile'
 import useMobileWidth from '/src/lib/utils/useMobileWidth'

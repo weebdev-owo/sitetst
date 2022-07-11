@@ -2,26 +2,15 @@
 import dbConnect from '/src/cms/lib/api/mongoose_connect'
 import getItemData from '/src/cms/lib/models/getItemData'
 //frontend
-import {useRef, useEffect, useState, createContext, useContext, useMemo} from 'react'
+import {useContext} from 'react'
 import Img from '/src/comp/image/img'
 import styles from '/src/styles/services.module.sass'
-import Carousel from '/src/comp/carousel/small_car'
-import TabCarousel from '/src/comp/tabCarousel/small_car'
-import Thirds from '/src/lib/comps/thirds'
-import MainLogo from '/src/svg/mcfd_logo'
+
 // import NavBar from '/src/comp/nav/navbar'
 import Layout, {ConfigContext, MobileWidthContext, BookContext, MobileNavContext} from '/src/lib/layouts/layout1'
 import Link from 'next/link'
-import {useParallax, Parallax, ParallaxProvider, ParallaxBanner} from 'react-scroll-parallax'
-import {setBgCol} from '/src/lib/utils/setbg'
-import getMobile from '/src/lib/utils/useIsMobile'
-import FadeUp from '/src/lib/animations/fadeup2'
-import useMobileWidth from '/src/lib/utils/useMobileWidth'
-import NavBurger from '/src/svg/nav_burger'
-import Modal from '/src/comp/modal/modal'
-import cn from 'classnames'
-// import useToggleScroll from '/src/lib/utils/toggleScrollv2'
-import ToggleScrollContext from '/src/lib/utils/toggleScrollContext'
+import {ParallaxBanner} from 'react-scroll-parallax'
+
 
 
 export default function Page({services}){
@@ -58,10 +47,7 @@ function ServicesSection({}){
                 <div className={styles['intro-desc']}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</div> 
             </div>
             <Members />
-            <div className={styles['intro']}>
-                <div className={styles['intro-title']}>Services</div> 
-                <div className={styles['intro-desc']}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</div> 
-            </div>
+
         </div>
     </>
 }
@@ -99,7 +85,7 @@ function Member({src, alt, order, name, desc}){
     const isMobileWidth = useContext(MobileWidthContext)
     if(!isMobileWidth) { return <>
         {/* <Img src={src} styleIn={styles['img3']} cStyle={{order: img_order}} alt={alt}/> */}
-        <ParallaxImg src={src} alt={alt} img_order={img_order} />
+        <ParallaxImg src={src} alt={alt} img_order={img_order} styleIn={styles['img3']}/>
         <div className={member_text_class} style={{order: text_order}}>
                 <Link href={`/`}><a className={styles['service-text-cont']}>
                     <div className={styles['member-name']}>{name}</div>
@@ -120,13 +106,12 @@ function Member({src, alt, order, name, desc}){
     </>
 }
 
-const ParallaxImg = ({src,img_order, alt}) => {
+const ParallaxImg = ({src,img_order, alt, styleIn, speed}) => {
+    const ord_style = img_order ? {order: img_order}:{}
     return <>
-        <div style={{order: img_order}}>
-            <ParallaxBanner className={styles['img3']} layers={[{
-                speed: -10,
-                children: (<Img src={src} styleIn={styles['img3']} alt={alt}/>),
-            }]}/>
-        </div>
+        <ParallaxBanner className={styleIn} style={ord_style} layers={[{
+            speed: speed || -20,
+            children: (<Img src={src} styleIn={styles['parallax-img']} alt={alt}/>),
+        }]}/>
     </>
 }
