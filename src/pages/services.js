@@ -58,6 +58,10 @@ function ServicesSection({}){
                 <div className={styles['intro-desc']}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</div> 
             </div>
             <Members />
+            <div className={styles['intro']}>
+                <div className={styles['intro-title']}>Services</div> 
+                <div className={styles['intro-desc']}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</div> 
+            </div>
         </div>
     </>
 }
